@@ -1,0 +1,128 @@
+{
+  "navigation_deadlock_about_blank": {
+    "symptom": "Host app stuck, no Navigate API call after initialization",
+    "rootCause": "XAML/host control waits for NavigationCompleted (about:blank) which is intentionally suppressed by WebView2 via initializing_navigation_id_ check",
+    "evidence": [
+      "Zero API=3 (Navigate) events in trace for failure PID",
+      "Long gap (>5s) with XAML animation frames but zero API calls",
+      "about:blank navigation completes fast (<5ms) in browser process",
+      "add_NavigationCompleted (API=37) registered AFTER about:blank commits"
+    ],
+    "classification": "Initialization Race Condition",
+    "resolution": [
+      "Remove about:blank event suppression (check IsEdgeWebViewCancelInitialNavigationEnabled flag)",
+      "Add a new ready-to-navigate signal after about:blank completes",
+      "Fix host/XAML control to not wait for NavigationCompleted before calling Navigate(Source)"
+    ],
+    "codeReferences": [
+      "embedded_browser_impl.cc lines 6893-6910 (NavigationCompleted suppression)",
+      "embedded_browser_impl.h line 1309 (initializing_navigation_id_)",
+      "webview_core.cc lines 935-972 (Navigate() has no init gate)"
+    ]
+  },
+  "event_handler_registration_race": {
+    "symptom": "Event handler registered after the event already fired",
+    "rootCause": "Host registers event handlers (e.g., add_NavigationCompleted) in CreateCoreWebView2ControllerCompleted callback, but the about:blank navigation may complete before handler registration",
+    "evidence": [
+      "API call for add_* (handler registration) timestamp is AFTER the event's expected fire time",
+      "Event fired in browser process but no corresponding WebView2_Event in host process"
+    ],
+    "classification": "Timing/Race Condition",
+    "resolution": [
+      "Register handlers before creating the controller (if API allows)",
+      "Use environment-level handlers that persist across navigations",
+      "Add handlers in the earliest possible callback"
+    ],
+    "codeReferences": []
+  },
+  "cold_start_timeout": {
+    "symptom": "WebView2 creation takes >5 seconds, may timeout",
+    "rootCause": "Cold start requires launching browser process, loading DLLs, initializing V8 engine. In VDI environments, DLL loading can take 10-30 seconds.",
+    "evidence": [
+      "WebView2_WebViewProcessLaunchType = 0 (cold)",
+      "WebView2_Creation_Client duration >5000ms",
+      "Large gaps in DLL loading (OnModuleEvent)"
+    ],
+    "classification": "Performance / Environment",
+    "resolution": [
+      "Pre-warm WebView2 at app startup",
+      "Use fixed version runtime to avoid version discovery",
+      "Check VDI environment (Citrix, VMware) for disk I/O bottlenecks"
+    ],
+    "codeReferences": []
+  },
+  "wam_token_failure": {
+    "symptom": "Authentication fails, page shows sign-in error",
+    "rootCause": "WAM (Web Account Manager) token request fails or times out",
+    "evidence": [
+      "WebTokenRequestResultOperation_ActivityStop with status != 0",
+      "WebTokenRequestResultOperation_ActivityError with non-zero hresult",
+      "Missing or delayed TokenBroker events"
+    ],
+    "classification": "Authentication Failure",
+    "resolution": [
+      "Check network connectivity (0x800704CF = network unreachable)",
+      "Verify AAD/MSA account health",
+      "Check if token cache is corrupted"
+    ],
+    "codeReferences": []
+  },
+  "vdi_dll_loading_delay": {
+    "symptom": "First WebView2 navigation extremely slow (10-30s) but subsequent ones fast",
+    "rootCause": "VDI/Citrix environment streams DLLs over network. First load of msedge.dll (~300MB) takes seconds.",
+    "evidence": [
+      "CommitToDidCommit browser-side >5s",
+      "DLL load gaps >1s between system DLLs",
+      "Citrix PVS/BrokerAgent processes present",
+      "Cold vs warm incarnation speedup >10x"
+    ],
+    "classification": "Performance",
+    "resolution": [
+      "Pre-cache WebView2 runtime DLLs at VDI image build",
+      "Use persistent write-back cache for PVS vDisks",
+      "Pin WebView2 runtime to local SSD/RAM cache",
+      "Exclude WebView2 dir from AV scanning",
+      "Pre-launch hidden WebView2 instance to warm cache",
+      "Consider Fixed Version deployment"
+    ],
+    "codeReferences": []
+  },
+  "service_worker_cold_activation": {
+    "symptom": "First navigation to PWA or SW-controlled page very slow",
+    "rootCause": "Service worker needs cold activation before fetch handler runs. ForwardServiceWorkerToWorkerReady phase dominates.",
+    "evidence": [
+      "ForwardServiceWorkerToWorkerReady >1s",
+      "EmbeddedWorkerInstance::Start present",
+      "First navigation slow, subsequent fast",
+      "SW status transitions visible"
+    ],
+    "classification": "Performance",
+    "resolution": [
+      "Pre-warm service worker at app startup",
+      "Bypass SW for initial navigation",
+      "Use navigation preload",
+      "Optimize SW activation code"
+    ],
+    "codeReferences": [
+      "service_worker_main_resource_loader.cc"
+    ]
+  },
+  "wam_network_failure": {
+    "symptom": "WebView2 navigation hangs waiting for authentication token",
+    "rootCause": "WAM (Web Account Manager) token request fails due to network unreachable or server error, blocking navigation that needs auth.",
+    "evidence": [
+      "WebTokenRequestResultOperation_ActivityError present",
+      "hresult 0x800704CF (network unreachable) or 0x80190190 (400)",
+      "Long DurationTotal_ms in ActivityStop",
+      "isCacheHit=false"
+    ],
+    "classification": "Authentication Failure",
+    "resolution": [
+      "Check network connectivity",
+      "Verify AAD endpoint reachability",
+      "Enable token caching",
+      "Implement timeout for auth-dependent navigations"
+    ],
+    "codeReferences": []
+  }
+}

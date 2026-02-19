@@ -1,0 +1,36 @@
+{
+  "name": "webview2-etw-mcp-server",
+  "version": "1.0.0",
+  "description": "MCP server for WebView2 ETW/ETL trace analysis — 11 tools, 189 events, auto-learning knowledge base",
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "webview2-etw-mcp": "dist/index.js"
+  },
+  "files": [
+    "dist/",
+    "knowledge/",
+    "README.md",
+    "TOOLS_GUIDE.md"
+  ],
+  "scripts": {
+    "build": "tsc && npm run copy-knowledge",
+    "copy-knowledge": "node -e \"const fs=require('fs');const p=require('path');fs.mkdirSync('knowledge',{recursive:true});['api_ids.json','events.json','root_causes.json','timing_baselines.json'].forEach(f=>fs.copyFileSync(p.join('src','knowledge',f),p.join('knowledge',f)))\"",
+    "prepublishOnly": "npm run build",
+    "start": "node dist/index.js",
+    "dev": "tsx src/index.ts",
+    "test": "tsx src/test.ts"
+  },
+  "keywords": ["webview2", "etw", "etl", "mcp", "analysis", "edge", "chromium", "debugging"],
+  "author": "krbharadwaj@microsoft.com",
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.26.0",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@types/node": "^25.3.0",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
+  }
+}

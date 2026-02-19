@@ -1,0 +1,1866 @@
+{
+  "WebView2_FactoryCreate": {
+    "description": "Factory instantiation — first step in WebView2 creation",
+    "category": "Factory & Creation",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [
+      "WebView2_FactoryAcquired",
+      "WebView2_FactoryConnectionError"
+    ]
+  },
+  "WebView2_FactoryAcquired": {
+    "description": "Factory ready for use after creation",
+    "category": "Factory & Creation",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [
+      "WebView2_FactoryCreate"
+    ]
+  },
+  "WebView2_FactoryConnectionError": {
+    "description": "Factory IPC connection failed",
+    "category": "Factory & Creation",
+    "severity": "Critical",
+    "params": [],
+    "relatedEvents": [
+      "WebView2_FactoryCreate"
+    ]
+  },
+  "WebView2_FactoryAddRef": {
+    "description": "Factory reference count incremented",
+    "category": "Factory & Creation",
+    "severity": "Debug",
+    "params": [],
+    "relatedEvents": [
+      "WebView2_FactoryRelease"
+    ]
+  },
+  "WebView2_FactoryRelease": {
+    "description": "Factory reference count decremented",
+    "category": "Factory & Creation",
+    "severity": "Debug",
+    "params": [],
+    "relatedEvents": [
+      "WebView2_FactoryAddRef",
+      "WebView2_FactoryDeleted"
+    ]
+  },
+  "WebView2_FactoryDeleted": {
+    "description": "Factory destroyed after last release",
+    "category": "Factory & Creation",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [
+      "WebView2_FactoryRelease"
+    ]
+  },
+  "WebView2_FactoryMapErased": {
+    "description": "Factory removed from global map during cleanup",
+    "category": "Factory & Creation",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [
+      "WebView2_FactoryDeleted"
+    ]
+  },
+  "WebView2_FactoryReleaseGlobal": {
+    "description": "Global factory reference released",
+    "category": "Factory & Creation",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [
+      "WebView2_FactoryRelease"
+    ]
+  },
+  "WebView2_FactoryUnregister": {
+    "description": "Factory deregistered from system",
+    "category": "Factory & Creation",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [
+      "WebView2_FactoryCreate"
+    ]
+  },
+  "WebView2_FactoryIOthread": {
+    "description": "Factory I/O thread operation",
+    "category": "Factory & Creation",
+    "severity": "Debug",
+    "params": [],
+    "relatedEvents": [
+      "WebView2_FactoryCreate"
+    ]
+  },
+  "WebView2_Creation_Client": {
+    "description": "Async WebView2 creation (BEGIN/END pair). Duration = creation time.",
+    "category": "Factory & Creation",
+    "severity": "Info",
+    "params": [
+      {
+        "index": 1,
+        "name": "hr",
+        "type": "HRESULT",
+        "description": "Result code (0=success)"
+      }
+    ],
+    "relatedEvents": [
+      "WebView2_CreationTime",
+      "WebView2_CreationFailure"
+    ]
+  },
+  "WebView2_CreationTime": {
+    "description": "WebView2 creation timing in milliseconds",
+    "category": "Factory & Creation",
+    "severity": "Info",
+    "params": [
+      {
+        "index": 1,
+        "name": "durationMs",
+        "type": "int",
+        "description": "Creation duration in ms"
+      }
+    ],
+    "relatedEvents": [
+      "WebView2_Creation_Client"
+    ]
+  },
+  "WebView2_CreationFailure": {
+    "description": "WebView2 creation failed",
+    "category": "Factory & Creation",
+    "severity": "Critical",
+    "params": [
+      {
+        "index": 1,
+        "name": "hr",
+        "type": "HRESULT",
+        "description": "Error code"
+      }
+    ],
+    "relatedEvents": [
+      "WebView2_Creation_Client"
+    ]
+  },
+  "WebView2_CreationFailureExe": {
+    "description": "Executable-specific WebView2 creation failure",
+    "category": "Factory & Creation",
+    "severity": "Critical",
+    "params": [],
+    "relatedEvents": [
+      "WebView2_CreationFailure"
+    ]
+  },
+  "WebView2_WebViewProcessLaunchType": {
+    "description": "Process launch type: 0=cold start, 1=warm start",
+    "category": "Factory & Creation",
+    "severity": "Info",
+    "params": [
+      {
+        "index": 1,
+        "name": "launchType",
+        "type": "int",
+        "description": "0=cold, 1=warm"
+      }
+    ],
+    "relatedEvents": [
+      "WebView2_Creation_Client"
+    ]
+  },
+  "WebView2_CustomCreationTimeout": {
+    "description": "Custom timeout set for WebView2 creation",
+    "category": "Factory & Creation",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [
+      "WebView2_Creation_Client"
+    ]
+  },
+  "WebView2_APICalled": {
+    "description": "WebView2 API method invoked. Field1 = API ID (see api_ids.json).",
+    "category": "API",
+    "severity": "Info",
+    "params": [
+      {
+        "index": 1,
+        "name": "apiId",
+        "type": "int",
+        "description": "API ID — decode with decode_api_id tool"
+      },
+      {
+        "index": 2,
+        "name": "hr",
+        "type": "HRESULT",
+        "description": "Result code"
+      }
+    ],
+    "relatedEvents": [
+      "WebView2_Event"
+    ]
+  },
+  "WebView2_Event": {
+    "description": "Event dispatched to host app. Field contains handler interface name.",
+    "category": "Event Dispatch",
+    "severity": "Info",
+    "params": [
+      {
+        "index": 1,
+        "name": "handlerName",
+        "type": "string",
+        "description": "Handler interface (e.g., ICoreWebView2NavigationStartingEventHandler)"
+      }
+    ],
+    "relatedEvents": [
+      "WebView2_APICalled",
+      "WebView2_InvokeFinished"
+    ]
+  },
+  "WebView2_InvokeFinished": {
+    "description": "Event handler returned to WebView2",
+    "category": "Event Dispatch",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [
+      "WebView2_Event"
+    ]
+  },
+  "WebView2_DeferralCompleted": {
+    "description": "Deferral completed — event processing can continue",
+    "category": "Event Dispatch",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [
+      "WebView2_Event"
+    ]
+  },
+  "WebView2_NoEventDispatcher": {
+    "description": "No dispatcher registered for this event type",
+    "category": "Event Dispatch",
+    "severity": "Warning",
+    "params": [],
+    "relatedEvents": [
+      "WebView2_DroppedEvent"
+    ]
+  },
+  "WebView2_DroppedEvent": {
+    "description": "Event dropped — handler not available or error occurred",
+    "category": "Event Dispatch",
+    "severity": "Warning",
+    "params": [],
+    "relatedEvents": [
+      "WebView2_NoEventDispatcher"
+    ]
+  },
+  "WebView2_DroppedEventConstructObjectError": {
+    "description": "Event object construction failed, event dropped",
+    "category": "Event Dispatch",
+    "severity": "Error",
+    "params": [],
+    "relatedEvents": [
+      "WebView2_DroppedEvent"
+    ]
+  },
+  "WebView2_NewNavigationContext": {
+    "description": "Main-frame navigation context created",
+    "category": "Navigation",
+    "severity": "Info",
+    "params": [
+      {
+        "index": 1,
+        "name": "navigationId",
+        "type": "int64",
+        "description": "Unique navigation ID"
+      }
+    ],
+    "relatedEvents": [
+      "WebView2_SetPendingNavigation",
+      "WebView2_HasPendingNavigation"
+    ]
+  },
+  "WebView2_NewFrameNavigationContext": {
+    "description": "Iframe navigation context created",
+    "category": "Navigation",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [
+      "WebView2_NewNavigationContext"
+    ]
+  },
+  "WebView2_SetPendingNavigation": {
+    "description": "Navigation queued as pending",
+    "category": "Navigation",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [
+      "WebView2_HasPendingNavigation"
+    ]
+  },
+  "WebView2_HasPendingNavigation": {
+    "description": "Check/clear for pending navigation",
+    "category": "Navigation",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [
+      "WebView2_SetPendingNavigation"
+    ]
+  },
+  "WebView2_DifferentNavigationId": {
+    "description": "Navigation ID mismatch — may indicate stale navigation",
+    "category": "Navigation",
+    "severity": "Warning",
+    "params": [],
+    "relatedEvents": [
+      "WebView2_NewNavigationContext"
+    ]
+  },
+  "WebView2_FirstNavigationTime": {
+    "description": "Time of first navigation in milliseconds",
+    "category": "Navigation",
+    "severity": "Info",
+    "params": [
+      {
+        "index": 1,
+        "name": "durationMs",
+        "type": "int",
+        "description": "First navigation time in ms"
+      }
+    ],
+    "relatedEvents": [
+      "WebView2_FirstNavigationFailed"
+    ]
+  },
+  "WebView2_FirstNavigationFailed": {
+    "description": "First navigation attempt failed",
+    "category": "Navigation",
+    "severity": "Critical",
+    "params": [],
+    "relatedEvents": [
+      "WebView2_FirstNavigationTime"
+    ]
+  },
+  "WebView2_NullFirstNavBeginTime": {
+    "description": "Abnormal: first navigation begin time is null",
+    "category": "Navigation",
+    "severity": "Warning",
+    "params": [],
+    "relatedEvents": [
+      "WebView2_FirstNavigationTime"
+    ]
+  },
+  "WebView2_BrowserProcessFailure": {
+    "description": "Browser process crashed or exited unexpectedly",
+    "category": "Error",
+    "severity": "Critical",
+    "params": [],
+    "relatedEvents": [
+      "WebView2_ProcessExited",
+      "WebView2_BrowserProcessExit"
+    ]
+  },
+  "WebView2_ProcessFailureTypeWithReason": {
+    "description": "Process failure with categorized reason",
+    "category": "Error",
+    "severity": "Critical",
+    "params": [
+      {
+        "index": 1,
+        "name": "failureType",
+        "type": "int",
+        "description": "Failure type enum"
+      },
+      {
+        "index": 2,
+        "name": "reason",
+        "type": "string",
+        "description": "Failure reason"
+      }
+    ],
+    "relatedEvents": [
+      "WebView2_BrowserProcessFailure"
+    ]
+  },
+  "WebView2_ProcessFailureTypeWithExitCode": {
+    "description": "Process failure with exit code",
+    "category": "Error",
+    "severity": "Critical",
+    "params": [
+      {
+        "index": 1,
+        "name": "exitCode",
+        "type": "int",
+        "description": "Process exit code"
+      }
+    ],
+    "relatedEvents": [
+      "WebView2_BrowserProcessFailure"
+    ]
+  },
+  "WebView2_RendererUnresponsive": {
+    "description": "Renderer process is not responding (hung)",
+    "category": "Error",
+    "severity": "Critical",
+    "params": [],
+    "relatedEvents": [
+      "WebView2_ProcessExited"
+    ]
+  },
+  "WebView2_ProcessExited": {
+    "description": "A WebView2 process exited",
+    "category": "Process",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [
+      "WebView2_BrowserProcessExit"
+    ]
+  },
+  "WebView2_BrowserProcessExit": {
+    "description": "Browser process terminated",
+    "category": "Process",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [
+      "WebView2_ProcessExited"
+    ]
+  },
+  "WebView2_ShuttingDown": {
+    "description": "Browser process shutting down gracefully",
+    "category": "Process",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [
+      "WebView2_CloseBrowserWindows"
+    ]
+  },
+  "WebView2_CloseBrowserWindows": {
+    "description": "Browser windows being closed during shutdown",
+    "category": "Process",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [
+      "WebView2_ShuttingDown"
+    ]
+  },
+  "WebView2_IncompatibleConfig": {
+    "description": "Configuration mismatch between host and WebView2",
+    "category": "Error",
+    "severity": "Error",
+    "params": [],
+    "relatedEvents": []
+  },
+  "WebView2_IncompatibleDPI": {
+    "description": "DPI configuration conflict between host and WebView2",
+    "category": "Error",
+    "severity": "Warning",
+    "params": [],
+    "relatedEvents": [
+      "WebView2_SetDpiAwareness_Failed"
+    ]
+  },
+  "WebView2_FailedToLoadProfile": {
+    "description": "Profile loading error — may affect settings and data",
+    "category": "Error",
+    "severity": "Error",
+    "params": [],
+    "relatedEvents": []
+  },
+  "WebView2_SetDpiAwareness_Failed": {
+    "description": "DPI awareness configuration failed",
+    "category": "Error",
+    "severity": "Warning",
+    "params": [],
+    "relatedEvents": [
+      "WebView2_IncompatibleDPI"
+    ]
+  },
+  "WebView2_FGBoost ProcID": {
+    "description": "Foreground boost applied — tracks PIDs being boosted",
+    "category": "Performance",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [
+      "WebView2_FGBoost Boosted"
+    ]
+  },
+  "WebView2_FGBoost Boosted": {
+    "description": "Foreground boost successfully applied",
+    "category": "Performance",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [
+      "WebView2_FGBoost ProcID"
+    ]
+  },
+  "WebView2_SetMemoryPressure": {
+    "description": "Memory pressure level changed",
+    "category": "Memory",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [
+      "WebView2_TrimNonRendererWorkingSet"
+    ]
+  },
+  "WebView2_TrimNonRendererWorkingSet": {
+    "description": "Memory trimmed from non-renderer processes",
+    "category": "Memory",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [
+      "WebView2_SetMemoryPressure"
+    ]
+  },
+  "WebView2_UpdateAllWebViewFrozenStatus": {
+    "description": "WebView freeze state changed (suspended/resumed)",
+    "category": "Memory",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": []
+  },
+  "WebView2_ResponseLoadingCanceled": {
+    "description": "Network response loading was cancelled",
+    "category": "Network",
+    "severity": "Warning",
+    "params": [],
+    "relatedEvents": [
+      "WebView2_ResponseLoadingBlocked"
+    ]
+  },
+  "WebView2_ResponseLoadingBlocked": {
+    "description": "Network response loading was blocked (e.g., by filter)",
+    "category": "Network",
+    "severity": "Warning",
+    "params": [],
+    "relatedEvents": [
+      "WebView2_ResponseLoadingCanceled"
+    ]
+  },
+  "WebView2_SDKVersion": {
+    "description": "SDK version details logged at startup",
+    "category": "Debugging",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [
+      "WebView2_SDKVersionFolder"
+    ]
+  },
+  "WebView2_SDKVersionFolder": {
+    "description": "SDK version folder path information",
+    "category": "Debugging",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [
+      "WebView2_SDKVersion"
+    ]
+  },
+  "WebView2_BrowserMode": {
+    "description": "Browser mode configuration logged",
+    "category": "Debugging",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [
+      "WebView2_UnexpectedBrowserMode"
+    ]
+  },
+  "WebView2_UnexpectedBrowserMode": {
+    "description": "Browser mode validation error — unexpected mode detected",
+    "category": "Error",
+    "severity": "Error",
+    "params": [],
+    "relatedEvents": [
+      "WebView2_BrowserMode"
+    ]
+  },
+  "WebView2_CodeIntegrity": {
+    "description": "Code integrity validation result",
+    "category": "Security",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": []
+  },
+  "WebView2_AdminElevationTypeDefault": {
+    "description": "Admin elevation type detected for the process",
+    "category": "Security",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": []
+  },
+  "WebView2_GetAccessToken_Failed": {
+    "description": "Access token retrieval failed",
+    "category": "Security",
+    "severity": "Error",
+    "params": [],
+    "relatedEvents": []
+  },
+  "WebView2_OnNcDestroy": {
+    "description": "Window receiving WM_NCDESTROY message",
+    "category": "Lifecycle",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": []
+  },
+  "WebView2_MemoryUsage": {
+    "description": "Memory usage reporting event",
+    "category": "Memory",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": []
+  },
+  "WebView2_Abydos_HandwritingNotInitialized": {
+    "description": "Handwriting system not ready",
+    "category": "Input & Text",
+    "severity": "Warning",
+    "params": [],
+    "relatedEvents": []
+  },
+  "WebView2_Abydos_NoPendingTargetArgs": {
+    "description": "Missing input target arguments",
+    "category": "Input & Text",
+    "severity": "Warning",
+    "params": [],
+    "relatedEvents": []
+  },
+  "WebView2_Abydos_RequestHandwriting": {
+    "description": "Handwriting request processing",
+    "category": "Input & Text",
+    "severity": "Debug",
+    "params": [],
+    "relatedEvents": []
+  },
+  "WebView2_Abydos_UnsupportedAbydosAction": {
+    "description": "Unsupported input action",
+    "category": "Input & Text",
+    "severity": "Warning",
+    "params": [],
+    "relatedEvents": []
+  },
+  "WebView2_Abydos_UnsupportedAbydosResponse": {
+    "description": "Unsupported input response",
+    "category": "Input & Text",
+    "severity": "Warning",
+    "params": [],
+    "relatedEvents": []
+  },
+  "WebView2_AudioStatus": {
+    "description": "Audio playback status changes",
+    "category": "Media",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": []
+  },
+  "WebView2_GameAssistAudioStatus": {
+    "description": "Game assist audio status",
+    "category": "Media",
+    "severity": "Debug",
+    "params": [],
+    "relatedEvents": []
+  },
+  "WebView2_ClientTelemetry": {
+    "description": "Client-specific telemetry events",
+    "category": "Telemetry",
+    "severity": "Debug",
+    "params": [],
+    "relatedEvents": []
+  },
+  "WebView2_CollectingSuspendMemory": {
+    "description": "Memory collection in progress during suspend",
+    "category": "Memory",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [
+      "WebView2_CollectSuspendMemoryRequested",
+      "WebView2_CollectSuspendMemoryCancelled"
+    ]
+  },
+  "WebView2_CollectSuspendMemoryCancelled": {
+    "description": "Memory collection cancelled during suspend",
+    "category": "Memory",
+    "severity": "Warning",
+    "params": [],
+    "relatedEvents": [
+      "WebView2_CollectSuspendMemoryRequested"
+    ]
+  },
+  "WebView2_CollectSuspendMemoryRequested": {
+    "description": "Memory collection requested during suspend",
+    "category": "Memory",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [
+      "WebView2_CollectingSuspendMemory",
+      "WebView2_SuspendMemory"
+    ]
+  },
+  "WebView2_SuspendMemory": {
+    "description": "Memory suspension operations",
+    "category": "Memory",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [
+      "WebView2_CollectSuspendMemoryRequested"
+    ]
+  },
+  "WebView2_CreateSharedArrayBuffer": {
+    "description": "Shared array buffer creation for IPC",
+    "category": "Memory",
+    "severity": "Debug",
+    "params": [],
+    "relatedEvents": [
+      "WebView2_ReleaseSharedArrayBuffer"
+    ]
+  },
+  "WebView2_ReleaseSharedArrayBuffer": {
+    "description": "Shared array buffer cleanup",
+    "category": "Memory",
+    "severity": "Debug",
+    "params": [],
+    "relatedEvents": [
+      "WebView2_CreateSharedArrayBuffer"
+    ]
+  },
+  "WebView2_CreateSharedMemoryRegionFailed": {
+    "description": "Shared memory region creation failure",
+    "category": "Memory",
+    "severity": "Critical",
+    "params": [],
+    "relatedEvents": []
+  },
+  "WebView2_CreateArrayBufferContentsFailed": {
+    "description": "Array buffer content creation failure",
+    "category": "Memory",
+    "severity": "Critical",
+    "params": [],
+    "relatedEvents": []
+  },
+  "WebView2_IgnoreOutOfSyncSharedBuffer": {
+    "description": "Buffer synchronization issue detected",
+    "category": "Memory",
+    "severity": "Warning",
+    "params": [],
+    "relatedEvents": []
+  },
+  "WebView2_SetRendererMemoryUsageTarget": {
+    "description": "Renderer memory usage target set",
+    "category": "Memory",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [
+      "WebView2_SetMemoryPressure"
+    ]
+  },
+  "WebView2_ComputeUserDataDir_Failed": {
+    "description": "User data directory computation failed",
+    "category": "Error & Failure",
+    "severity": "Critical",
+    "params": [],
+    "relatedEvents": [
+      "WebView2_CreationFailure"
+    ]
+  },
+  "WebView2_CreatePersonalContextShellToken_Failed": {
+    "description": "Personal context shell token creation failed",
+    "category": "Error & Failure",
+    "severity": "Critical",
+    "params": [],
+    "relatedEvents": []
+  },
+  "WebView2_CreatePersonalContextToken_Failed": {
+    "description": "Personal context token creation failed",
+    "category": "Error & Failure",
+    "severity": "Critical",
+    "params": [],
+    "relatedEvents": []
+  },
+  "WebView2_CreateWebMessageAsJsonStringifyFailed": {
+    "description": "Message JSON serialization failed",
+    "category": "Error & Failure",
+    "severity": "Warning",
+    "params": [],
+    "relatedEvents": []
+  },
+  "WebView2_DelayedInvalidWindow": {
+    "description": "Delayed window validation failure",
+    "category": "Error & Failure",
+    "severity": "Warning",
+    "params": [],
+    "relatedEvents": []
+  },
+  "WebView2_DupBrowserProcessHandleFailed": {
+    "description": "Process handle duplication failed",
+    "category": "Error & Failure",
+    "severity": "Critical",
+    "params": [],
+    "relatedEvents": []
+  },
+  "WebView2_FallbackOnLaunchNonElevatedFailure": {
+    "description": "Fallback after non-elevated launch failure",
+    "category": "Error & Failure",
+    "severity": "Warning",
+    "params": [],
+    "relatedEvents": [
+      "WebView2_LaunchNonElevatedProcess_Failed"
+    ]
+  },
+  "WebView2_Forward_Creation_Failed": {
+    "description": "Creation forwarding failed",
+    "category": "Error & Failure",
+    "severity": "Critical",
+    "params": [],
+    "relatedEvents": [
+      "WebView2_CreationFailure"
+    ]
+  },
+  "WebView2_GetLocalHandleFailed": {
+    "description": "Local handle acquisition failed",
+    "category": "Error & Failure",
+    "severity": "Critical",
+    "params": [],
+    "relatedEvents": []
+  },
+  "WebView2_GetShellToken_Failed": {
+    "description": "Shell token retrieval failed",
+    "category": "Error & Failure",
+    "severity": "Critical",
+    "params": [],
+    "relatedEvents": [
+      "WebView2_GetAccessToken_Failed"
+    ]
+  },
+  "WebView2_GetShellUserSidFailed": {
+    "description": "Shell user SID retrieval failed",
+    "category": "Error & Failure",
+    "severity": "Critical",
+    "params": [],
+    "relatedEvents": []
+  },
+  "WebView2_GetUserSidFailed": {
+    "description": "User SID retrieval failed",
+    "category": "Error & Failure",
+    "severity": "Critical",
+    "params": [],
+    "relatedEvents": []
+  },
+  "WebView2_InvalidParentWindowOperation": {
+    "description": "Invalid parent window operation",
+    "category": "Error & Failure",
+    "severity": "Warning",
+    "params": [],
+    "relatedEvents": []
+  },
+  "WebView2_LaunchEdgeView_Failed": {
+    "description": "Edge view launch failed",
+    "category": "Error & Failure",
+    "severity": "Critical",
+    "params": [],
+    "relatedEvents": [
+      "WebView2_CreationFailure"
+    ]
+  },
+  "WebView2_LaunchNonElevatedProcess_Failed": {
+    "description": "Non-elevated process launch failed",
+    "category": "Error & Failure",
+    "severity": "Critical",
+    "params": [],
+    "relatedEvents": []
+  },
+  "WebView2_LaunchWithToken_Failed": {
+    "description": "Token-based launch failed",
+    "category": "Error & Failure",
+    "severity": "Critical",
+    "params": [],
+    "relatedEvents": []
+  },
+  "WebView2_OpenAppProcessFailed": {
+    "description": "App process opening failed",
+    "category": "Error & Failure",
+    "severity": "Critical",
+    "params": [],
+    "relatedEvents": []
+  },
+  "WebView2_ParseParametersFailed": {
+    "description": "Parameter parsing failed",
+    "category": "Error & Failure",
+    "severity": "Warning",
+    "params": [],
+    "relatedEvents": []
+  },
+  "WebView2_SetPrivilege_Failed": {
+    "description": "Privilege setting failed",
+    "category": "Error & Failure",
+    "severity": "Critical",
+    "params": [],
+    "relatedEvents": []
+  },
+  "WebView2_WindowImpl_Init_Failed": {
+    "description": "Window implementation init failed",
+    "category": "Error & Failure",
+    "severity": "Critical",
+    "params": [],
+    "relatedEvents": []
+  },
+  "WebView2_Invalid_Version": {
+    "description": "Version validation failed",
+    "category": "Error & Failure",
+    "severity": "Critical",
+    "params": [],
+    "relatedEvents": [
+      "WebView2_version_too_old"
+    ]
+  },
+  "WebView2_version_too_old": {
+    "description": "WebView2 version too old for API",
+    "category": "Error & Failure",
+    "severity": "Critical",
+    "params": [],
+    "relatedEvents": [
+      "WebView2_Invalid_Version"
+    ]
+  },
+  "WebView2_EnabledForDedicatedWorker": {
+    "description": "Dedicated worker enablement",
+    "category": "Worker & Threading",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": []
+  },
+  "WebView2_GetHostWorkerNotFound": {
+    "description": "Host worker lookup failed",
+    "category": "Worker & Threading",
+    "severity": "Warning",
+    "params": [],
+    "relatedEvents": []
+  },
+  "WebView2_GetHostParentWorkerNotFound": {
+    "description": "Parent worker lookup failed",
+    "category": "Worker & Threading",
+    "severity": "Warning",
+    "params": [],
+    "relatedEvents": []
+  },
+  "WebView2_OnDedicatedWorkerCreatedNoHandlerOwners": {
+    "description": "Worker created without handlers",
+    "category": "Worker & Threading",
+    "severity": "Warning",
+    "params": [],
+    "relatedEvents": []
+  },
+  "WebView2_OnDedicatedWorkerDestroyedWorkerNotFound": {
+    "description": "Worker destroy for nonexistent worker",
+    "category": "Worker & Threading",
+    "severity": "Warning",
+    "params": [],
+    "relatedEvents": []
+  },
+  "WebView2_MsgReceivedActiveWorkerNotFound": {
+    "description": "Active SW lookup failed for message",
+    "category": "Worker & Threading",
+    "severity": "Warning",
+    "params": [],
+    "relatedEvents": []
+  },
+  "WebView2_ServiceWorkerPostMessageHandlerNotBound": {
+    "description": "SW message handler not bound",
+    "category": "Service Worker",
+    "severity": "Warning",
+    "params": [],
+    "relatedEvents": []
+  },
+  "WebView2_ServiceWorkerPostMessageNullMessage": {
+    "description": "SW received null message",
+    "category": "Service Worker",
+    "severity": "Warning",
+    "params": [],
+    "relatedEvents": []
+  },
+  "WebView2_UpdateHasServiceWorkerRegisteredEventHandlers": {
+    "description": "SW handler registration updated",
+    "category": "Service Worker",
+    "severity": "Debug",
+    "params": [],
+    "relatedEvents": []
+  },
+  "WebView2_ManagerProcessLaunchBoost": {
+    "description": "Process launch boost applied",
+    "category": "Process Management",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [
+      "WebView2_RemoveManagerProcessLaunchBoost"
+    ],
+    "sourceFile": "app_mojo_environment.cc:1706"
+  },
+  "WebView2_RemoveManagerProcessLaunchBoost": {
+    "description": "Process launch boost removed",
+    "category": "Process Management",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [
+      "WebView2_ManagerProcessLaunchBoost"
+    ]
+  },
+  "WebView2_MonitoringBrowserProcess": {
+    "description": "Browser process monitoring started",
+    "category": "Process Management",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [
+      "WebView2_WatchProcess"
+    ]
+  },
+  "WebView2_WatchProcess": {
+    "description": "Process watching event",
+    "category": "Process Management",
+    "severity": "Debug",
+    "params": [],
+    "relatedEvents": []
+  },
+  "WebView2_WaitForDescendantsTimeOut": {
+    "description": "Process cleanup timeout",
+    "category": "Process Management",
+    "severity": "Warning",
+    "params": [],
+    "relatedEvents": []
+  },
+  "WebView2_ProcessLaunchType": {
+    "description": "Process launch type telemetry",
+    "category": "Process Management",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": []
+  },
+  "WebView2_VisualHostingOSVersion": {
+    "description": "OS version for visual hosting",
+    "category": "Display & Config",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": []
+  },
+  "WebView2_UpdatePreferredColorScheme": {
+    "description": "Color scheme preference updated",
+    "category": "Display & Config",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": []
+  },
+  "WebView2_WipConfig": {
+    "description": "Windows Information Protection config",
+    "category": "Display & Config",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": []
+  },
+  "WebView2_SidePane": {
+    "description": "Side pane operation",
+    "category": "Display & Config",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [
+      "WebView2_SidePaneChanged"
+    ]
+  },
+  "WebView2_SidePaneChanged": {
+    "description": "Side pane state changed",
+    "category": "Display & Config",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [
+      "WebView2_SidePane"
+    ]
+  },
+  "WebView2_CallRemoteObject": {
+    "description": "Host calls remote object in browser process",
+    "category": "API & Communication",
+    "severity": "Debug",
+    "params": [],
+    "relatedEvents": [],
+    "sourceFile": "embedded_browser_host.cc:789"
+  },
+  "WebView2_ObjectCalled": {
+    "description": "API method invocation (BEGIN/END pair)",
+    "category": "API & Communication",
+    "severity": "Debug",
+    "params": [],
+    "relatedEvents": [
+      "WebView2_ObjectCallResponse"
+    ],
+    "sourceFile": "embedded_browser_host.cc:255"
+  },
+  "WebView2_ObjectCallResponse": {
+    "description": "API method response received",
+    "category": "API & Communication",
+    "severity": "Debug",
+    "params": [],
+    "relatedEvents": [
+      "WebView2_ObjectCalled"
+    ],
+    "sourceFile": "embedded_browser_host.cc:786"
+  },
+  "WebView2_FactoryReleaseRef": {
+    "description": "Factory last reference released",
+    "category": "Factory & Creation",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [
+      "WebView2_FactoryRelease",
+      "WebView2_FactoryDeleted"
+    ]
+  },
+  "WebView2_HasPendingFrameNavigation": {
+    "description": "Pending frame navigation check",
+    "category": "Navigation",
+    "severity": "Debug",
+    "params": [],
+    "relatedEvents": [
+      "WebView2_SetPendingFrameNavigation"
+    ]
+  },
+  "WebView2_SetPendingFrameNavigation": {
+    "description": "Frame navigation queued as pending",
+    "category": "Navigation",
+    "severity": "Debug",
+    "params": [],
+    "relatedEvents": [
+      "WebView2_HasPendingFrameNavigation"
+    ]
+  },
+  "WebView2_CloseInternal": {
+    "description": "WebView close internal operation",
+    "category": "Lifecycle",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [
+      "WebView2_ShuttingDown"
+    ],
+    "sourceFile": "embedded_browser_webview_impl.cc:2215"
+  },
+  "WebView2_LaunchProcess_Attempt": {
+    "description": "Process launch attempt",
+    "category": "Process Management",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [
+      "WebView2_LaunchProcess_Failed"
+    ],
+    "sourceFile": "app_mojo_environment.cc:1942"
+  },
+  "WebView2_LaunchProcess_Failed": {
+    "description": "Process launch failed",
+    "category": "Process Management",
+    "severity": "Critical",
+    "params": [],
+    "relatedEvents": [
+      "WebView2_LaunchProcess_Attempt"
+    ],
+    "sourceFile": "app_mojo_environment.cc:1953"
+  },
+  "NavigationRequest::Create": {
+    "description": "Navigation request created",
+    "category": "Chromium Navigation",
+    "severity": "Info",
+    "params": [
+      {
+        "name": "browser_initiated",
+        "type": "bool"
+      }
+    ],
+    "relatedEvents": [
+      "NavigationRequest::NavigationRequest"
+    ],
+    "sourceFile": "navigation_request.cc:1280"
+  },
+  "NavigationRequest::CreateRendererInitiated": {
+    "description": "Renderer-initiated navigation created",
+    "category": "Chromium Navigation",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [
+      "NavigationRequest::Create"
+    ],
+    "sourceFile": "navigation_request.cc:1391"
+  },
+  "NavigationRequest::NavigationRequest": {
+    "description": "Navigation request constructor (scope BEGIN)",
+    "category": "Chromium Navigation",
+    "severity": "Debug",
+    "params": [],
+    "relatedEvents": [],
+    "sourceFile": "navigation_request.cc:1801"
+  },
+  "NavigationRequest": {
+    "description": "Navigation request scope (BEGIN/END)",
+    "category": "Chromium Navigation",
+    "severity": "Debug",
+    "params": [],
+    "relatedEvents": [],
+    "sourceFile": "navigation_request.cc:1891"
+  },
+  "NavigationRequest::~NavigationRequest": {
+    "description": "Navigation request destroyed",
+    "category": "Chromium Navigation",
+    "severity": "Debug",
+    "params": [],
+    "relatedEvents": [],
+    "sourceFile": "navigation_request.cc:2314"
+  },
+  "NavigationRequest::BeginNavigation": {
+    "description": "Navigation begin processing",
+    "category": "Chromium Navigation",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [
+      "NavigationRequest::BeginNavigationImpl"
+    ],
+    "sourceFile": "navigation_request.cc:2521"
+  },
+  "NavigationRequest::BeginNavigationImpl": {
+    "description": "Navigation begin implementation",
+    "category": "Chromium Navigation",
+    "severity": "Debug",
+    "params": [],
+    "relatedEvents": [
+      "NavigationRequest::BeginNavigation"
+    ],
+    "sourceFile": "navigation_request.cc:2878"
+  },
+  "NavigationRequest::StartNavigation": {
+    "description": "Navigation starts (network request initiated)",
+    "category": "Chromium Navigation",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [
+      "NavigationRequest::BeginNavigation"
+    ],
+    "sourceFile": "navigation_request.cc:3271"
+  },
+  "NavigationRequest::WillStartRequest": {
+    "description": "Throttle check before start",
+    "category": "Chromium Navigation",
+    "severity": "Debug",
+    "params": [],
+    "relatedEvents": [],
+    "sourceFile": "navigation_request.cc:8647"
+  },
+  "NavigationRequest::WillRedirectRequest": {
+    "description": "Throttle check before redirect",
+    "category": "Chromium Navigation",
+    "severity": "Debug",
+    "params": [],
+    "relatedEvents": [
+      "NavigationRequest::OnRequestRedirected"
+    ],
+    "sourceFile": "navigation_request.cc:8719"
+  },
+  "NavigationRequest::WillProcessResponse": {
+    "description": "Throttle check before response processing",
+    "category": "Chromium Navigation",
+    "severity": "Debug",
+    "params": [],
+    "relatedEvents": [],
+    "sourceFile": "navigation_request.cc:8767"
+  },
+  "NavigationRequest::WillCommitWithoutUrlLoader": {
+    "description": "Commit without URL loader (e.g., about:blank)",
+    "category": "Chromium Navigation",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "sourceFile": "navigation_request.cc:8793"
+  },
+  "NavigationRequest::OnStartChecksComplete": {
+    "description": "Start checks passed",
+    "category": "Chromium Navigation",
+    "severity": "Debug",
+    "params": [],
+    "relatedEvents": [],
+    "sourceFile": "navigation_request.cc:5766"
+  },
+  "NavigationRequest::OnRedirectChecksComplete": {
+    "description": "Redirect checks passed",
+    "category": "Chromium Navigation",
+    "severity": "Debug",
+    "params": [],
+    "relatedEvents": [],
+    "sourceFile": "navigation_request.cc:6130"
+  },
+  "NavigationRequest::OnFailureChecksComplete": {
+    "description": "Failure checks completed",
+    "category": "Chromium Navigation",
+    "severity": "Warning",
+    "params": [],
+    "relatedEvents": [
+      "NavigationRequest::OnRequestFailedInternal"
+    ],
+    "sourceFile": "navigation_request.cc:6366"
+  },
+  "NavigationRequest::CommitNavigation": {
+    "description": "Navigation committed (IPC to renderer)",
+    "category": "Chromium Navigation",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [
+      "NavigationRequest::DidCommitNavigation"
+    ],
+    "sourceFile": "navigation_request.cc:6832"
+  },
+  "NavigationRequest::CommitPageActivation": {
+    "description": "Page activation committed",
+    "category": "Chromium Navigation",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "sourceFile": "navigation_request.cc:7254"
+  },
+  "NavigationRequest::ReadyToCommitNavigation": {
+    "description": "Navigation ready to commit",
+    "category": "Chromium Navigation",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [
+      "NavigationRequest::CommitNavigation"
+    ],
+    "sourceFile": "navigation_request.cc:9221"
+  },
+  "NavigationRequest::DidCommitNavigation": {
+    "description": "Navigation commit confirmed by renderer",
+    "category": "Chromium Navigation",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [
+      "NavigationRequest::CommitNavigation"
+    ],
+    "sourceFile": "navigation_request.cc:8846"
+  },
+  "NavigationRequest::OnRequestRedirected": {
+    "description": "Navigation redirected",
+    "category": "Chromium Navigation",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [
+      "NavigationRequest::WillRedirectRequest"
+    ],
+    "sourceFile": "navigation_request.cc:3768"
+  },
+  "NavigationRequest::OnRequestFailedInternal": {
+    "description": "Navigation request failed",
+    "category": "Chromium Navigation",
+    "severity": "Warning",
+    "params": [],
+    "relatedEvents": [],
+    "sourceFile": "navigation_request.cc:5519"
+  },
+  "NavigationTotal": {
+    "description": "End-to-end navigation duration",
+    "category": "Navigation Timing",
+    "severity": "Info",
+    "params": [
+      {
+        "name": "duration_ms",
+        "type": "number"
+      }
+    ],
+    "relatedEvents": [
+      "BeginNavigationToCommit",
+      "CommitToDidCommit",
+      "DidCommitToFinish"
+    ],
+    "sourceFile": "render_frame_host_impl.cc"
+  },
+  "BeginNavigationToCommit": {
+    "description": "Navigation begin to commit IPC duration",
+    "category": "Navigation Timing",
+    "severity": "Info",
+    "params": [
+      {
+        "name": "duration_ms",
+        "type": "number"
+      }
+    ],
+    "relatedEvents": [
+      "NavigationTotal"
+    ],
+    "sourceFile": "render_frame_host_impl.cc"
+  },
+  "CommitToDidCommit": {
+    "description": "Commit IPC to renderer confirmation duration",
+    "category": "Navigation Timing",
+    "severity": "Info",
+    "params": [
+      {
+        "name": "duration_ms",
+        "type": "number"
+      }
+    ],
+    "relatedEvents": [
+      "NavigationTotal"
+    ],
+    "sourceFile": "render_frame_host_impl.cc"
+  },
+  "DidCommitToFinish": {
+    "description": "Post-commit to navigation finish duration",
+    "category": "Navigation Timing",
+    "severity": "Info",
+    "params": [
+      {
+        "name": "duration_ms",
+        "type": "number"
+      }
+    ],
+    "relatedEvents": [
+      "NavigationTotal"
+    ],
+    "sourceFile": "render_frame_host_impl.cc"
+  },
+  "ThrottlingURLLoader::Start": {
+    "description": "Throttling URL loader started",
+    "category": "Network",
+    "severity": "Debug",
+    "params": [
+      {
+        "name": "request_id",
+        "type": "int"
+      }
+    ],
+    "relatedEvents": [
+      "ThrottlingURLLoader::StartNow"
+    ]
+  },
+  "ThrottlingURLLoader::StartNow": {
+    "description": "Throttling URL loader executing",
+    "category": "Network",
+    "severity": "Debug",
+    "params": [],
+    "relatedEvents": [
+      "ThrottlingURLLoader::Start"
+    ]
+  },
+  "CorsURLLoader::CorsURLLoader": {
+    "description": "CORS URL loader constructed",
+    "category": "Network",
+    "severity": "Debug",
+    "params": [
+      {
+        "name": "url",
+        "type": "string"
+      },
+      {
+        "name": "process_id",
+        "type": "int"
+      },
+      {
+        "name": "request_id",
+        "type": "int"
+      }
+    ],
+    "relatedEvents": [
+      "CorsURLLoader::Start"
+    ]
+  },
+  "CorsURLLoader::Start": {
+    "description": "CORS URL loader started",
+    "category": "Network",
+    "severity": "Debug",
+    "params": [],
+    "relatedEvents": [
+      "CorsURLLoader::StartRequest"
+    ]
+  },
+  "CorsURLLoader::StartRequest": {
+    "description": "CORS URL loader request initiated",
+    "category": "Network",
+    "severity": "Debug",
+    "params": [],
+    "relatedEvents": [
+      "CorsURLLoader::Start"
+    ]
+  },
+  "URLLoader::URLLoader": {
+    "description": "URL loader constructed",
+    "category": "Network",
+    "severity": "Debug",
+    "params": [],
+    "relatedEvents": [
+      "URLLoader::ScheduleStart"
+    ]
+  },
+  "URLLoader::ScheduleStart": {
+    "description": "URL loader start scheduled",
+    "category": "Network",
+    "severity": "Debug",
+    "params": [],
+    "relatedEvents": [
+      "URLLoader::URLLoader"
+    ]
+  },
+  "URLLoader::~URLLoader": {
+    "description": "URL loader destroyed",
+    "category": "Network",
+    "severity": "Debug",
+    "params": [],
+    "relatedEvents": [
+      "URLLoader::URLLoader"
+    ]
+  },
+  "ServiceWorkerMainResourceLoader::StartRequest": {
+    "description": "SW main resource intercept begins",
+    "category": "Service Worker",
+    "severity": "Info",
+    "params": [
+      {
+        "name": "url",
+        "type": "string"
+      },
+      {
+        "name": "navigation_type",
+        "type": "string"
+      }
+    ],
+    "relatedEvents": [
+      "ServiceWorkerMainResourceLoader::CommitCompleted"
+    ],
+    "sourceFile": "service_worker_main_resource_loader.cc"
+  },
+  "ServiceWorkerMainResourceLoader::CommitCompleted": {
+    "description": "SW main resource commit result",
+    "category": "Service Worker",
+    "severity": "Info",
+    "params": [
+      {
+        "name": "error_code",
+        "type": "int"
+      },
+      {
+        "name": "reason",
+        "type": "string"
+      }
+    ],
+    "relatedEvents": [
+      "ServiceWorkerMainResourceLoader::StartRequest"
+    ],
+    "sourceFile": "service_worker_main_resource_loader.cc"
+  },
+  "ServiceWorkerSubresourceLoader::StartRequest": {
+    "description": "SW subresource request started",
+    "category": "Service Worker",
+    "severity": "Debug",
+    "params": [
+      {
+        "name": "url",
+        "type": "string"
+      }
+    ],
+    "relatedEvents": [],
+    "sourceFile": "service_worker_subresource_loader.cc"
+  },
+  "ServiceWorkerSubresourceLoader::OnResponse": {
+    "description": "SW subresource response received",
+    "category": "Service Worker",
+    "severity": "Debug",
+    "params": [],
+    "relatedEvents": [
+      "ServiceWorkerSubresourceLoader::StartRequest"
+    ],
+    "sourceFile": "service_worker_subresource_loader.cc"
+  },
+  "ServiceWorkerSubresourceLoader::OnFallback": {
+    "description": "SW subresource fallback to network",
+    "category": "Service Worker",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [
+      "ServiceWorkerSubresourceLoader::StartRequest"
+    ],
+    "sourceFile": "service_worker_subresource_loader.cc"
+  },
+  "ServiceWorker.LoadTiming.Subresource": {
+    "description": "SW subresource timing anchor",
+    "category": "Service Worker",
+    "severity": "Debug",
+    "params": [
+      {
+        "name": "url",
+        "type": "string"
+      }
+    ],
+    "relatedEvents": []
+  },
+  "ServiceWorkerGlobalScope::DispatchFetchEventInternal": {
+    "description": "SW fetch event dispatched internally",
+    "category": "Service Worker",
+    "severity": "Info",
+    "params": [
+      {
+        "name": "url",
+        "type": "string"
+      },
+      {
+        "name": "method",
+        "type": "string"
+      }
+    ],
+    "relatedEvents": [],
+    "sourceFile": "service_worker_global_scope.cc"
+  },
+  "ServiceWorkerGlobalScope::DispatchFetchEventForMainResource": {
+    "description": "SW fetch event for main resource",
+    "category": "Service Worker",
+    "severity": "Info",
+    "params": [
+      {
+        "name": "url",
+        "type": "string"
+      },
+      {
+        "name": "method",
+        "type": "string"
+      }
+    ],
+    "relatedEvents": [
+      "ServiceWorkerMainResourceLoader::StartRequest"
+    ],
+    "sourceFile": "service_worker_global_scope.cc"
+  },
+  "ServiceWorkerGlobalScope::DispatchFetchEventForSubresource": {
+    "description": "SW fetch event for subresource",
+    "category": "Service Worker",
+    "severity": "Debug",
+    "params": [
+      {
+        "name": "url",
+        "type": "string"
+      },
+      {
+        "name": "method",
+        "type": "string"
+      }
+    ],
+    "relatedEvents": [],
+    "sourceFile": "service_worker_global_scope.cc"
+  },
+  "ServiceWorkerGlobalScope::RespondToFetchEvent": {
+    "description": "SW responded to fetch event",
+    "category": "Service Worker",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [
+      "ServiceWorkerGlobalScope::DispatchFetchEventInternal"
+    ],
+    "sourceFile": "service_worker_global_scope.cc"
+  },
+  "ServiceWorkerGlobalScope::RespondToFetchEventWithNoResponse": {
+    "description": "SW returned no response (passthrough)",
+    "category": "Service Worker",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [
+      "ServiceWorkerGlobalScope::DispatchFetchEventInternal"
+    ],
+    "sourceFile": "service_worker_global_scope.cc"
+  },
+  "ServiceWorkerGlobalScope::DidHandleFetchEvent": {
+    "description": "SW fetch event handling completed",
+    "category": "Service Worker",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [
+      "ServiceWorkerGlobalScope::DispatchFetchEventInternal"
+    ],
+    "sourceFile": "service_worker_global_scope.cc"
+  },
+  "ServiceWorkerVersion::SetStatus": {
+    "description": "SW version status changed",
+    "category": "Service Worker",
+    "severity": "Info",
+    "params": [
+      {
+        "name": "script_url",
+        "type": "string"
+      },
+      {
+        "name": "new_status",
+        "type": "string"
+      }
+    ],
+    "relatedEvents": []
+  },
+  "ServiceWorkerVersion::OnStopping": {
+    "description": "SW version stopping",
+    "category": "Service Worker",
+    "severity": "Warning",
+    "params": [],
+    "relatedEvents": [
+      "ServiceWorkerVersion::OnStoppedInternal"
+    ]
+  },
+  "ServiceWorkerVersion::OnStoppedInternal": {
+    "description": "SW version stopped",
+    "category": "Service Worker",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [
+      "ServiceWorkerVersion::OnStopping"
+    ]
+  },
+  "EmbeddedWorkerInstance::Start": {
+    "description": "Embedded worker instance started",
+    "category": "Service Worker",
+    "severity": "Info",
+    "params": [
+      {
+        "name": "script_url",
+        "type": "string"
+      }
+    ],
+    "relatedEvents": [
+      "EmbeddedWorkerInstance::Stop"
+    ]
+  },
+  "EmbeddedWorkerInstance::Stop": {
+    "description": "Embedded worker instance stopped",
+    "category": "Service Worker",
+    "severity": "Info",
+    "params": [
+      {
+        "name": "script_url",
+        "type": "string"
+      }
+    ],
+    "relatedEvents": [
+      "EmbeddedWorkerInstance::Start"
+    ]
+  },
+  "FindRegistrationToRequestStart": {
+    "description": "SW registry lookup phase",
+    "category": "Service Worker Timing",
+    "severity": "Debug",
+    "params": [],
+    "relatedEvents": [
+      "RequestStartToForwardServiceWorker"
+    ],
+    "sourceFile": "service_worker_main_resource_loader.cc"
+  },
+  "RequestStartToForwardServiceWorker": {
+    "description": "SW request routing phase",
+    "category": "Service Worker Timing",
+    "severity": "Debug",
+    "params": [],
+    "relatedEvents": [
+      "ForwardServiceWorkerToWorkerReady"
+    ],
+    "sourceFile": "service_worker_main_resource_loader.cc"
+  },
+  "ForwardServiceWorkerToWorkerReady": {
+    "description": "SW activation wait phase (can be slow on cold start)",
+    "category": "Service Worker Timing",
+    "severity": "Warning",
+    "params": [],
+    "relatedEvents": [
+      "WorkerReadyToFetchHandlerStart"
+    ],
+    "sourceFile": "service_worker_main_resource_loader.cc"
+  },
+  "WorkerReadyToFetchHandlerStart": {
+    "description": "SW worker ready to fetch handler start",
+    "category": "Service Worker Timing",
+    "severity": "Debug",
+    "params": [],
+    "relatedEvents": [
+      "FetchHandlerStartToFetchHandlerEnd"
+    ],
+    "sourceFile": "service_worker_main_resource_loader.cc"
+  },
+  "FetchHandlerStartToFetchHandlerEnd": {
+    "description": "SW fetch handler execution time",
+    "category": "Service Worker Timing",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [
+      "FetchHandlerEndToResponseReceived",
+      "FetchHandlerEndToFallbackNetwork"
+    ],
+    "sourceFile": "service_worker_main_resource_loader.cc"
+  },
+  "FetchHandlerEndToResponseReceived": {
+    "description": "SW response delivery phase",
+    "category": "Service Worker Timing",
+    "severity": "Debug",
+    "params": [],
+    "relatedEvents": [
+      "FetchHandlerStartToFetchHandlerEnd"
+    ],
+    "sourceFile": "service_worker_main_resource_loader.cc"
+  },
+  "FetchHandlerEndToFallbackNetwork": {
+    "description": "SW fallback to network (not cached)",
+    "category": "Service Worker Timing",
+    "severity": "Warning",
+    "params": [],
+    "relatedEvents": [
+      "FetchHandlerStartToFetchHandlerEnd"
+    ],
+    "sourceFile": "service_worker_main_resource_loader.cc"
+  },
+  "WorkerReadyToFetchHandlerEnd": {
+    "description": "SW worker ready to handler end (renderer)",
+    "category": "Service Worker Timing",
+    "severity": "Debug",
+    "params": [],
+    "relatedEvents": [],
+    "sourceFile": "service_worker_subresource_loader.cc"
+  },
+  "WebTokenRequestResultOperation_ActivityStop": {
+    "description": "WAM token request completed",
+    "category": "Authentication",
+    "severity": "Info",
+    "params": [
+      {
+        "name": "DurationTotal_ms",
+        "type": "number"
+      },
+      {
+        "name": "webTokenRequestStatus",
+        "type": "int"
+      },
+      {
+        "name": "errorCode",
+        "type": "int"
+      },
+      {
+        "name": "isCacheHit",
+        "type": "bool"
+      }
+    ],
+    "relatedEvents": [
+      "WebTokenRequestResultOperation_ActivityError"
+    ]
+  },
+  "WebTokenRequestResultOperation_ActivityError": {
+    "description": "WAM token request error",
+    "category": "Authentication",
+    "severity": "Critical",
+    "params": [
+      {
+        "name": "hresult",
+        "type": "string"
+      },
+      {
+        "name": "failureType",
+        "type": "string"
+      },
+      {
+        "name": "DurationTotal_ms",
+        "type": "number"
+      }
+    ],
+    "relatedEvents": [
+      "WebTokenRequestResultOperation_ActivityStop"
+    ]
+  },
+  "ShouldDisableSSOForOffRecordProfile": {
+    "description": "SSO disabled check for InPrivate WebView2",
+    "category": "Authentication",
+    "severity": "Info",
+    "params": [
+      {
+        "name": "sso_for_inprivate_webview2_enabled",
+        "type": "bool"
+      }
+    ],
+    "relatedEvents": []
+  }
+}
