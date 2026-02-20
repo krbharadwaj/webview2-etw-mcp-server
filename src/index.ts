@@ -13,6 +13,7 @@ import { compareIncarnations } from "./tools/compare.js";
 import { compareEtls } from "./tools/compare_etls.js";
 import { analyzeCpu } from "./tools/analyze_cpu.js";
 import { timelineSlice } from "./tools/timeline_slice.js";
+import { validateTrace } from "./tools/validate_trace.js";
 
 const server = new McpServer({
   name: "webview2-etw-analysis",
@@ -231,6 +232,20 @@ server.tool(
   },
   async ({ filtered_file, start_timestamp, end_timestamp, pid }) => {
     const result = timelineSlice(filtered_file, start_timestamp, end_timestamp, pid);
+    return { content: [{ type: "text", text: result }] };
+  }
+);
+
+// ─── Tool: validate_trace ───
+server.tool(
+  "validate_trace",
+  "Validate a filtered ETL trace against known API happy-path sequences. Identifies missing events, wrong ordering, and deviations. Use 'learn_good' mode on successful traces to auto-mine new API→event sequences. Use 'learn_bad' on failure traces to capture failure patterns.",
+  {
+    filtered_file: z.string().describe("Path to the filtered ETL text file (from analyze_etl extraction)"),
+    mode: z.enum(["validate", "learn_good", "learn_bad"]).optional().describe("Mode: 'validate' (default) checks against known sequences, 'learn_good' mines patterns from successful traces, 'learn_bad' captures failure patterns"),
+  },
+  async ({ filtered_file, mode }) => {
+    const result = validateTrace(filtered_file, mode || "validate");
     return { content: [{ type: "text", text: result }] };
   }
 );

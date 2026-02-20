@@ -1862,5 +1862,15 @@
       }
     ],
     "relatedEvents": []
+  },
+  "TestApp.exe": {
+    "description": "Auto-discovered: test app.exe",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-20",
+    "seenCount": 5
   }
 }
