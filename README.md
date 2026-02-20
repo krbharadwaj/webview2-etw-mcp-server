@@ -185,29 +185,98 @@ Ships pre-loaded — no setup required:
 | `events.json` | 189 events across 15 categories |
 | `root_causes.json` | 7 root causes (about:blank deadlock, VDI DLL loading, WAM failure, ...) |
 | `timing_baselines.json` | 16 timing baselines with p50/p95/p99 |
+| `api_sequences.json` | 12 API happy-path sequences (Navigate→events, Initialize→events, ...) |
 
-The knowledge base **grows automatically** with each analysis. The server auto-discovers unknown events and records timings from ETL data.
+## 🧠 How Auto-Learning Works
+
+The knowledge base **grows automatically** — no manual work required from users.
+
+### What Happens When You Analyze a Trace
+
+```
+You: "Validate this trace at C:\temp\filtered.txt"
+                    │
+                    ▼
+┌─────────────────────────────────────────────┐
+│ 1. AUTO-DISCOVER NEW EVENTS                 │
+│    Server scans every line in the trace.    │
+│    Unknown events → auto-added to events.json│
+│    with heuristic category/severity.        │
+├─────────────────────────────────────────────┤
+│ 2. EXTRACT TIMINGS                          │
+│    NavigationTotal, CreationTime, WAM token  │
+│    durations → update timing_baselines.json  │
+│    (running p50/p95/p99 averages)           │
+├─────────────────────────────────────────────┤
+│ 3. VALIDATE API SEQUENCES                   │
+│    Maps API calls → expected happy paths.    │
+│    Reports missing events, wrong order,      │
+│    failure indicators.                       │
+├─────────────────────────────────────────────┤
+│ 4. MINE NEW PATTERNS (learn_good/learn_bad) │
+│    Extracts API→event chains from traces.    │
+│    Stores with confidence scores.            │
+│    Future validations use mined patterns.    │
+├─────────────────────────────────────────────┤
+│ 5. EXTRACT FEATURE FLAGS                    │
+│    --enable-features, --disable-features,    │
+│    field trials, WebView2-specific flags,    │
+│    runtime version.                          │
+└─────────────────────────────────────────────┘
+                    │
+                    ▼ (if GITHUB_TOKEN is set)
+┌─────────────────────────────────────────────┐
+│ 6. SYNC TO GITHUB                           │
+│    Push updated JSONs back to the repo.      │
+│    Next user who starts the server gets      │
+│    EVERYONE's discoveries automatically.     │
+└─────────────────────────────────────────────┘
+```
+
+### What Users Need to Do
+
+| Action | Effort | What Gets Learned |
+|--------|--------|-------------------|
+| Just use `analyze_etl` + `validate_trace` | **Zero effort** | New events, timings, feature flags |
+| Run `validate_trace` with `learn_good` mode on a working trace | **1 extra word** | API→event happy-path sequences |
+| Run `validate_trace` with `learn_bad` mode on a broken trace | **1 extra word** | Failure patterns and indicators |
+| Set `GITHUB_TOKEN` env var | **One-time setup** | Share all discoveries with every user |
+| Use `contribute_root_cause` after finding a bug | **Optional** | Root cause patterns for diagnosis |
+
+### Shared Learning (GitHub Sync)
+
+When `GITHUB_TOKEN` is set:
+- **On startup**: Server pulls the latest knowledge from this GitHub repo
+- **After learning**: Server pushes new discoveries back
+- **Merge strategy**: Additive — never loses entries, local + remote are merged
+
+This means every ETL analysis by any user makes the server smarter for everyone.
+
+**Without a token**: Everything still works — learnings just stay on your local machine.
 
 ## 🏗️ Architecture
 
 ```
 webview2-etw-mcp-server/
 ├── src/
-│   ├── index.ts              MCP server entry (11 tools)
+│   ├── index.ts              MCP server entry (13 tools)
 │   ├── tools/
 │   │   ├── decode.ts         API ID decoding (175 IDs)
 │   │   ├── lookup.ts         Event lookup with fuzzy matching
 │   │   ├── diagnose.ts       7 symptom decision trees
-│   │   ├── analyze.ts        ETL extraction command generation
+│   │   ├── analyze.ts        ETL extraction + feature flag commands
 │   │   ├── analyze_cpu.ts    CPU profiling with 3 symbol servers
 │   │   ├── timeline_slice.ts Between-timestamp analysis
+│   │   ├── validate_trace.ts API happy-path validation + pattern mining
 │   │   ├── compare.ts        Incarnation comparison
 │   │   ├── compare_etls.ts   Two-ETL comparison
 │   │   ├── contribute.ts     Manual KB enrichment
 │   │   └── auto_learn.ts     Auto-learning from analysis
 │   └── knowledge/
 │       ├── loader.ts         JSON I/O with multi-mode path resolution
+│       ├── sync.ts           GitHub sync (pull on start, push on learn)
 │       ├── api_ids.json      175 API IDs
+│       ├── api_sequences.json 12 API happy-path sequences
 │       ├── events.json       189 events
 │       ├── root_causes.json  7 root causes
 │       └── timing_baselines.json  16 baselines
@@ -217,12 +286,19 @@ webview2-etw-mcp-server/
 
 ## 📌 Contributing
 
-Contributions welcome! The easiest way to contribute:
+The server is designed to learn from usage — the best contribution is simply **using it**!
 
-1. **Analyze an ETL** — the server auto-learns new events
-2. **Share root causes** — use `contribute_root_cause` when you find a new failure pattern
-3. **File issues** — bugs, feature requests, new event documentation
-4. **PRs** — add tools, improve diagnosis trees, expand the knowledge base
+### Automatic (just use the tools)
+1. **Analyze traces** — `analyze_etl` + `validate_trace` auto-discovers new events and timings
+2. **Validate working traces** — `validate_trace` with `learn_good` mode auto-mines API→event sequences
+3. **Validate broken traces** — `validate_trace` with `learn_bad` mode captures failure patterns
+4. **Set `GITHUB_TOKEN`** — your discoveries automatically benefit every other user
+
+### Manual (when you find something interesting)
+5. **Share root causes** — use `contribute_root_cause` when you find a new failure pattern
+6. **Add events** — use `contribute_event` for events you've documented deeply
+7. **File issues** — bugs, feature requests, new event documentation
+8. **PRs** — add tools, improve diagnosis trees, expand the knowledge base
 
 ## License
 

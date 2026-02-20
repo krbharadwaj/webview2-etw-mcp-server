@@ -66,6 +66,9 @@ export function validateTrace(
   const sequences = loadJson<Record<string, ApiSequence>>("api_sequences.json");
   const apiIds = loadJson<Record<string, any>>("api_ids.json");
 
+  // Step 0: Extract feature flags from trace
+  const featureFlags = extractFeatureFlags(lines);
+
   // Step 1: Extract all API calls from the trace
   const apiCalls = extractApiCalls(lines, apiIds);
   if (apiCalls.length === 0) {
@@ -115,16 +118,16 @@ export function validateTrace(
   // Step 4: If learning mode, mine patterns
   if (mode === "learn_good") {
     const mined = mineSequences(apiCalls, lines, apiIds, "success");
-    return formatValidationReport(results, apiCalls, lines.length, mode) +
+    return formatValidationReport(results, apiCalls, lines.length, mode, featureFlags) +
       "\n\n" + mined + flushLearnings();
   }
   if (mode === "learn_bad") {
     const mined = mineSequences(apiCalls, lines, apiIds, "failure");
-    return formatValidationReport(results, apiCalls, lines.length, mode) +
+    return formatValidationReport(results, apiCalls, lines.length, mode, featureFlags) +
       "\n\n" + mined + flushLearnings();
   }
 
-  return formatValidationReport(results, apiCalls, lines.length, mode) + flushLearnings();
+  return formatValidationReport(results, apiCalls, lines.length, mode, featureFlags) + flushLearnings();
 }
 
 // ─── Extract API calls ──────────────────────────────────────────────
@@ -254,7 +257,8 @@ function formatValidationReport(
   results: ValidationResult[],
   apiCalls: ApiCallInstance[],
   totalLines: number,
-  mode: string
+  mode: string,
+  featureFlags: FeatureFlagInfo
 ): string {
   const out: string[] = [];
 
@@ -263,6 +267,40 @@ function formatValidationReport(
   out.push(`📊 **${apiCalls.length} API calls** across **${results.length} unique APIs** | ${totalLines} total lines`);
   if (mode !== "validate") out.push(`📝 Mode: **${mode}** — learning from this trace`);
   out.push("");
+
+  // Feature Flags section
+  if (featureFlags.enabled.length > 0 || featureFlags.disabled.length > 0 ||
+      featureFlags.webview2Flags.length > 0 || featureFlags.fieldTrials.length > 0) {
+    out.push("### 🚩 Feature Flags & Experiments");
+    out.push("");
+    if (featureFlags.enabled.length > 0) {
+      out.push(`**Enabled** (${featureFlags.enabled.length}):`);
+      for (const f of featureFlags.enabled.slice(0, 30)) out.push(`- ✅ \`${f}\``);
+      if (featureFlags.enabled.length > 30) out.push(`- ... and ${featureFlags.enabled.length - 30} more`);
+      out.push("");
+    }
+    if (featureFlags.disabled.length > 0) {
+      out.push(`**Disabled** (${featureFlags.disabled.length}):`);
+      for (const f of featureFlags.disabled.slice(0, 20)) out.push(`- ❌ \`${f}\``);
+      if (featureFlags.disabled.length > 20) out.push(`- ... and ${featureFlags.disabled.length - 20} more`);
+      out.push("");
+    }
+    if (featureFlags.webview2Flags.length > 0) {
+      out.push(`**WebView2-Specific Flags** (${featureFlags.webview2Flags.length}):`);
+      for (const f of featureFlags.webview2Flags) out.push(`- 🔷 \`${f}\``);
+      out.push("");
+    }
+    if (featureFlags.fieldTrials.length > 0) {
+      out.push(`**Field Trials** (${featureFlags.fieldTrials.length}):`);
+      for (const f of featureFlags.fieldTrials.slice(0, 15)) out.push(`- 🧪 \`${f}\``);
+      if (featureFlags.fieldTrials.length > 15) out.push(`- ... and ${featureFlags.fieldTrials.length - 15} more`);
+      out.push("");
+    }
+    if (featureFlags.runtimeVersion) {
+      out.push(`**Runtime Version**: \`${featureFlags.runtimeVersion}\``);
+      out.push("");
+    }
+  }
 
   // Summary table
   out.push("### Health Summary");
@@ -461,4 +499,90 @@ function inferPhase(eventName: string): string {
   if (eventName.includes("DocumentLoader")) return "renderer";
   if (eventName.includes("URLLoader")) return "network";
   return "browser";
+}
+
+// ─── Feature Flag Extraction ────────────────────────────────────────
+
+interface FeatureFlagInfo {
+  enabled: string[];
+  disabled: string[];
+  webview2Flags: string[];
+  fieldTrials: string[];
+  runtimeVersion: string | null;
+}
+
+function extractFeatureFlags(lines: string[]): FeatureFlagInfo {
+  const enabled = new Set<string>();
+  const disabled = new Set<string>();
+  const webview2Flags = new Set<string>();
+  const fieldTrials = new Set<string>();
+  let runtimeVersion: string | null = null;
+
+  for (const line of lines) {
+    // --enable-features=Feature1,Feature2
+    const enableMatch = line.match(/enable-features[=:]([^\s;\"]+)/i);
+    if (enableMatch) {
+      for (const f of enableMatch[1].split(",")) {
+        const clean = f.split(":")[0].split("<")[0].trim();
+        if (clean.length > 1) {
+          enabled.add(clean);
+          if (isWebView2Flag(clean)) webview2Flags.add(clean);
+        }
+      }
+    }
+
+    // --disable-features=Feature1,Feature2
+    const disableMatch = line.match(/disable-features[=:]([^\s;\"]+)/i);
+    if (disableMatch) {
+      for (const f of disableMatch[1].split(",")) {
+        const clean = f.split(":")[0].split("<")[0].trim();
+        if (clean.length > 1) {
+          disabled.add(clean);
+          if (isWebView2Flag(clean)) webview2Flags.add(clean);
+        }
+      }
+    }
+
+    // --force-fieldtrials=Trial/Group
+    const trialMatch = line.match(/force-fieldtrials[=:]([^\s;\"]+)/i);
+    if (trialMatch) {
+      for (const t of trialMatch[1].split("/")) {
+        if (t.length > 1 && !/^\d+$/.test(t)) fieldTrials.add(t);
+      }
+    }
+
+    // WebView2-specific flags in event data
+    const wv2FlagMatches = line.matchAll(/\b(msWebView2\w+|EdgeWebView\w+|WebView2Feature\w+|IsEdgeWebView\w+)\b/g);
+    for (const m of wv2FlagMatches) {
+      webview2Flags.add(m[1]);
+    }
+
+    // Runtime version from process info or events
+    const versionMatch = line.match(/msedgewebview2\.exe.*?(\d+\.\d+\.\d+\.\d+)/);
+    if (versionMatch && !runtimeVersion) {
+      runtimeVersion = versionMatch[1];
+    }
+    // Also check for version in WebView2 events
+    const wv2VersionMatch = line.match(/WebView2.*?[Vv]ersion[=:]\s*(\d+\.\d+\.\d+\.\d+)/);
+    if (wv2VersionMatch && !runtimeVersion) {
+      runtimeVersion = wv2VersionMatch[1];
+    }
+  }
+
+  return {
+    enabled: [...enabled].sort(),
+    disabled: [...disabled].sort(),
+    webview2Flags: [...webview2Flags].sort(),
+    fieldTrials: [...fieldTrials].sort(),
+    runtimeVersion,
+  };
+}
+
+function isWebView2Flag(name: string): boolean {
+  const lower = name.toLowerCase();
+  return lower.includes("webview") ||
+    lower.includes("mswebview") ||
+    lower.includes("edgewebview") ||
+    lower.includes("edgeembedded") ||
+    lower.startsWith("msedge");
 }
