@@ -14,7 +14,7 @@ import { compareEtls } from "./tools/compare_etls.js";
 import { analyzeCpu } from "./tools/analyze_cpu.js";
 import { timelineSlice } from "./tools/timeline_slice.js";
 import { validateTrace } from "./tools/validate_trace.js";
-import { initSync, pullLatest, pushLearnings, getSyncStatus } from "./knowledge/sync.js";
+import { initSync, pullLatest, pushLearnings, getSyncStatus, previewLearnings, confirmAndPush } from "./knowledge/sync.js";
 import { dirname } from "path";
 import { fileURLToPath } from "url";
 import { existsSync } from "fs";
@@ -251,12 +251,31 @@ server.tool(
   },
   async ({ filtered_file, mode }) => {
     const result = validateTrace(filtered_file, mode || "validate");
-    // Push learnings to GitHub if in learning mode
-    let syncResult = "";
+    let learningSummary = "";
     if (mode === "learn_good" || mode === "learn_bad") {
-      syncResult = await pushToGitHub();
+      learningSummary = "\n\n💡 **Tip**: Run `share_learnings` to preview and push these learnings to the shared knowledge base.";
     }
-    return { content: [{ type: "text", text: result + syncResult }] };
+    return { content: [{ type: "text", text: result + learningSummary }] };
+  }
+);
+
+// ─── Tool: share_learnings ───
+server.tool(
+  "share_learnings",
+  "Share your locally-learned knowledge with all users via GitHub. Use 'preview' (default) to see what would be shared, then 'confirm' to push. Two-step flow: preview → review → confirm.",
+  {
+    action: z.enum(["preview", "confirm"]).optional().describe("'preview' (default) shows a diff of what's new locally. 'confirm' pushes the changes to GitHub after you've reviewed."),
+  },
+  async ({ action }) => {
+    const knowledgeDir = resolveKnowledgeDir();
+    let result: string;
+    if (action === "confirm") {
+      result = await confirmAndPush(knowledgeDir);
+    } else {
+      const preview = await previewLearnings(knowledgeDir);
+      result = preview.summary;
+    }
+    return { content: [{ type: "text", text: result }] };
   }
 );
 
