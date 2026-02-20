@@ -1,16 +1,20 @@
 /**
  * GitHub-synced knowledge base.
  *
- * On startup: pulls latest knowledge JSONs from the GitHub repo.
- * After learning: pushes updated JSONs back so all users benefit.
+ * On startup: pulls latest knowledge JSONs from the GitHub repo (public — no auth needed).
+ * After learning: pushes updates via GitHub Issues (auto-processed by GitHub Actions).
  *
- * Requires GITHUB_TOKEN env var (PAT with repo scope, or fine-grained with contents:write).
- * Falls back to local-only mode if no token is set.
+ * Token detection priority (all automatic — zero manual setup for most users):
+ *   1. GITHUB_TOKEN / GH_TOKEN env var (explicit)
+ *   2. gh CLI token (if gh is installed and authenticated)
+ *   3. VS Code GitHub token (from OS credential store)
+ *   4. No token — read-only mode (pull works, sharing requires auth)
  */
 
 import { readFileSync, writeFileSync, existsSync } from "fs";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
+import { execSync } from "child_process";
 
 const REPO_OWNER = "krbharadwaj";
 const REPO_NAME = "webview2-etw-mcp-server";
@@ -25,27 +29,175 @@ const KNOWLEDGE_FILES = [
 
 let syncEnabled = false;
 let githubToken: string | null = null;
+let tokenSource: string = "none";
 let lastSyncTime = 0;
 const SYNC_COOLDOWN_MS = 60_000; // Don't sync more than once per minute
 
 /**
  * Initialize sync — call once on server startup.
- * Returns true if GitHub sync is available.
+ * Attempts to auto-detect GitHub auth from multiple sources.
+ * Returns true if sync is available (always true — reads work without auth).
  */
 export function initSync(): boolean {
+  // Priority: explicit env var > gh CLI > VS Code credential store
   githubToken = process.env.GITHUB_TOKEN || process.env.GH_TOKEN || null;
-  syncEnabled = !!githubToken;
 
-  if (!syncEnabled) {
+  if (githubToken) {
+    tokenSource = "env";
+    console.error("[sync] Using GITHUB_TOKEN from environment.");
+  } else {
+    // Try auto-detection
+    githubToken = detectGhCliToken();
+    if (githubToken) {
+      tokenSource = "gh-cli";
+    } else {
+      githubToken = detectVSCodeToken();
+      if (githubToken) {
+        tokenSource = "vscode";
+      }
+    }
+  }
+
+  // Sync is always enabled — public repo reads work without auth
+  syncEnabled = true;
+
+  if (!githubToken) {
+    tokenSource = "none";
     console.error(
-      "[sync] No GITHUB_TOKEN set — running in local-only mode. " +
-      "Set GITHUB_TOKEN env var to enable shared learning."
+      "[sync] No GitHub auth detected — pull-only mode.\n" +
+      "       To enable sharing, do ONE of:\n" +
+      "       • Install gh CLI and run: gh auth login\n" +
+      "       • Sign into GitHub in VS Code\n" +
+      "       • Set GITHUB_TOKEN env var"
     );
   } else {
-    console.error("[sync] GitHub sync enabled — learnings will be shared.");
+    console.error(`[sync] GitHub auth detected (source: ${tokenSource}) — sharing enabled.`);
   }
 
   return syncEnabled;
+}
+
+/**
+ * Detect GitHub token from the gh CLI (if installed and authenticated).
+ */
+function detectGhCliToken(): string | null {
+  try {
+    const token = execSync("gh auth token", {
+      encoding: "utf-8",
+      timeout: 5000,
+      stdio: ["pipe", "pipe", "pipe"],
+    }).trim();
+    if (token && token.length > 10) {
+      console.error("[sync] Auto-detected gh CLI token.");
+      return token;
+    }
+  } catch {
+    // gh CLI not installed or not authenticated — silent fallback
+  }
+  return null;
+}
+
+/**
+ * Detect GitHub token from VS Code's credential store.
+ * VS Code stores GitHub OAuth tokens in the OS credential manager
+ * when users sign in for Copilot, Settings Sync, GitHub PRs, etc.
+ */
+function detectVSCodeToken(): string | null {
+  if (process.platform === "win32") {
+    return detectVSCodeTokenWindows();
+  } else if (process.platform === "darwin") {
+    return detectVSCodeTokenMacOS();
+  } else {
+    return detectVSCodeTokenLinux();
+  }
+}
+
+function detectVSCodeTokenWindows(): string | null {
+  try {
+    // VS Code stores GitHub tokens in Windows Credential Manager
+    // via the PasswordVault API under 'vscode/vscode.github-authentication'
+    const psScript = [
+      "[void][Windows.Security.Credentials.PasswordVault,Windows.Security.Credentials,ContentType=WindowsRuntime]",
+      "$vault = New-Object Windows.Security.Credentials.PasswordVault",
+      "try {",
+      "  $creds = $vault.FindAllByResource('vscode/vscode.github-authentication')",
+      "  if ($creds.Count -gt 0) {",
+      "    $creds[0].RetrievePassword()",
+      "    Write-Output $creds[0].Password",
+      "  }",
+      "} catch { }",
+    ].join("\n");
+
+    const raw = execSync(
+      `powershell -NoProfile -NonInteractive -Command "${psScript.replace(/"/g, '\\"').replace(/\n/g, " ")}"`,
+      { encoding: "utf-8", timeout: 10000, stdio: ["pipe", "pipe", "pipe"] }
+    ).trim();
+
+    if (raw) {
+      return extractTokenFromVSCodeCredential(raw);
+    }
+  } catch {
+    // PasswordVault not available or no VS Code credentials
+  }
+  return null;
+}
+
+function detectVSCodeTokenMacOS(): string | null {
+  try {
+    // macOS: VS Code uses Keychain
+    const raw = execSync(
+      `security find-generic-password -s "vscode.github-authentication" -w 2>/dev/null`,
+      { encoding: "utf-8", timeout: 5000, stdio: ["pipe", "pipe", "pipe"] }
+    ).trim();
+    if (raw) {
+      return extractTokenFromVSCodeCredential(raw);
+    }
+  } catch {
+    // Keychain entry not found
+  }
+  return null;
+}
+
+function detectVSCodeTokenLinux(): string | null {
+  try {
+    // Linux: VS Code uses libsecret / gnome-keyring
+    const raw = execSync(
+      `secret-tool lookup service "vscode.github-authentication" 2>/dev/null`,
+      { encoding: "utf-8", timeout: 5000, stdio: ["pipe", "pipe", "pipe"] }
+    ).trim();
+    if (raw) {
+      return extractTokenFromVSCodeCredential(raw);
+    }
+  } catch {
+    // secret-tool not available or no entry
+  }
+  return null;
+}
+
+/**
+ * VS Code stores credentials as a JSON array:
+ *   [{"accessToken":"gho_xxx","account":{"label":"user","id":"123"}}]
+ * Extract the accessToken from it.
+ */
+function extractTokenFromVSCodeCredential(raw: string): string | null {
+  try {
+    const parsed = JSON.parse(raw);
+    const entries = Array.isArray(parsed) ? parsed : [parsed];
+    for (const entry of entries) {
+      const token = entry?.accessToken;
+      if (typeof token === "string" && token.length > 10) {
+        console.error("[sync] Auto-detected VS Code GitHub token.");
+        return token;
+      }
+    }
+  } catch {
+    // Not JSON — might be a raw token string
+    if (typeof raw === "string" && raw.length > 10 && !raw.includes(" ")) {
+      console.error("[sync] Auto-detected VS Code GitHub token (raw).");
+      return raw;
+    }
+  }
+  return null;
 }
 
 /**
@@ -53,8 +205,6 @@ export function initSync(): boolean {
  * Merges remote data with local data (additive merge — never loses local entries).
  */
 export async function pullLatest(knowledgeDir: string): Promise<string> {
-  if (!syncEnabled || !githubToken) return "";
-
   const now = Date.now();
   if (now - lastSyncTime < SYNC_COOLDOWN_MS) return "";
 
@@ -97,7 +247,18 @@ export async function pullLatest(knowledgeDir: string): Promise<string> {
  * Only pushes files that have changed since last sync.
  */
 export async function pushLearnings(knowledgeDir: string): Promise<string> {
-  if (!syncEnabled || !githubToken) return "";
+  if (!githubToken) return "";
+  // Use direct push for users with repo write access (env token)
+  if (tokenSource === "env") {
+    return pushLearningsDirect(knowledgeDir);
+  }
+  return "";
+}
+
+/**
+ * Direct push for users with explicit GITHUB_TOKEN (repo write access).
+ */
+async function pushLearningsDirect(knowledgeDir: string): Promise<string> {
 
   const results: string[] = [];
 
@@ -164,10 +325,19 @@ export async function pushLearnings(knowledgeDir: string): Promise<string> {
  * Get sync status for display.
  */
 export function getSyncStatus(): string {
-  if (!syncEnabled) {
-    return "🔴 Local-only mode (set GITHUB_TOKEN to enable shared learning)";
+  if (!githubToken) {
+    return (
+      "🟡 Pull-only mode — receiving shared learnings but cannot share.\n\n" +
+      "To enable sharing, do ONE of:\n" +
+      "• Install `gh` CLI and run: `gh auth login`\n" +
+      "• Sign into GitHub in VS Code (for Copilot, Settings Sync, etc.)\n" +
+      "• Set `GITHUB_TOKEN` env var in your MCP config"
+    );
   }
-  return "🟢 GitHub sync enabled — learnings are shared with all users";
+  if (tokenSource === "env") {
+    return "🟢 GitHub sync enabled (direct push) — learnings are shared with all users";
+  }
+  return `🟢 GitHub sync enabled (via Issues, auth: ${tokenSource}) — learnings are shared with all users`;
 }
 
 // ─── Share Learnings (preview + confirm) ──────────────────────────
@@ -186,12 +356,7 @@ export async function previewLearnings(knowledgeDir: string): Promise<{
   diffs: LearningDiff[];
   summary: string;
 }> {
-  if (!syncEnabled || !githubToken) {
-    return {
-      diffs: [],
-      summary: "🔴 **Cannot share**: No GITHUB_TOKEN set. Add `GITHUB_TOKEN` to your MCP config env to enable sharing.",
-    };
-  }
+  // Preview works for everyone — reads are unauthenticated on public repo
 
   const diffs: LearningDiff[] = [];
   let totalNew = 0;
@@ -295,9 +460,29 @@ export async function previewLearnings(knowledgeDir: string): Promise<{
  * Only pushes files that have actual diffs (re-checks before pushing).
  */
 export async function confirmAndPush(knowledgeDir: string): Promise<string> {
-  if (!syncEnabled || !githubToken) {
-    return "🔴 Cannot share: No GITHUB_TOKEN set.";
+  if (!githubToken) {
+    return (
+      "🔴 **Cannot share**: No GitHub authentication detected.\n\n" +
+      "To enable sharing, do ONE of:\n" +
+      "• Install `gh` CLI and run: `gh auth login`\n" +
+      "• Sign into GitHub in VS Code (for Copilot, Settings Sync, etc.)\n" +
+      "• Set `GITHUB_TOKEN` env var in your MCP config"
+    );
   }
+
+  // Users with explicit env token (repo write access) → direct push
+  if (tokenSource === "env") {
+    return confirmAndPushDirect(knowledgeDir);
+  }
+
+  // Users with auto-detected token (gh CLI / VS Code) → push via GitHub Issue
+  return confirmAndPushViaIssue(knowledgeDir);
+}
+
+/**
+ * Direct push for users with repo write access (existing behavior).
+ */
+async function confirmAndPushDirect(knowledgeDir: string): Promise<string> {
 
   // Re-compute diffs to ensure we only push what's actually new
   const { diffs } = await previewLearnings(knowledgeDir);
@@ -364,6 +549,104 @@ export async function confirmAndPush(knowledgeDir: string): Promise<string> {
   return `## 📤 Share Results\n\n${results.join("\n")}\n\nAll users will receive these learnings when they next start their server.`;
 }
 
+/**
+ * Push learnings by creating a GitHub Issue.
+ * A GitHub Actions workflow automatically processes the issue, merges the
+ * knowledge, and commits. This only requires issues:write scope — no repo
+ * write access needed.
+ */
+async function confirmAndPushViaIssue(knowledgeDir: string): Promise<string> {
+  const { diffs } = await previewLearnings(knowledgeDir);
+  if (diffs.length === 0) {
+    return "✅ Nothing new to share — local knowledge matches the shared repo.";
+  }
+
+  // Build payload: only include files that have diffs
+  const files: Record<string, any> = {};
+  for (const diff of diffs) {
+    const localPath = join(knowledgeDir, diff.file);
+    if (!existsSync(localPath)) continue;
+    files[diff.file] = JSON.parse(readFileSync(localPath, "utf-8"));
+  }
+
+  const totalNew = diffs.reduce((s, d) => s + d.newEntries.length, 0);
+  const totalUpdated = diffs.reduce((s, d) => s + d.updatedEntries.length, 0);
+
+  // Build a human-readable summary for the issue body
+  const summaryLines: string[] = [
+    `Automated knowledge submission from MCP server (auth: ${tokenSource}).`,
+    ``,
+    `**Files:** ${Object.keys(files).join(", ")}`,
+    `**New entries:** ${totalNew} | **Updated entries:** ${totalUpdated}`,
+    ``,
+  ];
+
+  for (const diff of diffs) {
+    const label = file_labels[diff.file] || diff.file;
+    summaryLines.push(`### ${label}`);
+    if (diff.newEntries.length > 0) {
+      summaryLines.push(`New: ${diff.newEntries.map(e => `\`${e.key}\``).slice(0, 10).join(", ")}${diff.newEntries.length > 10 ? ` (+${diff.newEntries.length - 10} more)` : ""}`);
+    }
+    if (diff.updatedEntries.length > 0) {
+      summaryLines.push(`Updated: ${diff.updatedEntries.map(e => `\`${e.key}\``).slice(0, 10).join(", ")}`);
+    }
+    summaryLines.push(``);
+  }
+
+  summaryLines.push(`---`);
+  summaryLines.push(`<details><summary>Full payload (processed by GitHub Actions)</summary>\n`);
+  summaryLines.push("```json");
+  summaryLines.push(JSON.stringify({ files }, null, 2));
+  summaryLines.push("```");
+  summaryLines.push(`\n</details>`);
+
+  try {
+    const response = await fetch(
+      `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/issues`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${githubToken}`,
+          "Content-Type": "application/json",
+          "User-Agent": "webview2-etw-mcp-server",
+        },
+        body: JSON.stringify({
+          title: `🧠 Learning Submission: +${totalNew} new, ${totalUpdated} updated`,
+          body: summaryLines.join("\n"),
+          labels: ["learning-submission"],
+        }),
+      }
+    );
+
+    if (response.ok) {
+      const issue = (await response.json()) as any;
+      return (
+        `## 📤 Submitted!\n\n` +
+        `Created issue [#${issue.number}](${issue.html_url}) — GitHub Actions will process and merge automatically.\n\n` +
+        `Track progress: ${issue.html_url}\n\n` +
+        `All users will receive these learnings on their next server startup.`
+      );
+    } else {
+      const status = response.status;
+      const errText = await response.text();
+      console.error(`[sync] Issue creation failed (${status}): ${errText}`);
+
+      if (status === 403 || status === 401) {
+        return (
+          `❌ **Share failed**: Your GitHub token doesn't have permission to create issues.\n\n` +
+          `This can happen if your token has limited scopes. To fix:\n` +
+          `• **gh CLI**: Run \`gh auth login -s public_repo\` to refresh with the right scope\n` +
+          `• **VS Code**: Sign out and back into GitHub in VS Code\n` +
+          `• **Manual**: Set \`GITHUB_TOKEN\` env var with a token that has \`public_repo\` scope`
+        );
+      }
+      return `❌ Share failed (${status}): ${errText}`;
+    }
+  } catch (err: any) {
+    return `❌ Failed to create GitHub issue: ${err.message}`;
+  }
+}
+
 const file_labels: Record<string, string> = {
   "events.json": "📋 Events",
   "api_ids.json": "🔢 API IDs",
@@ -391,15 +674,18 @@ function summarizeEntry(file: string, key: string, value: any): string {
 
 async function fetchFileFromGitHub(path: string): Promise<any | null> {
   try {
+    const headers: Record<string, string> = {
+      Accept: "application/vnd.github.v3.raw",
+      "User-Agent": "webview2-etw-mcp-server",
+    };
+    // Use token if available (higher rate limit: 5000/hr vs 60/hr)
+    if (githubToken) {
+      headers.Authorization = `Bearer ${githubToken}`;
+    }
+
     const response = await fetch(
       `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${path}?ref=${BRANCH}`,
-      {
-        headers: {
-          Authorization: `Bearer ${githubToken}`,
-          Accept: "application/vnd.github.v3.raw",
-          "User-Agent": "webview2-etw-mcp-server",
-        },
-      }
+      { headers }
     );
     if (!response.ok) return null;
     const text = await response.text();
@@ -411,15 +697,17 @@ async function fetchFileFromGitHub(path: string): Promise<any | null> {
 
 async function getFileSha(path: string): Promise<{ sha: string } | null> {
   try {
+    const headers: Record<string, string> = {
+      Accept: "application/vnd.github.v3+json",
+      "User-Agent": "webview2-etw-mcp-server",
+    };
+    if (githubToken) {
+      headers.Authorization = `Bearer ${githubToken}`;
+    }
+
     const response = await fetch(
       `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${path}?ref=${BRANCH}`,
-      {
-        headers: {
-          Authorization: `Bearer ${githubToken}`,
-          Accept: "application/vnd.github.v3+json",
-          "User-Agent": "webview2-etw-mcp-server",
-        },
-      }
+      { headers }
     );
     if (!response.ok) return null;
     const data = await response.json() as any;

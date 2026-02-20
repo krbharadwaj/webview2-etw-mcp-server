@@ -105,20 +105,9 @@ Add to `.vscode/mcp.json` in your workspace:
     "webview2-etw": {
       "type": "stdio",
       "command": "npx",
-      "args": ["-y", "github:krbharadwaj/webview2-etw-mcp-server"],
-      "env": {
-        "GITHUB_TOKEN": "${input:github_token}"
-      }
+      "args": ["-y", "github:krbharadwaj/webview2-etw-mcp-server"]
     }
-  },
-  "inputs": [
-    {
-      "id": "github_token",
-      "type": "promptString",
-      "description": "GitHub token for shared learning (optional — press Enter to skip)",
-      "password": true
-    }
-  ]
+  }
 }
 ```
 
@@ -131,15 +120,14 @@ Or add to your VS Code user `settings.json` (global — applies to all workspace
       "webview2-etw": {
         "type": "stdio",
         "command": "npx",
-        "args": ["-y", "github:krbharadwaj/webview2-etw-mcp-server"],
-        "env": {
-          "GITHUB_TOKEN": "ghp_your_token_here"
-        }
+        "args": ["-y", "github:krbharadwaj/webview2-etw-mcp-server"]
       }
     }
   }
 }
 ```
+
+> **No `GITHUB_TOKEN` needed!** The server auto-detects your GitHub authentication from `gh` CLI or VS Code. See [Sharing Learnings](#-sharing-learnings) for details.
 
 ### 🔧 From Source (for development)
 
@@ -157,10 +145,7 @@ Then point to the local build:
     "webview2-etw": {
       "type": "stdio",
       "command": "node",
-      "args": ["<path>/webview2-etw-mcp-server/dist/index.js"],
-      "env": {
-        "GITHUB_TOKEN": "ghp_your_token_here"
-      }
+      "args": ["<path>/webview2-etw-mcp-server/dist/index.js"]
     }
   }
 }
@@ -333,16 +318,35 @@ Sharing is **explicit** — the server never pushes without your review.
 3. **Say `"looks good, confirm"`** — changes are pushed to GitHub
 4. **Every other user** pulls your discoveries on their next server startup
 
-### Setup (one-time)
+### Setup
 
-To share, you need a GitHub token with **Contents: Read and write** permission on this repo:
+**Most users need zero setup** — the server auto-detects your GitHub authentication:
 
-1. Go to [GitHub Settings → Fine-grained tokens](https://github.com/settings/personal-access-tokens/new)
-2. Select repository: `krbharadwaj/webview2-etw-mcp-server`
-3. Permissions: **Contents → Read and write**
-4. Add the token to your MCP config as `GITHUB_TOKEN` (see [Installation](#-installation))
+| Auth Source | How It Works | Setup Needed |
+|-------------|-------------|--------------|
+| **VS Code GitHub sign-in** | Auto-detected from OS credential store (Copilot, Settings Sync, GitHub PRs) | **None** — already signed in |
+| **`gh` CLI** | Auto-detected via `gh auth token` | **None** — already authenticated |
+| **`GITHUB_TOKEN` env var** | Explicit token with repo write access (direct push) | One-time PAT creation |
 
-**Without a token**: Everything still works. Learnings stay local, and you still **receive** others' shared discoveries (public repo, read access is free).
+The server tries each source in order. If you're signed into GitHub in VS Code or have the `gh` CLI, sharing works immediately.
+
+**If no auth is detected**, the server tells you how to fix it:
+
+```
+🟡 Pull-only mode — receiving shared learnings but cannot share.
+
+To enable sharing, do ONE of:
+• Install gh CLI and run: gh auth login
+• Sign into GitHub in VS Code
+• Set GITHUB_TOKEN env var in your MCP config
+```
+
+#### How sharing works behind the scenes
+
+- **Users with `GITHUB_TOKEN` env var** (repo collaborators): Direct push to the repo
+- **Users with `gh` CLI or VS Code auth**: Creates a GitHub Issue with the knowledge diff → a GitHub Actions workflow automatically validates, merges, and commits
+
+**Without any auth**: Everything still works. Learnings stay local, and you still **receive** others' shared discoveries (public repo, read access is free).
 
 ### What Gets Synced
 

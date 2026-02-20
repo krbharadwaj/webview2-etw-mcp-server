@@ -1,0 +1,166 @@
+name: Process Shared Learnings
+
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  process:
+    if: startsWith(github.event.issue.title, '🧠 Learning Submission')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Process and merge learnings
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issue = context.payload.issue;
+            const fs = require('fs');
+            const ALLOWED = [
+              'api_ids.json',
+              'events.json',
+              'root_causes.json',
+              'timing_baselines.json',
+              'api_sequences.json',
+            ];
+
+            // Parse JSON from issue body (between ```json markers)
+            const match = issue.body.match(/```json\n([\s\S]*?)\n```/);
+            if (!match) {
+              await github.rest.issues.createComment({
+                ...context.repo,
+                issue_number: issue.number,
+                body: '❌ No valid JSON found in submission. Expected a ```json block with `{ "files": { ... } }`.',
+              });
+              await github.rest.issues.update({
+                ...context.repo,
+                issue_number: issue.number,
+                state: 'closed',
+                labels: ['invalid'],
+              });
+              return;
+            }
+
+            let submission;
+            try {
+              submission = JSON.parse(match[1]);
+            } catch (e) {
+              await github.rest.issues.createComment({
+                ...context.repo,
+                issue_number: issue.number,
+                body: `❌ Invalid JSON: ${e.message}`,
+              });
+              await github.rest.issues.update({
+                ...context.repo,
+                issue_number: issue.number,
+                state: 'closed',
+                labels: ['invalid'],
+              });
+              return;
+            }
+
+            if (!submission.files || typeof submission.files !== 'object') {
+              await github.rest.issues.createComment({
+                ...context.repo,
+                issue_number: issue.number,
+                body: '❌ Missing `files` object in submission.',
+              });
+              await github.rest.issues.update({
+                ...context.repo,
+                issue_number: issue.number,
+                state: 'closed',
+                labels: ['invalid'],
+              });
+              return;
+            }
+
+            const results = [];
+
+            for (const [filename, newData] of Object.entries(submission.files)) {
+              if (!ALLOWED.includes(filename)) {
+                results.push(`⚠️ \`${filename}\`: skipped (not an allowed knowledge file)`);
+                continue;
+              }
+
+              const path = `src/knowledge/${filename}`;
+              let existing;
+              try {
+                existing = JSON.parse(fs.readFileSync(path, 'utf-8'));
+              } catch {
+                results.push(`⚠️ \`${filename}\`: skipped (could not read existing file)`);
+                continue;
+              }
+
+              let changes = 0;
+
+              for (const [key, value] of Object.entries(newData)) {
+                if (key.startsWith('_')) continue;
+
+                if (!(key in existing)) {
+                  existing[key] = value;
+                  changes++;
+                } else if (
+                  filename === 'timing_baselines.json' &&
+                  value &&
+                  typeof value === 'object' &&
+                  value.sampleCount > (existing[key].sampleCount || 0)
+                ) {
+                  existing[key] = value;
+                  changes++;
+                } else if (
+                  filename === 'api_sequences.json' &&
+                  key !== '_metadata' &&
+                  value &&
+                  typeof value === 'object' &&
+                  (value.steps?.length || 0) > (existing[key]?.steps?.length || 0)
+                ) {
+                  existing[key] = value;
+                  changes++;
+                }
+              }
+
+              if (changes > 0) {
+                fs.writeFileSync(path, JSON.stringify(existing, null, 2) + '\n');
+                results.push(`✅ \`${filename}\`: +${changes} entries merged`);
+              } else {
+                results.push(`⏭️ \`${filename}\`: no new entries`);
+              }
+            }
+
+            // Commit if there were changes
+            const { execSync } = require('child_process');
+            execSync('git config user.name "webview2-etw-bot"');
+            execSync('git config user.email "bot@users.noreply.github.com"');
+            execSync('git add src/knowledge/');
+
+            let committed = false;
+            try {
+              execSync(
+                `git commit -m "🧠 Community learning from #${issue.number}"`
+              );
+              execSync('git push');
+              committed = true;
+            } catch {
+              // No changes to commit
+            }
+
+            const summary = committed
+              ? `## 📤 Processing Results\n\n${results.join('\n')}\n\n🎉 Changes committed and pushed! All users will receive these learnings on next server startup.`
+              : `## 📤 Processing Results\n\n${results.join('\n')}\n\nℹ️ No file changes to commit.`;
+
+            await github.rest.issues.createComment({
+              ...context.repo,
+              issue_number: issue.number,
+              body: summary,
+            });
+
+            await github.rest.issues.update({
+              ...context.repo,
+              issue_number: issue.number,
+              state: 'closed',
+              labels: ['learning-processed'],
+            });
