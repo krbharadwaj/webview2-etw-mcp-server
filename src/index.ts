@@ -14,6 +14,11 @@ import { compareEtls } from "./tools/compare_etls.js";
 import { analyzeCpu } from "./tools/analyze_cpu.js";
 import { timelineSlice } from "./tools/timeline_slice.js";
 import { validateTrace } from "./tools/validate_trace.js";
+import { initSync, pullLatest, pushLearnings, getSyncStatus } from "./knowledge/sync.js";
+import { dirname } from "path";
+import { fileURLToPath } from "url";
+import { existsSync } from "fs";
+import { join } from "path";
 
 const server = new McpServer({
   name: "webview2-etw-analysis",
@@ -246,12 +251,64 @@ server.tool(
   },
   async ({ filtered_file, mode }) => {
     const result = validateTrace(filtered_file, mode || "validate");
-    return { content: [{ type: "text", text: result }] };
+    // Push learnings to GitHub if in learning mode
+    let syncResult = "";
+    if (mode === "learn_good" || mode === "learn_bad") {
+      syncResult = await pushToGitHub();
+    }
+    return { content: [{ type: "text", text: result + syncResult }] };
   }
 );
 
+// ─── Tool: sync_status ───
+server.tool(
+  "sync_status",
+  "Check the GitHub sync status of the shared knowledge base. Shows whether learnings are being shared with other users.",
+  {},
+  async () => {
+    const status = getSyncStatus();
+    return { content: [{ type: "text", text: status }] };
+  }
+);
+
+// ─── Helper: resolve knowledge dir and push ───
+async function pushToGitHub(): Promise<string> {
+  try {
+    const knowledgeDir = resolveKnowledgeDir();
+    return await pushLearnings(knowledgeDir);
+  } catch {
+    return "";
+  }
+}
+
+function resolveKnowledgeDir(): string {
+  const thisDir = dirname(fileURLToPath(import.meta.url));
+  // Check same patterns as loader.ts
+  const candidates = [
+    join(thisDir, "knowledge"),
+    join(thisDir, "..", "src", "knowledge"),
+    join(thisDir, "..", "knowledge"),
+  ];
+  for (const dir of candidates) {
+    if (existsSync(join(dir, "api_ids.json"))) return dir;
+  }
+  return join(thisDir, "knowledge");
+}
+
 // ─── Start Server ───
 async function main() {
+  // Initialize GitHub sync
+  initSync();
+
+  // Pull latest knowledge from GitHub (non-blocking)
+  try {
+    const knowledgeDir = resolveKnowledgeDir();
+    const syncResult = await pullLatest(knowledgeDir);
+    if (syncResult) console.error(syncResult);
+  } catch (err: any) {
+    console.error(`[sync] Pull failed (non-critical): ${err.message}`);
+  }
+
   const transport = new StdioServerTransport();
   await server.connect(transport);
   console.error("WebView2 ETW Analysis MCP Server running on stdio");

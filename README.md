@@ -75,9 +75,20 @@ Add to `.vscode/mcp.json` in your workspace:
     "webview2-etw": {
       "type": "stdio",
       "command": "npx",
-      "args": ["-y", "github:krbharadwaj/webview2-etw-mcp-server"]
+      "args": ["-y", "github:krbharadwaj/webview2-etw-mcp-server"],
+      "env": {
+        "GITHUB_TOKEN": "${input:github_token}"
+      }
     }
-  }
+  },
+  "inputs": [
+    {
+      "id": "github_token",
+      "type": "promptString",
+      "description": "GitHub token for shared learning (optional — press Enter to skip)",
+      "password": true
+    }
+  ]
 }
 ```
 
@@ -90,11 +101,23 @@ Or add to VS Code `settings.json` (global):
       "webview2-etw": {
         "type": "stdio",
         "command": "npx",
-        "args": ["-y", "github:krbharadwaj/webview2-etw-mcp-server"]
+        "args": ["-y", "github:krbharadwaj/webview2-etw-mcp-server"],
+        "env": {
+          "GITHUB_TOKEN": "ghp_your_token_here"
+        }
       }
     }
   }
 }
+```
+
+### 🧠 Shared Learning (Optional)
+
+Set `GITHUB_TOKEN` to enable shared learning. When you analyze traces, your discoveries (new events, timing baselines, API sequences) are automatically pushed back to this repo so **all users benefit**.
+
+Without a token, the server works normally but learnings stay local.
+
+To create a token: [GitHub Settings → Developer settings → Personal access tokens → Fine-grained](https://github.com/settings/personal-access-tokens/new) with `Contents: Read and write` permission on this repo.
 ```
 
 ### 🔧 From Source
