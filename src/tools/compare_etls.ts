@@ -1,4 +1,5 @@
 import { existsSync, readFileSync } from "fs";
+import { generatePreprocessStep } from "./etlx_cache.js";
 
 const XPERF_PATH = "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\xperf.exe";
 
@@ -58,14 +59,20 @@ function generateExtractionCommands(
     `$xperf = "${XPERF_PATH}"`,
     `$env:_NT_SYMBOL_PATH = "srv*C:\\Symbols*http://msdl.microsoft.com/download/symbols"`,
     `$hostApp = "${hostApp}"`,
+    `$successEtl = "${successEtl}"`,
+    `$failureEtl = "${failureEtl}"`,
     `$outDir = "C:\\temp\\etl_compare"`,
     `New-Item -ItemType Directory -Path $outDir -Force | Out-Null`,
     "```",
     "",
+    "### Step 1.5: Pre-process SUCCESS ETL",
+    ...generatePreprocessStep("$successEtl", "C:\\temp\\etl_compare"),
+    "### Step 1.6: Pre-process FAILURE ETL",
+    ...generatePreprocessStep("$failureEtl", "C:\\temp\\etl_compare"),
     "### Step 2: Extract SUCCESS ETL",
     "```powershell",
     `Write-Host "Extracting SUCCESS ETL..."`,
-    `& $xperf -i "${successEtl}" -quiet -a dumper 2>$null |`,
+    `& $xperf -i $successEtl -quiet -a dumper 2>$null |`,
     `  Select-String -Pattern "$hostApp|WebView2_|msedgewebview2|NavigationRequest|ServiceWorker|TokenBroker|BrowserMain|v8\\." |`,
     `  Where-Object { $_.Line -notmatch "Process Name \\( PID\\)" } |`,
     `  Out-File "$outDir\\success_filtered.txt" -Encoding utf8`,
@@ -75,7 +82,7 @@ function generateExtractionCommands(
     "### Step 3: Extract FAILURE ETL",
     "```powershell",
     `Write-Host "Extracting FAILURE ETL..."`,
-    `& $xperf -i "${failureEtl}" -quiet -a dumper 2>$null |`,
+    `& $xperf -i $failureEtl -quiet -a dumper 2>$null |`,
     `  Select-String -Pattern "$hostApp|WebView2_|msedgewebview2|NavigationRequest|ServiceWorker|TokenBroker|BrowserMain|v8\\." |`,
     `  Where-Object { $_.Line -notmatch "Process Name \\( PID\\)" } |`,
     `  Out-File "$outDir\\failure_filtered.txt" -Encoding utf8`,

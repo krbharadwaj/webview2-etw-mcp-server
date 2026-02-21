@@ -1,5 +1,6 @@
 import { execSync } from "child_process";
 import { existsSync, readFileSync } from "fs";
+import { generatePreprocessStep } from "./etlx_cache.js";
 
 const XPERF_PATH = "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\xperf.exe";
 
@@ -58,6 +59,7 @@ export function analyzeEtl(etlPath: string, hostApp: string, outDir?: string): s
     `New-Item -ItemType Directory -Path $outDir -Force | Out-Null`,
     "```",
     "",
+    ...generatePreprocessStep("$etl", outputDir),
     "### Step 2: Extract & Filter (run this — may take 5-15 min)",
     "```powershell",
     `& $xperf -i $etl -quiet -a dumper 2>$null |`,

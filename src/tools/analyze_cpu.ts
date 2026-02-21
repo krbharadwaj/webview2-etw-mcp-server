@@ -1,4 +1,5 @@
 import { existsSync, readFileSync } from "fs";
+import { generatePreprocessStep } from "./etlx_cache.js";
 
 const XPERF_PATH = "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\xperf.exe";
 
@@ -57,6 +58,7 @@ export function analyzeCpu(
     `$env:_NT_SYMBOL_PATH = "${SYMBOL_PATH}"`,
     "```",
     "",
+    ...generatePreprocessStep("$etl", outDir),
   ];
 
   if (rangeStartUs && rangeEndUs) {
