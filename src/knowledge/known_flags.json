@@ -1,81 +1,499 @@
 {
   "_metadata": {
-    "version": "1.0.0",
-    "description": "Known WebView2 feature flags and configuration keys with risk/impact annotations. When found in ETL traces, these provide context for diagnosis.",
-    "lastUpdated": "2025-07-21"
+    "version": "2.0.0",
+    "description": "Known WebView2 feature flags and browser arguments with risk/impact annotations. When found in ETL traces or app config, these provide context for diagnosis. Source: https://learn.microsoft.com/en-us/microsoft-edge/webview2/concepts/webview-features-flags",
+    "lastUpdated": "2026-02-21"
   },
   "flags": {
     "IsEdgeWebViewCancelInitialNavigationEnabled": {
       "description": "Cancels the initial about:blank navigation to prevent suppressed NavigationCompleted",
       "impact": "When enabled, about:blank NavigationCompleted is cancelled rather than suppressed. Can prevent deadlocks in hosts that wait for NavigationCompleted.",
       "relatedRootCause": "init_about_blank_deadlock",
-      "riskLevel": "medium"
+      "riskLevel": "medium",
+      "category": "navigation"
     },
     "msWebView2EnableAutoProfileDeletion": {
       "description": "Automatically deletes user data folder profile on WebView2 close",
       "impact": "Data loss risk — user data removed on each session end",
       "relatedRootCause": null,
-      "riskLevel": "high"
+      "riskLevel": "high",
+      "category": "initialization"
     },
     "msWebView2BrowserProcessExeOverride": {
       "description": "Overrides the browser process executable path",
       "impact": "Custom browser process — may cause version mismatches or compatibility issues",
       "relatedRootCause": "init_creation_failure",
-      "riskLevel": "high"
+      "riskLevel": "high",
+      "category": "initialization"
     },
     "msWebView2EnableTracing": {
       "description": "Enables ETW tracing for WebView2 events",
       "impact": "Performance overhead from trace logging. Should be enabled for diagnostics only.",
       "relatedRootCause": null,
-      "riskLevel": "low"
+      "riskLevel": "low",
+      "category": "debugging"
     },
     "EdgeWebViewPersistUserDataOnMigration": {
       "description": "Persists user data during WebView2 runtime migration/update",
       "impact": "When disabled, user data may be lost during runtime updates",
       "relatedRootCause": null,
-      "riskLevel": "medium"
+      "riskLevel": "medium",
+      "category": "initialization"
     },
     "msWebView2BlockAllPACScripts": {
       "description": "Blocks all PAC (Proxy Auto-Configuration) scripts",
       "impact": "Can break proxy authentication in corporate environments",
       "relatedRootCause": "auth_proxy_block",
-      "riskLevel": "high"
+      "riskLevel": "high",
+      "category": "network"
     },
     "msWebView2AllowSingleSignOnUsingOSPrimaryAccount": {
       "description": "Allows SSO using the OS primary account",
       "impact": "Enables or disables WAM-based SSO. When disabled, forces manual authentication.",
       "relatedRootCause": "auth_wam_token_failure",
-      "riskLevel": "medium"
+      "riskLevel": "medium",
+      "category": "authentication"
     },
     "msWebView2EnableDpiAwarenessDetection": {
       "description": "Enables DPI awareness detection for the WebView2 process",
       "impact": "When enabled, WebView2 detects and adapts to DPI changes. When disabled, may cause scaling issues.",
       "relatedRootCause": "dpi_scaling_rendering",
-      "riskLevel": "low"
+      "riskLevel": "low",
+      "category": "display"
     },
     "msWebView2DisableSmartscreen": {
       "description": "Disables SmartScreen filter for WebView2",
       "impact": "Removes malware/phishing protection. May speed up navigation but increases security risk.",
       "relatedRootCause": null,
-      "riskLevel": "high"
+      "riskLevel": "high",
+      "category": "security"
     },
     "msWebView2ChannelSearchKind": {
       "description": "Controls which WebView2 runtime channel is used (Stable, Beta, Dev, Canary)",
       "impact": "Using non-Stable channels may expose to runtime bugs and regressions",
       "relatedRootCause": "runtime_version_regression",
-      "riskLevel": "medium"
+      "riskLevel": "medium",
+      "category": "initialization"
     },
     "msWebView2ReleaseChannelPreference": {
       "description": "Sets preference for release channel selection",
       "impact": "Affects which runtime version is selected when multiple are available",
       "relatedRootCause": "runtime_version_regression",
-      "riskLevel": "low"
+      "riskLevel": "low",
+      "category": "initialization"
     },
     "msWebView2BrowserExecutableFolder": {
       "description": "Sets the folder containing the WebView2 runtime/fixed version distribution",
       "impact": "Used for Fixed Version deployment. Wrong path causes creation failure.",
       "relatedRootCause": "init_creation_failure",
-      "riskLevel": "medium"
+      "riskLevel": "medium",
+      "category": "initialization"
+    },
+    "disable-gpu": {
+      "description": "Disables GPU hardware acceleration. If a software renderer isn't in place, the GPU process doesn't launch.",
+      "impact": "Prevents GPU crashes but may cause rendering performance degradation. Useful for diagnosing GPU-related blank pages.",
+      "relatedRootCause": "perf_gpu_webgl_oom",
+      "riskLevel": "medium",
+      "category": "performance"
+    },
+    "disable-background-timer-throttling": {
+      "description": "Disables task throttling of timer tasks from background pages",
+      "impact": "Background pages run at full speed. Higher CPU usage but prevents timer starvation in background WebViews.",
+      "relatedRootCause": null,
+      "riskLevel": "medium",
+      "category": "performance"
+    },
+    "no-sandbox": {
+      "description": "Disables the sandbox for all process types that are normally sandboxed",
+      "impact": "Critical security risk — removes process isolation. Only for testing. If seen in production traces, flag immediately.",
+      "relatedRootCause": null,
+      "riskLevel": "critical",
+      "category": "security"
+    },
+    "RendererAppContainer": {
+      "description": "Enables Renderer AppContainer isolation",
+      "impact": "When enabled, can crash Low Integrity Level (Low-IL) desktop apps due to missing capability SID. Known root cause of Bug 48452932.",
+      "relatedRootCause": "init_renderer_app_container",
+      "riskLevel": "high",
+      "category": "security"
+    },
+    "disable-web-security": {
+      "description": "Disables cross-origin policy and doesn't enforce same-origin policy",
+      "impact": "Critical security risk — allows cross-origin requests. Website testing only.",
+      "relatedRootCause": null,
+      "riskLevel": "critical",
+      "category": "security"
+    },
+    "disable-site-isolation-trials": {
+      "description": "Disables site isolation",
+      "impact": "Reduces security isolation between sites. May affect cross-origin iframe behavior.",
+      "relatedRootCause": null,
+      "riskLevel": "high",
+      "category": "security"
+    },
+    "msWebViewAllowLocalNetworkAccessChecks": {
+      "description": "Enables Local Network Access security checks that restrict web content from public origins from accessing local/loopback resources",
+      "impact": "When enabled, can break apps accessing local services. Known regression in WV2 143 (LNA permission change).",
+      "relatedRootCause": "chromium_upstream_regression",
+      "riskLevel": "high",
+      "category": "security"
+    },
+    "BlockInsecurePrivateNetworkRequests": {
+      "description": "Blocks private network requests from non-secure contexts in public address space",
+      "impact": "Can break legitimate local network communication from WebView2 apps.",
+      "relatedRootCause": null,
+      "riskLevel": "medium",
+      "category": "security"
+    },
+    "msEnhancedTrackingPreventionEnabled": {
+      "description": "Enables native privacy protection features such as blocking tracking cookies and requests",
+      "impact": "May break functionality on sites that rely on third-party cookies or tracking scripts.",
+      "relatedRootCause": null,
+      "riskLevel": "medium",
+      "category": "security"
+    },
+    "sdsm-state": {
+      "description": "Super Duper Secure Mode state (off/basic/balanced/strict)",
+      "impact": "Higher levels disable JIT compilation for security. Can significantly impact JavaScript performance.",
+      "relatedRootCause": null,
+      "riskLevel": "medium",
+      "category": "security"
+    },
+    "msSmartScreenProtection": {
+      "description": "Makes SmartScreen protection available",
+      "impact": "Adds malware/phishing protection. May add latency to navigation due to URL checking.",
+      "relatedRootCause": null,
+      "riskLevel": "low",
+      "category": "security"
+    },
+    "proxy-server": {
+      "description": "Proxy server that overrides system settings (HTTP and HTTPS only)",
+      "impact": "Overrides system proxy. Misconfiguration can cause all network requests to fail.",
+      "relatedRootCause": "auth_proxy_block",
+      "riskLevel": "medium",
+      "category": "network"
+    },
+    "proxy-bypass-list": {
+      "description": "Hosts for which proxy settings are bypassed (comma-separated)",
+      "impact": "Allows direct connections to specified hosts. Ignored unless --proxy-server is also set.",
+      "relatedRootCause": "auth_proxy_block",
+      "riskLevel": "low",
+      "category": "network"
+    },
+    "no-proxy-server": {
+      "description": "Overrides any other proxy server flags that are passed",
+      "impact": "Forces direct connections, bypassing all proxy configuration.",
+      "relatedRootCause": null,
+      "riskLevel": "medium",
+      "category": "network"
+    },
+    "allow-insecure-localhost": {
+      "description": "Allows TLS/SSL errors on localhost to be ignored",
+      "impact": "No interstitial for localhost cert errors. Useful for development but security risk in production.",
+      "relatedRootCause": null,
+      "riskLevel": "medium",
+      "category": "network"
+    },
+    "ignore-certificate-errors": {
+      "description": "Ignores all certificate-related errors",
+      "impact": "Critical security risk — silently accepts invalid/expired/self-signed certs. Development only.",
+      "relatedRootCause": "network_tls_failure",
+      "riskLevel": "critical",
+      "category": "network"
+    },
+    "log-net-log": {
+      "description": "Enables saving net log events to a file for network debugging",
+      "impact": "Captures detailed network activity. Useful for diagnosing TLS, proxy, and request failures.",
+      "relatedRootCause": null,
+      "riskLevel": "low",
+      "category": "debugging"
+    },
+    "net-log-capture-mode": {
+      "description": "Sets granularity of events in network log (Default/IncludeSensitive/Everything)",
+      "impact": "IncludeSensitive and Everything modes capture auth tokens and cookies — privacy risk.",
+      "relatedRootCause": null,
+      "riskLevel": "medium",
+      "category": "debugging"
+    },
+    "auto-open-devtools-for-tabs": {
+      "description": "Makes Edge WebView auto-open the DevTools window for each tab",
+      "impact": "DevTools open automatically. May trigger service worker force-update stall via CDP detach (CL 6619069).",
+      "relatedRootCause": "perf_sw_force_update_stall",
+      "riskLevel": "low",
+      "category": "debugging"
+    },
+    "remote-debugging-port": {
+      "description": "Enables remote debugging over HTTP on specified port",
+      "impact": "Opens debugging port — security risk if exposed. Used for automation and DevTools protocol access.",
+      "relatedRootCause": null,
+      "riskLevel": "high",
+      "category": "debugging"
+    },
+    "msEdgeDevToolsWdpRemoteDebugging": {
+      "description": "Enables remote debugging for WebView2 WinUI 2 (UWP) apps",
+      "impact": "Enables WDP-based remote debugging for UWP-hosted WebView2.",
+      "relatedRootCause": null,
+      "riskLevel": "medium",
+      "category": "debugging"
+    },
+    "enable-logging": {
+      "description": "Enable logging at the error level",
+      "impact": "Adds error-level logging output. Minimal performance impact.",
+      "relatedRootCause": null,
+      "riskLevel": "low",
+      "category": "debugging"
+    },
+    "force-device-scale-factor": {
+      "description": "Overrides the device scale factor for browser UI and contents",
+      "impact": "Forces specific DPI scaling. Useful for diagnosing DPI-related rendering issues.",
+      "relatedRootCause": "dpi_scaling_rendering",
+      "riskLevel": "low",
+      "category": "display"
+    },
+    "embedded-browser-webview-dpi-awareness": {
+      "description": "Sets the DPI awareness level of server-side processes",
+      "impact": "Controls DPI awareness for WebView2 browser process. Affects rendering on multi-monitor setups.",
+      "relatedRootCause": "dpi_scaling_rendering",
+      "riskLevel": "medium",
+      "category": "display"
+    },
+    "edge-webview-no-dpi-workaround": {
+      "description": "Disables the DPI awareness app compatibility shim workaround",
+      "impact": "Stops launching browser process via shell to avoid inheriting app compat shim. May fix or break DPI handling.",
+      "relatedRootCause": "dpi_scaling_rendering",
+      "riskLevel": "medium",
+      "category": "display"
+    },
+    "msEnhancedTextContrast": {
+      "description": "Improves text contrast enhancement and gamma correction to match native Windows apps",
+      "impact": "Font rendering respects ClearType Tuner settings. Visual improvement but may change text layout.",
+      "relatedRootCause": null,
+      "riskLevel": "low",
+      "category": "display"
+    },
+    "force-color-profile": {
+      "description": "Forces all monitors to use specified color profile (srgb/generic-rgb)",
+      "impact": "Overrides monitor color profiles. Useful for consistent rendering across displays.",
+      "relatedRootCause": null,
+      "riskLevel": "low",
+      "category": "display"
+    },
+    "msWebView2BrowserHitTransparent": {
+      "description": "Causes mouse/keyboard events to pass through WebView2 to underlying app",
+      "impact": "Input events bypass WebView2. May cause app to crash or freeze. Related to transparent window scenarios.",
+      "relatedRootCause": "display_transparent_window_covered",
+      "riskLevel": "high",
+      "category": "display"
+    },
+    "msWebView2EnableDraggableRegions": {
+      "description": "Enables app-region: drag/nodrag CSS style for titlebar-like behavior",
+      "impact": "Elements with app-region:drag behave like titlebars. Affects input handling on those elements.",
+      "relatedRootCause": null,
+      "riskLevel": "low",
+      "category": "display"
+    },
+    "block-new-web-contents": {
+      "description": "Makes all pop-ups and window.open calls fail when set to true",
+      "impact": "Blocks all new windows/tabs. May break sites that rely on popups for auth or payment flows.",
+      "relatedRootCause": null,
+      "riskLevel": "medium",
+      "category": "navigation"
+    },
+    "msWebView2CancelInitialNavigation": {
+      "description": "Cancels the initial navigation in WebView2 to improve startup performance",
+      "impact": "Skips about:blank navigation. Faster startup but may affect apps that depend on initial NavigationCompleted.",
+      "relatedRootCause": "init_about_blank_deadlock",
+      "riskLevel": "medium",
+      "category": "navigation"
+    },
+    "allow-file-access-from-files": {
+      "description": "Allows reading file:// URIs from other file:// URIs",
+      "impact": "Enables local file cross-referencing. Security risk if loading untrusted local content.",
+      "relatedRootCause": null,
+      "riskLevel": "medium",
+      "category": "navigation"
+    },
+    "disk-cache-size": {
+      "description": "Forces maximum disk space for disk cache (in bytes)",
+      "impact": "Limits cache size. Too small causes repeated network fetches; too large wastes disk. Relates to UDF bloat.",
+      "relatedRootCause": "perf_udf_bloat",
+      "riskLevel": "low",
+      "category": "performance"
+    },
+    "msWebView2CodeCache": {
+      "description": "Enables bytecode caching for JS resources loaded via SetVirtualHostNameToFolderMapping or WebResourceRequested",
+      "impact": "Speeds up 3rd+ loads of JS files. Increases disk usage but improves script execution time.",
+      "relatedRootCause": null,
+      "riskLevel": "low",
+      "category": "performance"
+    },
+    "edge-webview-foreground-boost-opt-in": {
+      "description": "Opts-in to foreground priority boost for WebView2 processes",
+      "impact": "WebView2 processes get higher scheduling priority when in foreground. May improve responsiveness.",
+      "relatedRootCause": null,
+      "riskLevel": "low",
+      "category": "performance"
+    },
+    "edge-webview-foreground-boost-opt-out": {
+      "description": "Opts-out of foreground priority boost",
+      "impact": "WebView2 processes do not get foreground boost. May reduce responsiveness but save CPU for host app.",
+      "relatedRootCause": null,
+      "riskLevel": "low",
+      "category": "performance"
+    },
+    "msWebView2SimulateMemoryPressureWhenInactive": {
+      "description": "Simulates memory pressure for inactive WebViews",
+      "impact": "Forces memory reclamation when WebView is inactive. Reduces memory but may cause reloads when reactivated.",
+      "relatedRootCause": null,
+      "riskLevel": "medium",
+      "category": "performance"
+    },
+    "SpareRendererForSitePerProcess": {
+      "description": "Keeps a warm spare renderer process for the most recently requested BrowserContext",
+      "impact": "Faster navigation by pre-spawning renderer. Increases baseline memory usage.",
+      "relatedRootCause": null,
+      "riskLevel": "low",
+      "category": "performance"
+    },
+    "js-flags": {
+      "description": "Passes flags to V8 JS engine (e.g., --scavenger_max_new_space_capacity_mb=8)",
+      "impact": "Controls V8 GC behavior. Lower scavenger limit = less memory, more frequent GC. Higher = more memory, less GC.",
+      "relatedRootCause": null,
+      "riskLevel": "medium",
+      "category": "performance"
+    },
+    "long-animation-frame-timing": {
+      "description": "Provides detailed timing for long animation frames exceeding 16.67ms (60fps)",
+      "impact": "Debugging aid for animation performance. Helps identify jank and bottlenecks.",
+      "relatedRootCause": null,
+      "riskLevel": "low",
+      "category": "performance"
+    },
+    "msWebView2TreatAppSuspendAsDeviceSuspend": {
+      "description": "When all WebViews suspended, treats app as if device is suspended (pauses timers/tasks)",
+      "impact": "Aggressive power saving. All delayed tasks and timers paused. May cause unexpected behavior on resume.",
+      "relatedRootCause": null,
+      "riskLevel": "medium",
+      "category": "performance"
+    },
+    "allow-run-as-system": {
+      "description": "Bypasses check that prevents Edge WebView browser from running as System account",
+      "impact": "Allows running as SYSTEM — not recommended. May be needed for specific service scenarios.",
+      "relatedRootCause": null,
+      "riskLevel": "high",
+      "category": "initialization"
+    },
+    "incognito": {
+      "description": "Forces InPrivate (Incognito) mode even with user data directory specified",
+      "impact": "No data persisted. Cookies, cache, history cleared on exit. Breaks SSO unless msAllowAmbientAuthInPrivateWebView2 also set.",
+      "relatedRootCause": null,
+      "riskLevel": "medium",
+      "category": "initialization"
+    },
+    "msSingleSignOnForInPrivateWebView2": {
+      "description": "Enables browser-based SSO flow for InPrivate sessions",
+      "impact": "Allows SSO in InPrivate mode. Use with msAllowAmbientAuthInPrivateWebView2 for ambient auth.",
+      "relatedRootCause": "auth_wam_token_failure",
+      "riskLevel": "medium",
+      "category": "authentication"
+    },
+    "msAllowAmbientAuthInPrivateWebView2": {
+      "description": "Enables SSO with default credential/ambient authentication flow in InPrivate mode",
+      "impact": "Must be used with msSingleSignOnForInPrivateWebView2. Enables automatic auth without user interaction.",
+      "relatedRootCause": "auth_wam_token_failure",
+      "riskLevel": "medium",
+      "category": "authentication"
+    },
+    "msSingleSignOnOSForPrimaryAccountIsShared": {
+      "description": "Allows implicit sign-in to Microsoft webpages using any account via OS primary account info",
+      "impact": "Broadens SSO to use OS-level account info for Microsoft webpages.",
+      "relatedRootCause": null,
+      "riskLevel": "medium",
+      "category": "authentication"
+    },
+    "user-agent": {
+      "description": "Overrides the default user agent with a custom string",
+      "impact": "Changes User-Agent header. May break server-side detection or feature gating.",
+      "relatedRootCause": null,
+      "riskLevel": "low",
+      "category": "network"
+    },
+    "accept-lang": {
+      "description": "Specifies Accept-Language header sent to servers (format: language[-country])",
+      "impact": "Overrides browser language for server content negotiation.",
+      "relatedRootCause": null,
+      "riskLevel": "low",
+      "category": "network"
+    },
+    "msWebView2EnableDownloadContentInWebResourceResponseReceived": {
+      "description": "Allows download navigation responses to be available in WebResourceResponseReceived",
+      "impact": "Enables intercepting download responses. Needed for custom download handling.",
+      "relatedRootCause": null,
+      "riskLevel": "low",
+      "category": "navigation"
+    },
+    "msWebView2TextureStream": {
+      "description": "Allows streaming captured/composed video frames to WebView2 for JS rendering",
+      "impact": "Enables texture streaming for media scenarios. Required for custom video composition pipelines.",
+      "relatedRootCause": null,
+      "riskLevel": "low",
+      "category": "media"
+    },
+    "msWebView2NativeEventDispatch": {
+      "description": "Uses native mojo connection for internal event dispatch (e.g., web messages to renderer)",
+      "impact": "Faster event dispatch path. May affect timing of WebMessage delivery.",
+      "relatedRootCause": null,
+      "riskLevel": "medium",
+      "category": "performance"
+    },
+    "msWebViewEdgeApplyWebResourceRequestedFilterForOOPIFs": {
+      "description": "Makes AddWebResourceRequestedFilter also apply to out-of-process iframes",
+      "impact": "Extends WRR filtering to OOPIFs. Required for intercepting iframe network requests.",
+      "relatedRootCause": null,
+      "riskLevel": "medium",
+      "category": "navigation"
+    },
+    "ThirdPartyStoragePartitioning": {
+      "description": "Enables partitioning of third-party storage (IndexedDB, CacheStorage) by top-level site",
+      "impact": "Reduces fingerprinting but may break apps relying on shared third-party storage across sites.",
+      "relatedRootCause": null,
+      "riskLevel": "medium",
+      "category": "security"
+    },
+    "PartitionedCookies": {
+      "description": "Enables sites to opt-in to having cookies partitioned by top-level site via Partitioned attribute",
+      "impact": "Partitioned cookies only sent when on same top-level site as when set. May break cross-site cookie flows.",
+      "relatedRootCause": null,
+      "riskLevel": "medium",
+      "category": "security"
+    },
+    "isolate-origins": {
+      "description": "Requires dedicated processes for specified origins (comma-separated list)",
+      "impact": "Increases process count and memory but improves security isolation for specified origins.",
+      "relatedRootCause": null,
+      "riskLevel": "medium",
+      "category": "security"
+    },
+    "edge-webview-is-background": {
+      "description": "Indicates that WebView is being launched in the background",
+      "impact": "Affects process priority and resource allocation. Background WebViews may be throttled.",
+      "relatedRootCause": null,
+      "riskLevel": "low",
+      "category": "initialization"
+    },
+    "edge-webview-run-with-package-id": {
+      "description": "Runs WebView processes with package identity for bridged Desktop apps",
+      "impact": "Affects Windows identity and capability resolution. Required for some MSIX scenarios.",
+      "relatedRootCause": null,
+      "riskLevel": "medium",
+      "category": "initialization"
+    },
+    "do-not-de-elevate": {
+      "description": "Prevents de-elevation of WebView2 on launch",
+      "impact": "Used after de-elevating to prevent infinite loops. Related to elevation/integrity level handling.",
+      "relatedRootCause": "perf_integrity_level_regression",
+      "riskLevel": "medium",
+      "category": "initialization"
     }
   }
 }
