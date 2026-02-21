@@ -6,7 +6,9 @@
       {
         "order": 1,
         "name": "NavigateAPI",
-        "events": ["WebView2_APICalled(API=3)"],
+        "events": [
+          "WebView2_APICalled(API=3)"
+        ],
         "phase": "host",
         "required": true,
         "description": "Host calls Navigate/NavigateToString",
@@ -15,17 +17,25 @@
       {
         "order": 2,
         "name": "NavigationStarting",
-        "events": ["WebView2_NavigationStarting", "WebView2_Event_NavigationStartingHandler"],
+        "events": [
+          "WebView2_NavigationStarting",
+          "WebView2_Event_NavigationStartingHandler"
+        ],
         "phase": "host_event",
         "required": true,
         "description": "WebView2 client receives NavigationStarting and fires to host",
         "checkQuestion": "Did the WebView2 client fire NavigationStarting to the host?",
-        "failureVariants": ["WebView2_NoHandlers_NavigationStarting"]
+        "failureVariants": [
+          "WebView2_NoHandlers_NavigationStarting"
+        ]
       },
       {
         "order": 3,
         "name": "NavigationRequest",
-        "events": ["NavigationRequest::Create", "NavigationRequest::BeginNavigation"],
+        "events": [
+          "NavigationRequest::Create",
+          "NavigationRequest::BeginNavigation"
+        ],
         "phase": "browser",
         "required": true,
         "description": "Browser process creates and begins the navigation request",
@@ -34,7 +44,10 @@
       {
         "order": 4,
         "name": "SourceChanged",
-        "events": ["WebView2_SourceChanged", "WebView2_Event_SourceChangedHandler"],
+        "events": [
+          "WebView2_SourceChanged",
+          "WebView2_Event_SourceChangedHandler"
+        ],
         "phase": "host_event",
         "required": false,
         "description": "Source URI changed notification",
@@ -43,7 +56,10 @@
       {
         "order": 5,
         "name": "ContentLoading",
-        "events": ["WebView2_ContentLoading", "WebView2_Event_ContentLoadingHandler"],
+        "events": [
+          "WebView2_ContentLoading",
+          "WebView2_Event_ContentLoadingHandler"
+        ],
         "phase": "host_event",
         "required": false,
         "description": "Content began loading in the renderer",
@@ -52,17 +68,26 @@
       {
         "order": 6,
         "name": "DocumentCommit",
-        "events": ["NavigationRequest::CommitNavigation", "NavigationRequest::DidCommitNavigation", "WebView2_DocStateChanged"],
+        "events": [
+          "NavigationRequest::CommitNavigation",
+          "NavigationRequest::DidCommitNavigation",
+          "WebView2_DocStateChanged"
+        ],
         "phase": "browser",
         "required": true,
         "description": "Document committed in browser process",
         "checkQuestion": "Did document commit occur?",
-        "failureVariants": ["WebView2_DocStateSuppressed", "WebView2_NavIdNotFound"]
+        "failureVariants": [
+          "WebView2_DocStateSuppressed",
+          "WebView2_NavIdNotFound"
+        ]
       },
       {
         "order": 7,
         "name": "HistoryChanged",
-        "events": ["WebView2_HistoryChanged"],
+        "events": [
+          "WebView2_HistoryChanged"
+        ],
         "phase": "host_event",
         "required": false,
         "description": "Browser history updated",
@@ -71,7 +96,10 @@
       {
         "order": 8,
         "name": "DOMContentLoaded",
-        "events": ["WebView2_DOMContentLoaded", "WebView2_Event_DOMContentLoadedHandler"],
+        "events": [
+          "WebView2_DOMContentLoaded",
+          "WebView2_Event_DOMContentLoadedHandler"
+        ],
         "phase": "host_event",
         "required": false,
         "description": "DOM fully parsed",
@@ -80,7 +108,10 @@
       {
         "order": 9,
         "name": "NavigationCompleted",
-        "events": ["WebView2_NavigationCompleted", "WebView2_Event_NavigationCompletedHandler"],
+        "events": [
+          "WebView2_NavigationCompleted",
+          "WebView2_Event_NavigationCompletedHandler"
+        ],
         "phase": "host_event",
         "required": true,
         "description": "Navigation finished — success or failure reported to host",
@@ -98,26 +129,43 @@
         "name": "runtime_to_host_dispatch",
         "description": "Check if event was generated in runtime but not dispatched to host",
         "indicators": {
-          "dispatched": ["WebView2_Event_*Handler"],
-          "dropped": ["WebView2_DroppedEvent", "WebView2_NoEventDispatcher"],
-          "no_handler": ["WebView2_NoHandlers_*"]
+          "dispatched": [
+            "WebView2_Event_*Handler"
+          ],
+          "dropped": [
+            "WebView2_DroppedEvent",
+            "WebView2_NoEventDispatcher"
+          ],
+          "no_handler": [
+            "WebView2_NoHandlers_*"
+          ]
         }
       },
       {
         "name": "navigation_id_correlation",
         "description": "Check NavigationId consistency across events",
         "indicators": {
-          "mismatch": ["WebView2_DifferentNavigationId"],
-          "not_found": ["WebView2_NavIdNotFound"],
-          "suppressed": ["WebView2_DocStateSuppressed"]
+          "mismatch": [
+            "WebView2_DifferentNavigationId"
+          ],
+          "not_found": [
+            "WebView2_NavIdNotFound"
+          ],
+          "suppressed": [
+            "WebView2_DocStateSuppressed"
+          ]
         }
       },
       {
         "name": "iframe_lifecycle",
         "description": "Check for iframe removal mid-navigation",
         "indicators": {
-          "removed": ["WebView2_IFrameNotFound"],
-          "detached": ["WebView2_FrameDetached"]
+          "removed": [
+            "WebView2_IFrameNotFound"
+          ],
+          "detached": [
+            "WebView2_FrameDetached"
+          ]
         }
       }
     ]
@@ -128,7 +176,10 @@
       {
         "order": 1,
         "name": "EnvironmentCreate",
-        "events": ["WebView2_FactoryCreate", "WebView2_Factory_Start"],
+        "events": [
+          "WebView2_FactoryCreate",
+          "WebView2_Factory_Start"
+        ],
         "phase": "host",
         "required": true,
         "description": "Environment creation initiated"
@@ -136,7 +187,10 @@
       {
         "order": 2,
         "name": "BrowserProcess",
-        "events": ["WebView2_BrowserProcess_Start", "WebView2_WebViewProcessLaunchType"],
+        "events": [
+          "WebView2_BrowserProcess_Start",
+          "WebView2_WebViewProcessLaunchType"
+        ],
         "phase": "browser",
         "required": true,
         "description": "Browser process started (cold or warm)"
@@ -144,7 +198,10 @@
       {
         "order": 3,
         "name": "ControllerCreate",
-        "events": ["WebView2_Creation_Client", "WebView2_Creation_Server"],
+        "events": [
+          "WebView2_Creation_Client",
+          "WebView2_Creation_Server"
+        ],
         "phase": "host",
         "required": true,
         "description": "Controller creation (client + server side)"
@@ -152,7 +209,10 @@
       {
         "order": 4,
         "name": "AboutBlankNav",
-        "events": ["WebView2_NavigationStarting", "WebView2_NavigationCompleted"],
+        "events": [
+          "WebView2_NavigationStarting",
+          "WebView2_NavigationCompleted"
+        ],
         "phase": "browser",
         "required": false,
         "description": "Initial about:blank navigation (may be suppressed)",
@@ -161,7 +221,9 @@
       {
         "order": 5,
         "name": "Ready",
-        "events": ["WebView2_Creation_Client_End"],
+        "events": [
+          "WebView2_Creation_Client_End"
+        ],
         "phase": "host",
         "required": true,
         "description": "WebView2 ready for use"
@@ -183,27 +245,32 @@
         },
         {
           "id": "check_nav_starting",
-          "question": "Is WebView2_NavigationStarting present?",
-          "eventToCheck": "WebView2_NavigationStarting",
+          "question": "Is WebView2_Event with NavigationStartingHandler present in trace?",
+          "eventToCheck": "WebView2_Event",
           "yes": "check_begin_navigation",
           "no": "check_no_handlers_starting",
-          "diagnosis_no_default": "Navigation failed before NavigationStarting — check for initialization issues or service worker blocking"
+          "diagnosis_no_default": "Navigation failed before NavigationStarting — check for initialization issues or service worker blocking",
+          "eventParam": "ICoreWebView2NavigationStartingEventHandler",
+          "traceNote": "NavigationStarting is not a standalone ETW event. Look for WebView2_Event with event param containing NavigationStartingEventHandler."
         },
         {
           "id": "check_no_handlers_starting",
-          "question": "Is WebView2_NoHandlers present for NavigationStarting?",
-          "eventToCheck": "WebView2_NoHandlers",
+          "question": "Is WebView2_NoEventDispatcher present?",
+          "eventToCheck": "WebView2_NoEventDispatcher",
           "yes": "diagnosis_no_handlers",
           "no": "check_iframe_not_found",
-          "diagnosis_yes": "Host app did not register NavigationStarting handler (add_NavigationStarting API=35 not called) — events are silently dropped"
+          "diagnosis_yes": "Host app did not register NavigationStarting handler (add_NavigationStarting API=35 not called) — events are silently dropped",
+          "traceNote": "WebView2_NoHandlers specific variants may not exist. Check for WebView2_DroppedEvent or WebView2_NoEventDispatcher as proxies."
         },
         {
           "id": "check_iframe_not_found",
-          "question": "Is WebView2_IFrameNotFound present?",
-          "eventToCheck": "WebView2_IFrameNotFound",
+          "question": "Are WebView2_DroppedEvent entries present for navigation events?",
+          "eventToCheck": "WebView2_DroppedEvent",
           "yes": "diagnosis_iframe_torn",
           "no": "diagnosis_nav_starting_missing",
-          "diagnosis_yes": "IFrame was destroyed mid-navigation — all lifecycle events silently dropped because frame no longer exists"
+          "diagnosis_yes": "Navigation events were dropped — possible iframe destruction mid-navigation. Check WebView2_DroppedEvent details for affected handler.",
+          "traceNote": "WebView2_IFrameNotFound will be available after nav diagnostic PR merges. Until then, check for WebView2_DroppedEvent + missing frame events as proxy.",
+          "status": "degraded_until_nav_diagnostic_pr"
         },
         {
           "id": "check_begin_navigation",
@@ -240,40 +307,85 @@
         },
         {
           "id": "check_doc_state",
-          "question": "Is WebView2_DocStateChanged present?",
-          "eventToCheck": "WebView2_DocStateChanged",
+          "question": "Did commit succeed? (NavigationRequest::DidCommitNavigation already checked in previous step)",
+          "eventToCheck": "NavigationRequest::DidCommitNavigation",
           "yes": "check_nav_completed_event",
           "no": "diagnosis_doc_state_suppressed",
-          "diagnosis_no": "Document committed but DocStateChanged was suppressed — check WebView2_DocStateSuppressed for nav ID mismatch or about:blank suppression"
+          "diagnosis_no": "Navigation committed but client-side doc state may not have updated — possible nav ID mismatch (WebView2_DifferentNavigationId) or about:blank suppression.",
+          "traceNote": "WebView2_DocStateChanged will be available after nav diagnostic PR merges. For now, use DidCommitNavigation as proxy — if commit succeeded, doc state should have changed.",
+          "status": "degraded_until_nav_diagnostic_pr"
         },
         {
           "id": "check_nav_completed_event",
-          "question": "Is WebView2_NavigationCompleted present in ETW but not received by host?",
-          "eventToCheck": "WebView2_NavigationCompleted",
+          "question": "Is WebView2_Event with NavigationCompletedHandler present in trace?",
+          "eventToCheck": "WebView2_Event",
           "yes": "check_handler_dispatch",
           "no": "diagnosis_nav_completed_never_generated",
-          "diagnosis_no": "NavigationCompleted was never generated by the client — possible nav ID mismatch (WebView2_DifferentNavigationId) or event was dropped (WebView2_DroppedEvent)"
+          "diagnosis_no": "NavigationCompleted was never generated by the client — possible nav ID mismatch (WebView2_DifferentNavigationId) or event was dropped (WebView2_DroppedEvent)",
+          "eventParam": "ICoreWebView2NavigationCompletedEventHandler",
+          "traceNote": "NavigationCompleted is not a standalone ETW event. Look for WebView2_Event with event param containing NavigationCompletedEventHandler."
         },
         {
           "id": "check_handler_dispatch",
-          "question": "Is WebView2_Event_NavigationCompletedHandler present?",
-          "eventToCheck": "WebView2_Event_NavigationCompletedHandler",
+          "question": "Is WebView2_InvokeFinished present after the NavigationCompleted WebView2_Event?",
+          "eventToCheck": "WebView2_InvokeFinished",
           "yes": "diagnosis_handler_slow",
           "no": "diagnosis_dispatch_failed",
           "diagnosis_yes": "NavigationCompleted was dispatched to host handler — issue is in host app's handler code or timing",
-          "diagnosis_no": "NavigationCompleted was generated but never dispatched to host — WebView2_NoEventDispatcher or handler not registered"
+          "diagnosis_no": "NavigationCompleted was generated but never dispatched to host — WebView2_NoEventDispatcher or handler not registered",
+          "traceNote": "Handler dispatch and completion is tracked by WebView2_InvokeFinished. If Event fired but InvokeFinished missing, the handler may be hung."
         }
       ],
       "commonRootCauses": [
-        { "cause": "nav_id_mismatch", "evidence": "WebView2_DifferentNavigationId", "frequency": "common" },
-        { "cause": "about_blank_suppression", "evidence": "initializing_navigation_id_ in DocStateSuppressed", "frequency": "common" },
-        { "cause": "service_worker_blocking", "evidence": "ForwardServiceWorkerToWorkerReady with long gap before DidCommitNavigation", "frequency": "common" },
-        { "cause": "iframe_destroyed", "evidence": "WebView2_IFrameNotFound + WebView2_FrameDetached", "frequency": "moderate" },
-        { "cause": "memory_pressure", "evidence": "No commit, no crash, throttling events present", "frequency": "moderate" },
-        { "cause": "handler_not_registered", "evidence": "WebView2_NoHandlers", "frequency": "rare" },
-        { "cause": "pending_commit_blocking", "evidence": "NavigationRequest::CommitNavigation present but DidCommitNavigation delayed >5s", "frequency": "moderate" },
-        { "cause": "renderer_crash", "evidence": "WebView2_ProcessExited or WebView2_RendererUnresponsive", "frequency": "rare" }
+        {
+          "cause": "nav_id_mismatch",
+          "evidence": "WebView2_DifferentNavigationId",
+          "frequency": "common"
+        },
+        {
+          "cause": "about_blank_suppression",
+          "evidence": "initializing_navigation_id_ in DocStateSuppressed",
+          "frequency": "common"
+        },
+        {
+          "cause": "service_worker_blocking",
+          "evidence": "ForwardServiceWorkerToWorkerReady with long gap before DidCommitNavigation",
+          "frequency": "common"
+        },
+        {
+          "cause": "iframe_destroyed",
+          "evidence": "WebView2_IFrameNotFound + WebView2_FrameDetached",
+          "frequency": "moderate"
+        },
+        {
+          "cause": "memory_pressure",
+          "evidence": "No commit, no crash, throttling events present",
+          "frequency": "moderate"
+        },
+        {
+          "cause": "handler_not_registered",
+          "evidence": "WebView2_NoHandlers",
+          "frequency": "rare"
+        },
+        {
+          "cause": "pending_commit_blocking",
+          "evidence": "NavigationRequest::CommitNavigation present but DidCommitNavigation delayed >5s",
+          "frequency": "moderate"
+        },
+        {
+          "cause": "renderer_crash",
+          "evidence": "WebView2_ProcessExited or WebView2_RendererUnresponsive",
+          "frequency": "rare"
+        }
       ]
+    }
+  },
+  "_metadata": {
+    "eventNamingConvention": {
+      "note": "Events prefixed WebView2_ may be real ETW TRACE_EVENT names or logical API callback names.",
+      "real_etw_events": "Events like WebView2_APICalled, WebView2_Creation_Client, WebView2_NewNavigationContext are standalone ETW trace events.",
+      "api_callbacks": "Events like WebView2_NavigationStarting, WebView2_NavigationCompleted appear in ETL traces as WebView2_Event with the handler interface name as a parameter.",
+      "pr_only_events": "Events like WebView2_DocStateChanged, WebView2_DocStateSuppressed, WebView2_IFrameNotFound are only available after the navigation diagnostic PR merges to main."
     }
   }
 }

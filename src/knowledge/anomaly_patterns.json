@@ -306,18 +306,6 @@
       "evidenceTemplate": "WebView2_CreateSharedMemoryRegionFailed — system may be low on memory"
     },
     {
-      "id": "nav_blocked_pending_commit",
-      "patterns": {
-        "present": [
-          "kBlockedByPendingCommit"
-        ],
-        "absent": []
-      },
-      "severity": "warning",
-      "message": "🟡 Navigation BLOCKED by pending about:blank commit",
-      "evidenceTemplate": "kBlockedByPendingCommit — real navigation deferred until about:blank completes. Check service worker activation."
-    },
-    {
       "id": "throttling_url_loader_stall",
       "patterns": {
         "present": [
@@ -335,13 +323,14 @@
       "id": "iframe_torn_mid_navigation",
       "patterns": {
         "present": [
-          "WebView2_IFrameNotFound"
+          "WebView2_DroppedEvent"
         ],
         "absent": []
       },
       "severity": "warning",
       "message": "🟡 IFrame torn down mid-navigation — events will be silently dropped",
-      "evidenceTemplate": "WebView2_IFrameNotFound — frame destroyed during active navigation lifecycle"
+      "evidenceTemplate": "WebView2_DroppedEvent — frame destroyed during active navigation lifecycle",
+      "notes": " WebView2_IFrameNotFound is available after nav diagnostic PR merges. Until then, check WebView2_DroppedEvent + WebView2_FrameDetached patterns."
     },
     {
       "id": "shutdown_race_launch_failure",
@@ -369,7 +358,10 @@
       },
       "severity": "critical",
       "message": "🔴 Renderer process exited before navigation completed — likely renderer crash",
-      "evidenceTemplate": "WebView2_ProcessExited detected without NavigationCompleted — check ProcessFailedKind (RenderProcessExited / FrameRenderProcessExitedFailure). Common cause: RendererAppContainer enablement on Low-IL apps"
+      "evidenceTemplate": "WebView2_ProcessExited detected without NavigationCompleted — check ProcessFailedKind (RenderProcessExited / FrameRenderProcessExitedFailure). Common cause: RendererAppContainer enablement on Low-IL apps",
+      "traceNotes": {
+        "WebView2_NavigationCompleted": "This is an API callback, not a standalone ETW event. In traces, look for WebView2_Event with the corresponding handler interface name."
+      }
     },
     {
       "id": "gpu_process_crash_restart",
@@ -402,7 +394,7 @@
       "patterns": {
         "present": [
           "WebView2_Creation_Client",
-          "WebView2_Creation_Client_End"
+          "WebView2_Creation_Client"
         ],
         "absent": [
           "WebView2_NavigationStarting"
@@ -410,7 +402,10 @@
       },
       "severity": "warning",
       "message": "🟡 WebView2 created successfully but no navigation was initiated",
-      "evidenceTemplate": "WebView2 initialization completed (Creation_Client → Creation_Client_End) but no NavigationStarting — host app may not have called Navigate()"
+      "evidenceTemplate": "WebView2 initialization completed (Creation_Client → Creation_Client_End) but no NavigationStarting — host app may not have called Navigate()",
+      "traceNotes": {
+        "WebView2_NavigationStarting": "This is an API callback, not a standalone ETW event. In traces, look for WebView2_Event with the corresponding handler interface name."
+      }
     },
     {
       "id": "dropped_event_detected",
@@ -460,19 +455,22 @@
       },
       "severity": "critical",
       "message": "🔴 Navigation ID mismatch — NavigationCompleted suppressed",
-      "evidenceTemplate": "WebView2_DifferentNavigationId present without NavigationCompleted — the navigation completed in the browser but the client suppressed it because the nav ID didn't match. Common with about:blank ID reuse"
+      "evidenceTemplate": "WebView2_DifferentNavigationId present without NavigationCompleted — the navigation completed in the browser but the client suppressed it because the nav ID didn't match. Common with about:blank ID reuse",
+      "traceNotes": {
+        "WebView2_NavigationCompleted": "This is an API callback, not a standalone ETW event. In traces, look for WebView2_Event with the corresponding handler interface name."
+      }
     },
     {
       "id": "doc_state_suppressed",
       "patterns": {
-        "present": [
-          "WebView2_DocStateSuppressed"
-        ],
+        "present": [],
         "absent": []
       },
       "severity": "warning",
       "message": "🟡 Document state change was suppressed",
-      "evidenceTemplate": "WebView2_DocStateSuppressed — document state transition was intentionally suppressed. Common for initial about:blank navigation (initializing_navigation_id_)"
+      "evidenceTemplate": "WebView2_DocStateSuppressed — document state transition was intentionally suppressed. Common for initial about:blank navigation (initializing_navigation_id_)",
+      "status": "partial",
+      "notes": " WebView2_DocStateSuppressed removed (available when nav diagnostic PR merges)."
     }
   ]
 }

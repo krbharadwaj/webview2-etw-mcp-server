@@ -1883,5 +1883,236 @@
     "relatedEvents": [
       "NavigationRequest::CommitNavigation"
     ]
+  },
+  "WebView2_SetWindowPos": {
+    "description": "Window position set on WebView2 controller during bounds/position changes.",
+    "category": "Window Management",
+    "severity": "Info",
+    "params": [
+      {
+        "index": 1,
+        "name": "hwnd",
+        "type": "pointer",
+        "description": "Window handle"
+      },
+      {
+        "index": 2,
+        "name": "flags",
+        "type": "uint32",
+        "description": "SWP flags"
+      }
+    ],
+    "relatedEvents": [
+      "WebView2_ClientWindowInit",
+      "WebView2_InvalidWindow"
+    ],
+    "sourceFile": "controller.cc"
+  },
+  "WebView2_ClientWindowInit": {
+    "description": "Client window initialization on the WebView2 controller.",
+    "category": "Initialization",
+    "severity": "Info",
+    "params": [
+      {
+        "index": 1,
+        "name": "hwnd",
+        "type": "pointer",
+        "description": "Window handle"
+      }
+    ],
+    "relatedEvents": [
+      "WebView2_Creation_Client",
+      "WebView2_SetWindowPos"
+    ],
+    "sourceFile": "controller.cc"
+  },
+  "WebView2_InvalidWindow": {
+    "description": "Invalid window handle detected during WebView2 operations.",
+    "category": "Error",
+    "severity": "Error",
+    "params": [
+      {
+        "index": 1,
+        "name": "hwnd",
+        "type": "pointer",
+        "description": "Invalid window handle"
+      }
+    ],
+    "relatedEvents": [
+      "WebView2_DelayedInvalidWindow",
+      "WebView2_ClientWindowInit"
+    ],
+    "sourceFile": "controller.cc"
+  },
+  "WebView2_CallCDPMethodFailed": {
+    "description": "Chrome DevTools Protocol method call failed.",
+    "category": "CDP",
+    "severity": "Error",
+    "params": [
+      {
+        "index": 1,
+        "name": "method",
+        "type": "string",
+        "description": "CDP method name"
+      },
+      {
+        "index": 2,
+        "name": "error",
+        "type": "string",
+        "description": "Error details"
+      }
+    ],
+    "relatedEvents": [
+      "WebView2_APICalled"
+    ],
+    "sourceFile": "webview_core.cc"
+  },
+  "WebView2_GetDpiAwareness": {
+    "description": "DPI awareness level retrieved for WebView2 controller window.",
+    "category": "DPI",
+    "severity": "Info",
+    "params": [
+      {
+        "index": 1,
+        "name": "awareness",
+        "type": "uint32",
+        "description": "DPI awareness level"
+      }
+    ],
+    "relatedEvents": [
+      "WebView2_IncompatibleDPI",
+      "WebView2_SetDpiAwareness_Failed"
+    ],
+    "sourceFile": "controller.cc"
+  },
+  "WebView2_WatcherTerminateProcess": {
+    "description": "Process watcher terminated a lingering descendant process on shutdown.",
+    "category": "Process Management",
+    "severity": "Warning",
+    "params": [
+      {
+        "index": 1,
+        "name": "pid",
+        "type": "uint32",
+        "description": "Process ID being terminated"
+      },
+      {
+        "index": 2,
+        "name": "process_type",
+        "type": "string",
+        "description": "Type of process"
+      }
+    ],
+    "relatedEvents": [
+      "WebView2_ProcessExited",
+      "WebView2_WaitForDescendantsTimeOut"
+    ],
+    "sourceFile": "runtime_processes_collection_tracker.cc"
+  },
+  "WebView2_RegisterUIAEndpoints": {
+    "description": "UI Automation accessibility endpoints registered for WebView2.",
+    "category": "Accessibility",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [
+      "WebView2_ClientWindowInit"
+    ],
+    "sourceFile": "controller.cc"
+  },
+  "WebView2_NavigationStarting": {
+    "description": "NavigationStarting callback dispatched to host app when navigation is initiated.",
+    "category": "Navigation Events",
+    "severity": "Info",
+    "type": "api_callback",
+    "traceMapping": {
+      "etw_event": "WebView2_Event",
+      "param": "event",
+      "handlerInterface": "ICoreWebView2NavigationStartingEventHandler"
+    },
+    "notes": "Not a standalone ETW event. In traces appears as WebView2_Event with handler name parameter.",
+    "relatedEvents": [
+      "WebView2_Event",
+      "WebView2_APICalled",
+      "WebView2_NewNavigationContext"
+    ]
+  },
+  "WebView2_NavigationCompleted": {
+    "description": "NavigationCompleted callback dispatched to host app when navigation finishes.",
+    "category": "Navigation Events",
+    "severity": "Info",
+    "type": "api_callback",
+    "traceMapping": {
+      "etw_event": "WebView2_Event",
+      "param": "event",
+      "handlerInterface": "ICoreWebView2NavigationCompletedEventHandler"
+    },
+    "notes": "Not a standalone ETW event. In traces appears as WebView2_Event with handler name parameter.",
+    "relatedEvents": [
+      "WebView2_Event",
+      "WebView2_NavigationStarting"
+    ]
+  },
+  "WebView2_ContentLoading": {
+    "description": "ContentLoading callback dispatched to host app when content begins loading.",
+    "category": "Navigation Events",
+    "severity": "Info",
+    "type": "api_callback",
+    "traceMapping": {
+      "etw_event": "WebView2_Event",
+      "param": "event",
+      "handlerInterface": "ICoreWebView2ContentLoadingEventHandler"
+    },
+    "notes": "Not a standalone ETW event. In traces appears as WebView2_Event with handler name parameter.",
+    "relatedEvents": [
+      "WebView2_Event",
+      "WebView2_NavigationStarting"
+    ]
+  },
+  "WebView2_DOMContentLoaded": {
+    "description": "DOMContentLoaded callback dispatched to host app when DOM is fully parsed.",
+    "category": "Navigation Events",
+    "severity": "Info",
+    "type": "api_callback",
+    "traceMapping": {
+      "etw_event": "WebView2_Event",
+      "param": "event",
+      "handlerInterface": "ICoreWebView2DOMContentLoadedEventHandler"
+    },
+    "notes": "Not a standalone ETW event. In traces appears as WebView2_Event with handler name parameter.",
+    "relatedEvents": [
+      "WebView2_Event",
+      "WebView2_ContentLoading"
+    ]
+  },
+  "WebView2_SourceChanged": {
+    "description": "SourceChanged callback dispatched to host app when source URI changes.",
+    "category": "Navigation Events",
+    "severity": "Info",
+    "type": "api_callback",
+    "traceMapping": {
+      "etw_event": "WebView2_Event",
+      "param": "event",
+      "handlerInterface": "ICoreWebView2SourceChangedEventHandler"
+    },
+    "notes": "Not a standalone ETW event. In traces appears as WebView2_Event with handler name parameter.",
+    "relatedEvents": [
+      "WebView2_Event",
+      "WebView2_NavigationStarting"
+    ]
+  },
+  "WebView2_HistoryChanged": {
+    "description": "HistoryChanged callback dispatched to host app when browser history is updated.",
+    "category": "Navigation Events",
+    "severity": "Info",
+    "type": "api_callback",
+    "traceMapping": {
+      "etw_event": "WebView2_Event",
+      "param": "event",
+      "handlerInterface": "ICoreWebView2HistoryChangedEventHandler"
+    },
+    "notes": "Not a standalone ETW event. In traces appears as WebView2_Event with handler name parameter.",
+    "relatedEvents": [
+      "WebView2_Event"
+    ]
   }
 }
