@@ -7,6 +7,7 @@ import { z } from "zod";
 import { decodeApiId, decodeApiIdBatch, listApisByCategory } from "./tools/decode.js";
 import { unifiedAnalyze } from "./tools/unified_analyze.js";
 import { getExpectedTraceEvents } from "./tools/expected_events.js";
+import { lookupFlag, listFlagsByCategory, listAllCategories, findFlagsForScenario } from "./tools/feature_flags.js";
 import { initSync, pullLatest, getSyncStatus, previewLearnings, confirmAndPush } from "./knowledge/sync.js";
 import { dirname } from "path";
 import { fileURLToPath } from "url";
@@ -102,7 +103,37 @@ Supported flows: navigation, initialization, Navigate, NavigateToString, Initial
   }
 );
 
-// ─── Tool 4: share_learnings ───
+// ─── Tool 4: lookup_feature_flags ───
+server.tool(
+  "lookup_feature_flags",
+  `Look up WebView2 feature flags (browser arguments) — their purpose, risk level, and when to use them.
+
+Modes:
+- flag_name: Look up a specific flag by name (supports partial matching)
+- category: List all flags in a category (security, network, performance, display, navigation, initialization, debugging, authentication, media)
+- scenario: Find flags relevant to a problem scenario (e.g., "blank page", "proxy", "GPU crash", "slow startup")
+- No parameters: Show all categories with counts`,
+  {
+    flag_name: z.string().optional().describe("Flag name to look up (e.g., 'disable-gpu', 'RendererAppContainer', 'proxy')"),
+    category: z.string().optional().describe("List flags by category (e.g., 'security', 'performance', 'network', 'display')"),
+    scenario: z.string().optional().describe("Find flags helpful for a scenario (e.g., 'blank page after navigation', 'GPU crash', 'slow startup', 'proxy auth failure')"),
+  },
+  async ({ flag_name, category, scenario }) => {
+    let result: string;
+    if (flag_name) {
+      result = lookupFlag(flag_name);
+    } else if (category) {
+      result = listFlagsByCategory(category);
+    } else if (scenario) {
+      result = findFlagsForScenario(scenario);
+    } else {
+      result = listAllCategories();
+    }
+    return { content: [{ type: "text", text: result }] };
+  }
+);
+
+// ─── Tool 5: share_learnings ───
 server.tool(
   "share_learnings",
   "Share locally-learned knowledge with all users via GitHub. Use 'preview' to see what would be shared, then 'confirm' to push. Two-step: preview → review → confirm.",
@@ -151,7 +182,7 @@ async function main() {
 
   const transport = new StdioServerTransport();
   await server.connect(transport);
-  console.error("WebView2 ETW Analysis MCP Server running on stdio (4 tools)");
+  console.error("WebView2 ETW Analysis MCP Server running on stdio (5 tools)");
 }
 
 main().catch((error) => {
