@@ -7,9 +7,7 @@ import { z } from "zod";
 import { decodeApiId, decodeApiIdBatch, listApisByCategory } from "./tools/decode.js";
 import { lookupEvent, listEventsByCategory } from "./tools/lookup.js";
 import { diagnose, listRootCauses } from "./tools/diagnose.js";
-import { contributeEvent, contributeRootCause, contributeTiming } from "./tools/contribute.js";
 import { analyzeEtl, generateFilterCommand } from "./tools/analyze.js";
-import { compareIncarnations } from "./tools/compare.js";
 import { compareEtls } from "./tools/compare_etls.js";
 import { analyzeCpu } from "./tools/analyze_cpu.js";
 import { timelineSlice } from "./tools/timeline_slice.js";
@@ -100,100 +98,6 @@ server.tool(
   }
 );
 
-// ─── Tool: compare_incarnations ───
-server.tool(
-  "compare_incarnations",
-  "Compare SUCCESS vs FAILURE WebView2 incarnations side-by-side. Identifies the first divergence point. Provide event lines from filtered ETL dumps for both incarnations.",
-  {
-    success_events: z.string().describe("Event lines from the SUCCESS incarnation (from filtered ETL dump)"),
-    failure_events: z.string().describe("Event lines from the FAILURE incarnation (from filtered ETL dump)"),
-  },
-  async ({ success_events, failure_events }) => {
-    const result = compareIncarnations(success_events, failure_events);
-    return { content: [{ type: "text", text: result }] };
-  }
-);
-
-// ─── Tool: contribute_event ───
-server.tool(
-  "contribute_event",
-  "Add a new event or update an existing event in the knowledge base. Use after discovering an undocumented WebView2 ETW event.",
-  {
-    event_name: z.string().describe("Event name (e.g., 'WebView2_NewFeatureEvent')"),
-    description: z.string().describe("What this event means"),
-    category: z.string().optional().describe("Category (e.g., 'Navigation', 'Factory & Creation', 'Error')"),
-    severity: z.string().optional().describe("Severity: 'Critical', 'Error', 'Warning', 'Info', 'Debug'"),
-    params: z.array(z.object({
-      index: z.number(),
-      name: z.string(),
-      type: z.string(),
-      description: z.string(),
-    })).optional().describe("Event parameters with field index, name, type, and description"),
-    related_events: z.array(z.string()).optional().describe("Names of related events"),
-    source_file: z.string().optional().describe("Source code file where this event is defined"),
-    contributor: z.string().optional().describe("Your email for attribution"),
-  },
-  async ({ event_name, description, category, severity, params, related_events, source_file, contributor }) => {
-    const result = contributeEvent({
-      eventName: event_name,
-      description,
-      category,
-      severity,
-      params,
-      relatedEvents: related_events,
-      sourceFile: source_file,
-      contributor,
-    });
-    return { content: [{ type: "text", text: result }] };
-  }
-);
-
-// ─── Tool: contribute_root_cause ───
-server.tool(
-  "contribute_root_cause",
-  "Add a new root cause to the knowledge base. Use after completing an ETL analysis that reveals a new failure pattern.",
-  {
-    key: z.string().describe("Unique key for this root cause (e.g., 'service_worker_timeout')"),
-    symptom: z.string().describe("User-visible symptom"),
-    root_cause: z.string().describe("Technical root cause explanation"),
-    evidence: z.array(z.string()).describe("Evidence items that confirm this root cause"),
-    classification: z.string().describe("Classification (e.g., 'Race Condition', 'Performance', 'Authentication Failure')"),
-    resolution: z.array(z.string()).describe("Possible resolutions"),
-    code_references: z.array(z.string()).optional().describe("Source code file references"),
-    discovered_from: z.string().optional().describe("ETL file this was discovered from"),
-    discovered_by: z.string().optional().describe("Your email for attribution"),
-  },
-  async ({ key, symptom, root_cause, evidence, classification, resolution, code_references, discovered_from, discovered_by }) => {
-    const result = contributeRootCause({
-      key,
-      symptom,
-      rootCause: root_cause,
-      evidence,
-      classification,
-      resolution,
-      codeReferences: code_references,
-      discoveredFrom: discovered_from,
-      discoveredBy: discovered_by,
-    });
-    return { content: [{ type: "text", text: result }] };
-  }
-);
-
-// ─── Tool: contribute_timing ───
-server.tool(
-  "contribute_timing",
-  "Update timing baselines with a new observation. Baselines improve with each analysis, helping detect anomalies.",
-  {
-    key: z.string().describe("Timing baseline key (e.g., 'about_blank_navigation', 'creation_client_cold_start')"),
-    observed_ms: z.number().describe("Observed duration in milliseconds"),
-    notes: z.string().optional().describe("Additional context about this observation"),
-  },
-  async ({ key, observed_ms, notes }) => {
-    const result = contributeTiming({ key, observedMs: observed_ms, notes });
-    return { content: [{ type: "text", text: result }] };
-  }
-);
-
 // ─── Tool: compare_etls ───
 server.tool(
   "compare_etls",
@@ -214,7 +118,7 @@ server.tool(
 // ─── Tool: analyze_cpu ───
 server.tool(
   "analyze_cpu",
-  "Analyze CPU traces for specific keywords using symbol servers. Generates symbolized CPU extraction commands, or parses already-extracted symbolized data to show CPU time per keyword, top functions, and module breakdown. Use SEPARATELY from analyze_etl — this is for CPU profiling only.",
+  "⏳ DEFERRED — Only use when timeline_slice or evidence_pack suggests CPU contention as the bottleneck. NOT for initial analysis. Analyzes CPU traces with symbol servers (Chromium, Edge, Microsoft). Generates symbolized extraction commands or parses pre-extracted data.",
   {
     etl_path: z.string().describe("Path to the ETL file"),
     pid: z.string().describe("Process ID to analyze CPU for"),
@@ -350,15 +254,7 @@ server.tool(
   }
 );
 
-// ─── Helper: resolve knowledge dir and push ───
-async function pushToGitHub(): Promise<string> {
-  try {
-    const knowledgeDir = resolveKnowledgeDir();
-    return await pushLearnings(knowledgeDir);
-  } catch {
-    return "";
-  }
-}
+// ─── Helper: resolve knowledge dir ───
 
 function resolveKnowledgeDir(): string {
   const thisDir = dirname(fileURLToPath(import.meta.url));

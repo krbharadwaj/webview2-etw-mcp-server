@@ -1,7 +1,7 @@
 {
   "name": "webview2-etw-mcp-server",
-  "version": "2.0.0",
-  "description": "MCP server for WebView2 ETW/ETL trace analysis — 18 tools, root-cause-first triage, navigation playbooks, evidence packs, auto-learning knowledge base",
+  "version": "2.1.0",
+  "description": "MCP server for WebView2 ETW/ETL trace analysis — 14 tools, root-cause-first workflow, navigation playbooks, evidence packs, auto-learning knowledge base",
   "type": "module",
   "main": "dist/index.js",
   "bin": {
