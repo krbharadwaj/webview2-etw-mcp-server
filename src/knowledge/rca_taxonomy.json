@@ -208,7 +208,7 @@
       "nav_blocked_pending_commit": {
         "symptom": "Navigation blocked by pending about:blank commit (kBlockedByPendingCommit)",
         "etwSignature": [
-          "WebView2_FirstDocState"
+          "WebView2_DocStateChanged"
         ],
         "description": "Real navigation is deferred because about:blank commit hasn't completed yet. Often caused by service worker activation gating the commit. Network response arrives in ~10ms but commit is blocked for seconds.",
         "scoringHints": {
@@ -217,8 +217,8 @@
             "NavigationRequest::DidCommitNavigation"
           ],
           "mayPresent": [
-            "WebView2_FirstDocState",
-            "WebView2_InitComplete",
+            "WebView2_DocStateChanged",
+            "WebView2_Creation_Client",
             "ForwardServiceWorkerToWorkerReady"
           ],
           "timingKeys": [
@@ -236,19 +236,16 @@
       "nav_iframe_torn_down": {
         "symptom": "Navigation fails silently because iframe was destroyed mid-flight",
         "etwSignature": [
-          "WebView2_NavStarting_IFrameNotFound",
-          "WebView2_NavCompleted_IFrameNotFound"
+          "WebView2_IFrameNotFound"
         ],
         "description": "Frame was destroyed during active navigation, causing all subsequent lifecycle events to be silently dropped. Not a crash — a lifecycle race.",
         "scoringHints": {
           "mustPresent": [
-            "WebView2_NavStarting_IFrameNotFound"
+            "WebView2_IFrameNotFound"
           ],
           "mustAbsent": [],
           "mayPresent": [
-            "WebView2_DocState_IFrameNotFound",
-            "WebView2_NavCompleted_IFrameNotFound",
-            "WebView2_DOMContentLoaded_IFrameNotFound"
+            "WebView2_FrameDetached"
           ],
           "timingKeys": [],
           "symptomKeywords": [

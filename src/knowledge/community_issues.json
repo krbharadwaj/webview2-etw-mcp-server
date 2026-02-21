@@ -414,8 +414,8 @@
       "NavigationRequest::DidCommitNavigation"
     ],
     "diagnosticEvents": [
-      "WebView2_FirstDocState",
-      "WebView2_InitComplete",
+      "WebView2_DocStateChanged",
+      "WebView2_Creation_Client",
       "ThrottlingURLLoader_OnReceiveResponse"
     ],
     "keyChecks": [
@@ -439,8 +439,8 @@
       "NavigationRequest::DidCommitNavigation"
     ],
     "diagnosticEvents": [
-      "WebView2_NavStarting_Kind",
-      "WebView2_FirstDocState"
+      "WebView2_NavigationStarting",
+      "WebView2_DocStateChanged"
     ],
     "keyChecks": [
       "Is SW activation handler doing synchronous cache iteration + deletion?",
@@ -556,8 +556,8 @@
       "WebView2_APICalled"
     ],
     "diagnosticEvents": [
-      "WebView2_InitComplete",
-      "WebView2_FirstDocState"
+      "WebView2_CreationTime",
+      "WebView2_DocStateChanged"
     ],
     "keyChecks": [
       "Was CreateCoreWebView2ControllerAsync called and completed? Check timing.",

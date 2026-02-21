@@ -332,28 +332,16 @@
       "evidenceTemplate": "ThrottlingURLLoader::OnReceiveResponse present but DidCommitNavigation missing — response may be blocked or deferred"
     },
     {
-      "id": "nav_id_duplication",
-      "patterns": {
-        "present": [
-          "WebView2_NavStarting_DupNavId"
-        ],
-        "absent": []
-      },
-      "severity": "warning",
-      "message": "🟡 Navigation ID collision — about:blank ID reused for new navigation",
-      "evidenceTemplate": "WebView2_NavStarting_DupNavId — browser reused init navigation ID, may cause event suppression"
-    },
-    {
       "id": "iframe_torn_mid_navigation",
       "patterns": {
         "present": [
-          "WebView2_NavStarting_IFrameNotFound"
+          "WebView2_IFrameNotFound"
         ],
         "absent": []
       },
       "severity": "warning",
       "message": "🟡 IFrame torn down mid-navigation — events will be silently dropped",
-      "evidenceTemplate": "WebView2_NavStarting_IFrameNotFound — frame destroyed during active navigation lifecycle"
+      "evidenceTemplate": "WebView2_IFrameNotFound — frame destroyed during active navigation lifecycle"
     },
     {
       "id": "shutdown_race_launch_failure",
@@ -368,18 +356,6 @@
       "severity": "critical",
       "message": "🔴 WebView2 factory created but never acquired — possible shutdown race",
       "evidenceTemplate": "WebView2_FactoryCreate without WebView2_FactoryAcquired — another WV2 shutdown may be blocking"
-    },
-    {
-      "id": "nav_with_webresource_failed",
-      "patterns": {
-        "present": [
-          "WebView2_NavWithWebResource_Failed"
-        ],
-        "absent": []
-      },
-      "severity": "critical",
-      "message": "🔴 NavigateWithWebResourceRequest failed — silent ERR_UNEXPECTED injected",
-      "evidenceTemplate": "WebView2_NavWithWebResource_Failed — async body-read error caused synthetic error injection"
     }
   ]
 }
