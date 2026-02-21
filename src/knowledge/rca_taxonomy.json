@@ -443,6 +443,64 @@
         "communityIssues": [
           "Bug 61008208"
         ]
+      },
+      "init_renderer_app_container": {
+        "symptom": "Renderer crashes on navigation due to RendererAppContainer enablement on Low-IL apps",
+        "etwSignature": [
+          "WebView2_ProcessExited"
+        ],
+        "description": "RendererAppContainer enabled by default caused missing capability SID for renderer processes in Low Integrity Level desktop apps. Renderer crashes on first navigation.",
+        "scoringHints": {
+          "mustPresent": [
+            "WebView2_ProcessExited"
+          ],
+          "mustAbsent": [
+            "WebView2_NavigationCompleted"
+          ],
+          "mayPresent": [
+            "WebView2_NavigationStarting",
+            "WebView2_BrowserProcessFailure"
+          ],
+          "timingKeys": [],
+          "symptomKeywords": [
+            "renderer crash",
+            "Low-IL",
+            "Low Integrity",
+            "AppContainer",
+            "capability SID",
+            "crash on navigation"
+          ]
+        },
+        "communityIssues": [
+          "Bug 48452932"
+        ]
+      },
+      "init_profile_deletion_failure": {
+        "symptom": "CreateWebView fails with wrong HRESULT after profile deletion",
+        "etwSignature": [
+          "WebView2_CreationFailure"
+        ],
+        "description": "Basename vs full path mismatch in profile deletion detection causes kUnexpectedError (10) instead of kErrorDeletePending (14).",
+        "scoringHints": {
+          "mustPresent": [
+            "WebView2_CreationFailure"
+          ],
+          "mustAbsent": [
+            "WebView2_Creation_Client"
+          ],
+          "mayPresent": [
+            "WebView2_FactoryCreate"
+          ],
+          "timingKeys": [],
+          "symptomKeywords": [
+            "profile",
+            "deletion",
+            "HRESULT",
+            "kUnexpectedError",
+            "kErrorDeletePending",
+            "CreateWebView"
+          ]
+        }
       }
     }
   },
@@ -606,6 +664,86 @@
             "long running",
             "degradation",
             "cache"
+          ]
+        }
+      },
+      "perf_sw_force_update_stall": {
+        "symptom": "Navigation stalls because service worker is force-updated on WRR/CDP detach",
+        "etwSignature": [
+          "ForwardServiceWorkerToWorkerReady"
+        ],
+        "description": "Upstream Chromium CL 6619069 forces SW reload on DevTools detach. Since WRR uses CDP, this forces SW re-activation even when SW script isn't intercepted, causing navigation pauses.",
+        "scoringHints": {
+          "mustPresent": [
+            "ForwardServiceWorkerToWorkerReady"
+          ],
+          "mustAbsent": [],
+          "mayPresent": [
+            "WebView2_NavigationStarting",
+            "NavigationRequest::BeginNavigation"
+          ],
+          "timingKeys": [
+            "navigation_total"
+          ],
+          "symptomKeywords": [
+            "service worker",
+            "force update",
+            "WRR",
+            "WebResourceRequested",
+            "CDP",
+            "stall",
+            "activation"
+          ]
+        }
+      },
+      "perf_transparent_window_memory": {
+        "symptom": "Memory regression (7-16%) from transparent window rendering changes",
+        "etwSignature": [
+          "WebView2_CreationTime"
+        ],
+        "description": "kSideBySide feature enabled by default introduced multi content view border covering WebView2 window. Fix (making border invisible) caused memory regression detected by PerfLab bisection.",
+        "scoringHints": {
+          "mustPresent": [],
+          "mustAbsent": [],
+          "mayPresent": [
+            "WebView2_CreationTime",
+            "WebView2_Creation_Client"
+          ],
+          "timingKeys": [
+            "creation_client_cold_start"
+          ],
+          "symptomKeywords": [
+            "memory",
+            "regression",
+            "transparent",
+            "effective_size",
+            "kSideBySide",
+            "content view border"
+          ]
+        }
+      },
+      "perf_gpu_webgl_oom": {
+        "symptom": "GPU process OOM from WebGL operations causing process restart and visual artifacts",
+        "etwSignature": [
+          "WebView2_ProcessExited"
+        ],
+        "description": "WebGL operations fail silently (no exceptions) and eventually cause GPU process exit. GPU auto-restarts but content flashes. Detached DOM nodes compound the problem.",
+        "scoringHints": {
+          "mustPresent": [
+            "WebView2_ProcessExited"
+          ],
+          "mustAbsent": [],
+          "mayPresent": [],
+          "timingKeys": [],
+          "symptomKeywords": [
+            "GPU",
+            "WebGL",
+            "OOM",
+            "context loss",
+            "flash",
+            "artifacts",
+            "restart",
+            "detached DOM"
           ]
         }
       }
@@ -1022,6 +1160,101 @@
         "communityIssues": [
           "#5449"
         ]
+      },
+      "chromium_upstream_regression": {
+        "symptom": "Feature or behavior regression caused by upstream Chromium change",
+        "etwSignature": [],
+        "description": "Upstream Chromium changes that break WebView2-specific scenarios. Common patterns: WM_MOVE handling (select dropdowns in WPF), custom URL scheme handling, security hardening changes, LNA permission changes.",
+        "scoringHints": {
+          "mustPresent": [],
+          "mustAbsent": [],
+          "mayPresent": [
+            "WebView2_APICalled",
+            "WebView2_NavigationStarting"
+          ],
+          "timingKeys": [],
+          "symptomKeywords": [
+            "upstream",
+            "Chromium",
+            "regression",
+            "version",
+            "update",
+            "broke",
+            "WPF",
+            "custom scheme",
+            "select dropdown",
+            "WM_MOVE"
+          ]
+        },
+        "communityIssues": []
+      }
+    }
+  },
+  "display": {
+    "label": "Display & Rendering Issues",
+    "subCauses": {
+      "display_dark_mode_not_honored": {
+        "symptom": "System dark mode theme not applied in WebView2 apps",
+        "etwSignature": [],
+        "description": "Themes routing logic (IsEdgeThemeServiceDarkModeEnabled) present in Edge but missing in WebView2 caused system dark mode to not apply.",
+        "scoringHints": {
+          "mustPresent": [],
+          "mustAbsent": [],
+          "mayPresent": [
+            "WebView2_Creation_Client"
+          ],
+          "timingKeys": [],
+          "symptomKeywords": [
+            "dark mode",
+            "theme",
+            "light mode",
+            "system theme",
+            "color scheme"
+          ]
+        }
+      },
+      "display_double_title_bar": {
+        "symptom": "Double or persistent title bar on Windows 10 after WebView2 update",
+        "etwSignature": [],
+        "description": "UI regression in window rendering causing extra title bar on Windows 10. Version-specific regression (v144).",
+        "scoringHints": {
+          "mustPresent": [],
+          "mustAbsent": [],
+          "mayPresent": [
+            "WebView2_Creation_Client"
+          ],
+          "timingKeys": [],
+          "symptomKeywords": [
+            "title bar",
+            "double",
+            "persistent",
+            "Windows 10",
+            "Win10",
+            "extra"
+          ]
+        }
+      },
+      "display_transparent_window_covered": {
+        "symptom": "Transparent WebView2 window covered by content view border (kSideBySide regression)",
+        "etwSignature": [],
+        "description": "kSideBySide feature enabled by default introduced multi content view border that covers transparent WebView2 windows. Edge unaffected because it doesn't use transparent window model.",
+        "scoringHints": {
+          "mustPresent": [],
+          "mustAbsent": [],
+          "mayPresent": [
+            "WebView2_Creation_Client"
+          ],
+          "timingKeys": [],
+          "symptomKeywords": [
+            "transparent",
+            "covered",
+            "invisible",
+            "white window",
+            "blank",
+            "kSideBySide",
+            "content border"
+          ]
+        }
       }
     }
   }

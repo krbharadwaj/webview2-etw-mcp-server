@@ -719,5 +719,186 @@
     "taxonomyRef": "network_tls_failure",
     "relatedIssues": [],
     "notes": "Chromium/BoringSSL may fail when TPMs cannot produce TLS-compatible RSA-PSS signatures. Requires net-export logs and possibly browser process TTD trace."
+  },
+  "renderer_app_container_crash": {
+    "category": "Security",
+    "symptom": "Renderer crashes on navigation in Low Integrity Level desktop apps after RendererAppContainer enablement",
+    "expectedPresent": [
+      "WebView2_FactoryCreate",
+      "WebView2_Creation_Client",
+      "WebView2_NavigationStarting"
+    ],
+    "expectedAbsent": [
+      "WebView2_NavigationCompleted"
+    ],
+    "diagnosticEvents": [
+      "WebView2_ProcessExited",
+      "WebView2_BrowserProcessFailure"
+    ],
+    "keyChecks": [
+      "Is WebView2_ProcessExited present with RenderProcessExited or FrameRenderProcessExitedFailure?",
+      "Is the host app running at Low Integrity Level (Low-IL)?",
+      "Was RendererAppContainer enabled by default in this build?",
+      "Check for missing capability SID for renderer processes.",
+      "Watson crash signatures may show renderer crash on first navigation."
+    ],
+    "taxonomyRef": "renderer_app_container",
+    "relatedIssues": ["Bug 48452932"],
+    "rootCause": "RendererAppContainer enabled by default caused missing capability SID for renderer processes in Low-IL apps. Fix: disable RendererAppContainer for non-AppContainer Low-IL scenarios.",
+    "concluded": true
+  },
+  "select_dropdown_dismissed_wpf": {
+    "category": "Input",
+    "symptom": "HTML <select> dropdown immediately dismisses in WPF-hosted WebView2 apps (v134)",
+    "expectedPresent": [
+      "WebView2_APICalled",
+      "WebView2_NavigationCompleted"
+    ],
+    "expectedAbsent": [],
+    "diagnosticEvents": [],
+    "keyChecks": [
+      "Is the host a WPF application?",
+      "Is WebView2 runtime v134?",
+      "Are frequent WM_MOVE messages being generated? Upstream Chromium change causes select popup dismissal.",
+      "Does the issue reproduce in WinForms or Win32? If not, it's WPF-specific WM_MOVE handling."
+    ],
+    "taxonomyRef": "chromium_upstream_regression",
+    "relatedIssues": [],
+    "rootCause": "Upstream Chromium change caused frequent WM_MOVE events in WPF hosts, dismissing select dropdowns. Fix backported to v134 and v135.",
+    "concluded": true
+  },
+  "custom_url_scheme_broken": {
+    "category": "Navigation",
+    "symptom": "Custom URL schemes used by embedded browser scenarios (e.g., SAP GUI) stop working after WebView2 144",
+    "expectedPresent": [
+      "WebView2_APICalled",
+      "WebView2_NavigationStarting"
+    ],
+    "expectedAbsent": [
+      "WebView2_NavigationCompleted"
+    ],
+    "diagnosticEvents": [
+      "NavigationRequest::OnRequestFailedInternal"
+    ],
+    "keyChecks": [
+      "Is the app using custom URL schemes (non-standard protocols)?",
+      "Is WebView2 runtime v144 or newer?",
+      "Does NavigationRequest::OnRequestFailedInternal appear for custom scheme URLs?",
+      "Does downgrading to v143 fix the issue?"
+    ],
+    "taxonomyRef": "chromium_upstream_regression",
+    "relatedIssues": [],
+    "rootCause": "Platform change in Edge 144 altered handling of custom URL schemes used by embedded browser scenarios. Fix shipped in 144.0.3719.92.",
+    "concluded": true
+  },
+  "dark_mode_not_honored": {
+    "category": "Display",
+    "symptom": "System dark mode theme not applied in WebView2 apps",
+    "expectedPresent": [
+      "WebView2_FactoryCreate",
+      "WebView2_Creation_Client"
+    ],
+    "expectedAbsent": [],
+    "diagnosticEvents": [],
+    "keyChecks": [
+      "Is system dark mode enabled?",
+      "Is the WebView2 content rendering in light mode despite system dark mode?",
+      "Check if IsEdgeThemeServiceDarkModeEnabled flag is present in WebView2 runtime.",
+      "This was a missing code path in WebView2 that Edge had — themes routing logic absent."
+    ],
+    "taxonomyRef": "display_theme_regression",
+    "relatedIssues": [],
+    "rootCause": "Themes code change introduced IsEdgeThemeServiceDarkModeEnabled flag and routing logic present in Edge but missing in WebView2. Fix: added missing theme logic to WebView2.",
+    "concluded": true
+  },
+  "gpu_process_crash_webgl_oom": {
+    "category": "Process",
+    "symptom": "GPU process exits and restarts causing visual artifacts, blank frames, or content flash",
+    "expectedPresent": [
+      "WebView2_FactoryCreate",
+      "WebView2_Creation_Client"
+    ],
+    "expectedAbsent": [],
+    "diagnosticEvents": [
+      "WebView2_ProcessExited"
+    ],
+    "keyChecks": [
+      "Is WebView2_ProcessExited present with GPU process type?",
+      "Check edge://gpu for GPU reset or driver failure indicators.",
+      "Is the page using WebGL? WebGL operations fail silently before eventually killing GPU process.",
+      "Are there detached DOM nodes causing gradual memory growth?",
+      "GPU process auto-restarts but content may flash or require re-render."
+    ],
+    "taxonomyRef": "gpu_process_oom",
+    "relatedIssues": [],
+    "rootCause": "WebGL OOM, context loss, or GPU driver incompatibility causes GPU process exit. WebGL functions do not throw — errors only visible via WebGL error inspection.",
+    "concluded": true
+  },
+  "service_worker_force_update_nav_stall": {
+    "category": "Performance",
+    "symptom": "Navigation stalls because service worker is force-updated on DevTools/CDP detach",
+    "expectedPresent": [
+      "WebView2_APICalled",
+      "WebView2_NavigationStarting",
+      "ForwardServiceWorkerToWorkerReady"
+    ],
+    "expectedAbsent": [],
+    "diagnosticEvents": [
+      "ForwardServiceWorkerToWorkerReady"
+    ],
+    "keyChecks": [
+      "Is ForwardServiceWorkerToWorkerReady present with a large time gap before DidCommitNavigation?",
+      "Is the app using WebResourceRequested (WRR) interception?",
+      "WRR uses CDP internally — Chromium CL 6619069 forces SW reload on DevTools detach.",
+      "Is navigation paused while service worker is being re-activated?",
+      "Mitigation: WebView2 bypass of force-update logic while upstream fix pending."
+    ],
+    "taxonomyRef": "service_worker_force_update",
+    "relatedIssues": ["Chromium CL 6619069"],
+    "rootCause": "Upstream Chromium change forces service worker reload on DevTools detach for security. Since WRR uses CDP, this forces SW updates even when SW script is not intercepted, causing navigation stalls.",
+    "concluded": true
+  },
+  "profile_deletion_hresult_mismatch": {
+    "category": "Initialization",
+    "symptom": "CreateWebView fails with wrong HRESULT (kUnexpectedError instead of kErrorDeletePending) after profile deletion",
+    "expectedPresent": [
+      "WebView2_FactoryCreate"
+    ],
+    "expectedAbsent": [
+      "WebView2_Creation_Client"
+    ],
+    "diagnosticEvents": [
+      "WebView2_CreationFailure"
+    ],
+    "keyChecks": [
+      "Was a profile just deleted before calling CreateWebView?",
+      "Is WebView2_CreationFailure present with HRESULT indicating unexpected error?",
+      "Expected: kErrorDeletePending (14). Actual: kUnexpectedError (10).",
+      "Root cause: basename vs full path mismatch in profile deletion detection logic."
+    ],
+    "taxonomyRef": "init_profile_deletion_failure",
+    "relatedIssues": [],
+    "rootCause": "Basename vs full path mismatch in profile deletion detection caused incorrect error code. Expected kErrorDeletePending (14) but returned kUnexpectedError (10).",
+    "concluded": true
+  },
+  "double_title_bar_win10": {
+    "category": "Display",
+    "symptom": "Double or persistent title bar appears on Windows 10 in WebView2 v144",
+    "expectedPresent": [
+      "WebView2_FactoryCreate",
+      "WebView2_Creation_Client"
+    ],
+    "expectedAbsent": [],
+    "diagnosticEvents": [],
+    "keyChecks": [
+      "Is the host running on Windows 10?",
+      "Is WebView2 runtime v144?",
+      "Is an extra title bar visible covering or duplicating the app title bar?",
+      "UI regression in window rendering behavior specific to Win10."
+    ],
+    "taxonomyRef": "display_rendering_regression",
+    "relatedIssues": [],
+    "rootCause": "UI regression in WebView2 144 caused extra title bar to remain visible on Windows 10 due to window rendering behavior changes. Fix shipped with improved Win10 validation.",
+    "concluded": true
   }
 }
