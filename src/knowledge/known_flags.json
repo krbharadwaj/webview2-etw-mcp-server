@@ -1,0 +1,81 @@
+{
+  "_metadata": {
+    "version": "1.0.0",
+    "description": "Known WebView2 feature flags and configuration keys with risk/impact annotations. When found in ETL traces, these provide context for diagnosis.",
+    "lastUpdated": "2025-07-21"
+  },
+  "flags": {
+    "IsEdgeWebViewCancelInitialNavigationEnabled": {
+      "description": "Cancels the initial about:blank navigation to prevent suppressed NavigationCompleted",
+      "impact": "When enabled, about:blank NavigationCompleted is cancelled rather than suppressed. Can prevent deadlocks in hosts that wait for NavigationCompleted.",
+      "relatedRootCause": "init_about_blank_deadlock",
+      "riskLevel": "medium"
+    },
+    "msWebView2EnableAutoProfileDeletion": {
+      "description": "Automatically deletes user data folder profile on WebView2 close",
+      "impact": "Data loss risk — user data removed on each session end",
+      "relatedRootCause": null,
+      "riskLevel": "high"
+    },
+    "msWebView2BrowserProcessExeOverride": {
+      "description": "Overrides the browser process executable path",
+      "impact": "Custom browser process — may cause version mismatches or compatibility issues",
+      "relatedRootCause": "init_creation_failure",
+      "riskLevel": "high"
+    },
+    "msWebView2EnableTracing": {
+      "description": "Enables ETW tracing for WebView2 events",
+      "impact": "Performance overhead from trace logging. Should be enabled for diagnostics only.",
+      "relatedRootCause": null,
+      "riskLevel": "low"
+    },
+    "EdgeWebViewPersistUserDataOnMigration": {
+      "description": "Persists user data during WebView2 runtime migration/update",
+      "impact": "When disabled, user data may be lost during runtime updates",
+      "relatedRootCause": null,
+      "riskLevel": "medium"
+    },
+    "msWebView2BlockAllPACScripts": {
+      "description": "Blocks all PAC (Proxy Auto-Configuration) scripts",
+      "impact": "Can break proxy authentication in corporate environments",
+      "relatedRootCause": "auth_proxy_block",
+      "riskLevel": "high"
+    },
+    "msWebView2AllowSingleSignOnUsingOSPrimaryAccount": {
+      "description": "Allows SSO using the OS primary account",
+      "impact": "Enables or disables WAM-based SSO. When disabled, forces manual authentication.",
+      "relatedRootCause": "auth_wam_token_failure",
+      "riskLevel": "medium"
+    },
+    "msWebView2EnableDpiAwarenessDetection": {
+      "description": "Enables DPI awareness detection for the WebView2 process",
+      "impact": "When enabled, WebView2 detects and adapts to DPI changes. When disabled, may cause scaling issues.",
+      "relatedRootCause": "dpi_scaling_rendering",
+      "riskLevel": "low"
+    },
+    "msWebView2DisableSmartscreen": {
+      "description": "Disables SmartScreen filter for WebView2",
+      "impact": "Removes malware/phishing protection. May speed up navigation but increases security risk.",
+      "relatedRootCause": null,
+      "riskLevel": "high"
+    },
+    "msWebView2ChannelSearchKind": {
+      "description": "Controls which WebView2 runtime channel is used (Stable, Beta, Dev, Canary)",
+      "impact": "Using non-Stable channels may expose to runtime bugs and regressions",
+      "relatedRootCause": "runtime_version_regression",
+      "riskLevel": "medium"
+    },
+    "msWebView2ReleaseChannelPreference": {
+      "description": "Sets preference for release channel selection",
+      "impact": "Affects which runtime version is selected when multiple are available",
+      "relatedRootCause": "runtime_version_regression",
+      "riskLevel": "low"
+    },
+    "msWebView2BrowserExecutableFolder": {
+      "description": "Sets the folder containing the WebView2 runtime/fixed version distribution",
+      "impact": "Used for Fixed Version deployment. Wrong path causes creation failure.",
+      "relatedRootCause": "init_creation_failure",
+      "riskLevel": "medium"
+    }
+  }
+}

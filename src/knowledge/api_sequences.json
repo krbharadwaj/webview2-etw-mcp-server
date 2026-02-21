@@ -4,71 +4,110 @@
     "description": "Navigates the WebView to a new URL",
     "happyPath": [
       { "event": "WebView2_APICalled", "field": "API=3", "phase": "trigger", "required": true },
-      { "event": "WebView2_Event_NavigationStarting", "phase": "host_event", "required": true },
+      { "event": "WebView2_NewNavigationContext", "phase": "client", "required": false, "notes": "Client creates new navigation context" },
+      { "event": "WebView2_SetPendingNavigation", "phase": "client", "required": false, "notes": "Marks navigation as pending" },
       { "event": "NavigationRequest::Create", "phase": "browser", "required": false },
-      { "event": "WebView2_Event_ContentLoading", "phase": "host_event", "required": true },
-      { "event": "NavigationRequest::CommitNavigation", "phase": "browser", "required": false },
-      { "event": "NavigationRequest::DidCommitNavigation", "phase": "browser", "required": false },
-      { "event": "WebView2_Event_NavigationCompleted", "phase": "host_event", "required": true, "terminal": true }
+      { "event": "NavigationRequest::BeginNavigation", "phase": "browser", "required": true },
+      { "event": "NavigationRequest::StartNavigation", "phase": "browser", "required": true },
+      { "event": "NavigationRequest::CommitNavigation", "phase": "browser", "required": true },
+      { "event": "NavigationRequest::DidCommitNavigation", "phase": "browser", "required": true },
+      { "event": "WebView2_Event", "phase": "host_dispatch", "required": true, "notes": "Generic event dispatch for NavigationCompleted", "terminal": true }
     ],
+    "timingEvents": ["NavigationTotal", "BeginNavigationToCommit", "CommitToDidCommit", "DidCommitToFinish"],
     "expectedTimingKey": "navigation_total",
     "failureIndicators": [
-      "NavigationCompleted never fires",
-      "NavigationRequest::OnRequestFailed",
-      "isSuccess=false in NavigationCompleted"
+      "NavigationRequest::OnRequestFailedInternal appears",
+      "WebView2_DroppedEvent for navigation event",
+      "WebView2_DifferentNavigationId (NavId mismatch)",
+      "No NavigationRequest::DidCommitNavigation after CommitNavigation"
     ],
-    "knownIssues": ["navigation_deadlock_about_blank", "event_handler_registration_race"]
+    "knownIssues": ["nav_completed_not_received", "nav_completed_suppressed", "nav_id_mismatch", "init_about_blank_deadlock"]
   },
   "NavigateToString": {
     "apiId": 4,
     "description": "Navigates the WebView to HTML string content",
     "happyPath": [
       { "event": "WebView2_APICalled", "field": "API=4", "phase": "trigger", "required": true },
-      { "event": "WebView2_Event_NavigationStarting", "phase": "host_event", "required": true },
-      { "event": "WebView2_Event_ContentLoading", "phase": "host_event", "required": true },
-      { "event": "WebView2_Event_NavigationCompleted", "phase": "host_event", "required": true, "terminal": true }
+      { "event": "WebView2_NewNavigationContext", "phase": "client", "required": false },
+      { "event": "NavigationRequest::Create", "phase": "browser", "required": false },
+      { "event": "NavigationRequest::BeginNavigation", "phase": "browser", "required": true },
+      { "event": "NavigationRequest::CommitNavigation", "phase": "browser", "required": true },
+      { "event": "NavigationRequest::DidCommitNavigation", "phase": "browser", "required": true },
+      { "event": "WebView2_Event", "phase": "host_dispatch", "required": true, "terminal": true }
     ],
+    "timingEvents": ["NavigationTotal"],
     "expectedTimingKey": "navigation_total",
     "failureIndicators": [
-      "NavigationCompleted never fires",
-      "isSuccess=false in NavigationCompleted"
+      "NavigationRequest::OnRequestFailedInternal appears",
+      "No DidCommitNavigation"
     ],
     "knownIssues": []
+  },
+  "NavigateWithWebResourceRequest": {
+    "apiId": 95,
+    "description": "Navigates using a custom WebResourceRequest with headers/method",
+    "happyPath": [
+      { "event": "WebView2_APICalled", "field": "API=95", "phase": "trigger", "required": true },
+      { "event": "WebView2_NewNavigationContext", "phase": "client", "required": false },
+      { "event": "NavigationRequest::Create", "phase": "browser", "required": false },
+      { "event": "NavigationRequest::BeginNavigation", "phase": "browser", "required": true },
+      { "event": "NavigationRequest::CommitNavigation", "phase": "browser", "required": true },
+      { "event": "NavigationRequest::DidCommitNavigation", "phase": "browser", "required": true },
+      { "event": "WebView2_Event", "phase": "host_dispatch", "required": true, "terminal": true }
+    ],
+    "timingEvents": ["NavigationTotal", "BeginNavigationToCommit"],
+    "expectedTimingKey": "navigation_total",
+    "failureIndicators": [
+      "NavigationRequest::OnRequestFailedInternal",
+      "WebView2_ResponseLoadingBlocked"
+    ],
+    "knownIssues": ["nav_request_failed"]
   },
   "Initialize": {
     "apiId": 7,
     "description": "Creates and initializes the WebView2 environment and controller",
     "happyPath": [
-      { "event": "WebView2_Creation_Client_Creation_RequestSent", "phase": "host", "required": true },
-      { "event": "WebView2_Factory_CreateCoreWebView2Environment", "phase": "factory", "required": true },
-      { "event": "WebView2_Creation_Server_BrowserExeLaunchStart", "phase": "server", "required": false },
-      { "event": "WebView2_Creation_Server_BrowserProcessCreated", "phase": "server", "required": true },
-      { "event": "WebView2_Creation_Server_Create_Start", "phase": "server", "required": true },
-      { "event": "WebView2_Creation_Server_Create_End", "phase": "server", "required": true },
-      { "event": "WebView2_Creation_Client_CreateCoreWebView2ControllerCompleted", "phase": "host", "required": true, "terminal": true }
+      { "event": "WebView2_FactoryCreate", "phase": "factory", "required": true },
+      { "event": "WebView2_FactoryAcquired", "phase": "factory", "required": true },
+      { "event": "WebView2_WebViewProcessLaunchType", "phase": "factory", "required": false, "notes": "type=0 cold, type=1 warm" },
+      { "event": "WebView2_LaunchProcess_Attempt", "phase": "factory", "required": false },
+      { "event": "WebView2_Creation_Client", "phase": "client", "required": true, "notes": "Async BEGIN/END pair — duration = creation time" },
+      { "event": "WebView2_CreationTime", "phase": "client", "required": false },
+      { "event": "WebView2_ClientWindowInit", "phase": "controller", "required": false },
+      { "event": "WebView2_RegisterUIAEndpoints", "phase": "controller", "required": false },
+      { "event": "WebView2_FirstNavigationTime", "phase": "client", "required": false, "terminal": true }
     ],
+    "timingEvents": ["WebView2_Creation_Client"],
     "expectedTimingKey": "creation_client_cold_start",
     "failureIndicators": [
       "WebView2_CreationFailure",
+      "WebView2_CreationFailureExe",
+      "WebView2_FactoryConnectionError",
       "WebView2_BrowserProcessFailure",
-      "CreateCoreWebView2ControllerCompleted with error HRESULT",
-      "Browser process crash (exit code != 0)"
+      "WebView2_LaunchProcess_Failed",
+      "WebView2_Invalid_Version",
+      "WebView2_version_too_old",
+      "WebView2_WindowImpl_Init_Failed"
     ],
-    "knownIssues": ["cold_start_timeout", "vdi_dll_loading_delay"]
+    "knownIssues": ["init_cold_start_timeout", "perf_vdi_dll_loading", "headless_creation_failure"]
   },
   "Reload": {
     "apiId": 9,
     "description": "Reloads the current page",
     "happyPath": [
       { "event": "WebView2_APICalled", "field": "API=9", "phase": "trigger", "required": true },
-      { "event": "WebView2_Event_NavigationStarting", "phase": "host_event", "required": true },
-      { "event": "WebView2_Event_ContentLoading", "phase": "host_event", "required": true },
-      { "event": "WebView2_Event_NavigationCompleted", "phase": "host_event", "required": true, "terminal": true }
+      { "event": "WebView2_NewNavigationContext", "phase": "client", "required": false },
+      { "event": "NavigationRequest::Create", "phase": "browser", "required": false },
+      { "event": "NavigationRequest::BeginNavigation", "phase": "browser", "required": true },
+      { "event": "NavigationRequest::CommitNavigation", "phase": "browser", "required": true },
+      { "event": "NavigationRequest::DidCommitNavigation", "phase": "browser", "required": true },
+      { "event": "WebView2_Event", "phase": "host_dispatch", "required": true, "terminal": true }
     ],
+    "timingEvents": ["NavigationTotal"],
     "expectedTimingKey": "navigation_total",
     "failureIndicators": [
-      "NavigationCompleted never fires",
-      "isSuccess=false"
+      "NavigationRequest::OnRequestFailedInternal",
+      "No DidCommitNavigation"
     ],
     "knownIssues": []
   },
@@ -77,12 +116,15 @@
     "description": "Navigates back in history",
     "happyPath": [
       { "event": "WebView2_APICalled", "field": "API=21", "phase": "trigger", "required": true },
-      { "event": "WebView2_Event_NavigationStarting", "phase": "host_event", "required": true },
-      { "event": "WebView2_Event_ContentLoading", "phase": "host_event", "required": true },
-      { "event": "WebView2_Event_NavigationCompleted", "phase": "host_event", "required": true, "terminal": true }
+      { "event": "NavigationRequest::Create", "phase": "browser", "required": false },
+      { "event": "NavigationRequest::BeginNavigation", "phase": "browser", "required": true },
+      { "event": "NavigationRequest::CommitNavigation", "phase": "browser", "required": true },
+      { "event": "NavigationRequest::DidCommitNavigation", "phase": "browser", "required": true },
+      { "event": "WebView2_Event", "phase": "host_dispatch", "required": true, "terminal": true }
     ],
+    "timingEvents": ["NavigationTotal"],
     "expectedTimingKey": "navigation_total",
-    "failureIndicators": ["No navigation events fire (empty history)"],
+    "failureIndicators": ["No NavigationRequest::Create (empty history)"],
     "knownIssues": []
   },
   "GoForward": {
@@ -90,23 +132,93 @@
     "description": "Navigates forward in history",
     "happyPath": [
       { "event": "WebView2_APICalled", "field": "API=22", "phase": "trigger", "required": true },
-      { "event": "WebView2_Event_NavigationStarting", "phase": "host_event", "required": true },
-      { "event": "WebView2_Event_ContentLoading", "phase": "host_event", "required": true },
-      { "event": "WebView2_Event_NavigationCompleted", "phase": "host_event", "required": true, "terminal": true }
+      { "event": "NavigationRequest::Create", "phase": "browser", "required": false },
+      { "event": "NavigationRequest::BeginNavigation", "phase": "browser", "required": true },
+      { "event": "NavigationRequest::CommitNavigation", "phase": "browser", "required": true },
+      { "event": "NavigationRequest::DidCommitNavigation", "phase": "browser", "required": true },
+      { "event": "WebView2_Event", "phase": "host_dispatch", "required": true, "terminal": true }
     ],
+    "timingEvents": ["NavigationTotal"],
     "expectedTimingKey": "navigation_total",
-    "failureIndicators": ["No navigation events fire (no forward history)"],
+    "failureIndicators": ["No NavigationRequest::Create (no forward history)"],
     "knownIssues": []
   },
   "Stop": {
     "apiId": 23,
     "description": "Stops any ongoing navigation",
     "happyPath": [
-      { "event": "WebView2_APICalled", "field": "API=23", "phase": "trigger", "required": true },
-      { "event": "WebView2_Event_NavigationCompleted", "phase": "host_event", "required": false, "notes": "Fires with isSuccess=false if navigation was in progress" }
+      { "event": "WebView2_APICalled", "field": "API=23", "phase": "trigger", "required": true }
     ],
     "expectedTimingKey": null,
-    "failureIndicators": ["Navigation continues after Stop call"],
+    "failureIndicators": ["Navigation continues after Stop — DidCommitNavigation still appears"],
+    "knownIssues": []
+  },
+  "ExecuteScript": {
+    "apiId": 5,
+    "description": "Executes JavaScript in the WebView",
+    "happyPath": [
+      { "event": "WebView2_APICalled", "field": "API=5", "phase": "trigger", "required": true },
+      { "event": "WebView2_ObjectCalled", "phase": "host_ipc", "required": false, "notes": "COM object call to renderer" },
+      { "event": "WebView2_InvokeFinished", "phase": "host_dispatch", "required": true, "terminal": true }
+    ],
+    "expectedTimingKey": "execute_script",
+    "failureIndicators": [
+      "WebView2_CallCDPMethodFailed",
+      "No WebView2_InvokeFinished (renderer hung or dead)",
+      "WebView2_RendererUnresponsive"
+    ],
+    "knownIssues": ["execute_script_failure"]
+  },
+  "ExecuteScriptWithResult": {
+    "apiId": 173,
+    "description": "Executes JavaScript and returns structured result",
+    "happyPath": [
+      { "event": "WebView2_APICalled", "field": "API=173", "phase": "trigger", "required": true },
+      { "event": "WebView2_ObjectCalled", "phase": "host_ipc", "required": false },
+      { "event": "WebView2_InvokeFinished", "phase": "host_dispatch", "required": true, "terminal": true }
+    ],
+    "expectedTimingKey": "execute_script",
+    "failureIndicators": [
+      "WebView2_CallCDPMethodFailed",
+      "WebView2_RendererUnresponsive"
+    ],
+    "knownIssues": ["execute_script_failure"]
+  },
+  "PostWebMessage": {
+    "apiId": 8,
+    "description": "Posts a message to the WebView content",
+    "happyPath": [
+      { "event": "WebView2_APICalled", "field": "API=8", "phase": "trigger", "required": true }
+    ],
+    "expectedTimingKey": null,
+    "failureIndicators": [
+      "WebView2_CreateWebMessageAsJsonStringifyFailed",
+      "WebView2_ServiceWorkerPostMessageNullMessage"
+    ],
+    "knownIssues": ["webview_bridge_undefined"]
+  },
+  "CapturePreview": {
+    "apiId": 10,
+    "description": "Captures screenshot of the WebView content",
+    "happyPath": [
+      { "event": "WebView2_APICalled", "field": "API=10", "phase": "trigger", "required": true },
+      { "event": "WebView2_InvokeFinished", "phase": "host_dispatch", "required": true, "terminal": true }
+    ],
+    "expectedTimingKey": "capture_preview",
+    "failureIndicators": [
+      "No WebView2_InvokeFinished (capture timed out)",
+      "WebView2_RendererUnresponsive"
+    ],
+    "knownIssues": []
+  },
+  "AddScriptToExecuteOnDocumentCreated": {
+    "apiId": 11,
+    "description": "Registers script to run on every new document",
+    "happyPath": [
+      { "event": "WebView2_APICalled", "field": "API=11", "phase": "trigger", "required": true }
+    ],
+    "expectedTimingKey": "event_handler_registration",
+    "failureIndicators": [],
     "knownIssues": []
   },
   "AddNavigationStarting": {
@@ -115,9 +227,9 @@
     "happyPath": [
       { "event": "WebView2_APICalled", "field": "API=33", "phase": "trigger", "required": true }
     ],
-    "expectedTimingKey": null,
-    "failureIndicators": ["Registered AFTER about:blank navigation already completed"],
-    "knownIssues": ["event_handler_registration_race"]
+    "expectedTimingKey": "event_handler_registration",
+    "failureIndicators": ["Registered AFTER about:blank NavigationStarting already fired"],
+    "knownIssues": ["init_handler_registration_race"]
   },
   "AddNavigationCompleted": {
     "apiId": 37,
@@ -125,37 +237,315 @@
     "happyPath": [
       { "event": "WebView2_APICalled", "field": "API=37", "phase": "trigger", "required": true }
     ],
-    "expectedTimingKey": null,
-    "failureIndicators": ["Registered AFTER about:blank navigation already completed"],
-    "knownIssues": ["event_handler_registration_race", "navigation_deadlock_about_blank"]
+    "expectedTimingKey": "event_handler_registration",
+    "failureIndicators": ["Registered AFTER about:blank NavigationCompleted already fired"],
+    "knownIssues": ["init_handler_registration_race", "init_about_blank_deadlock"]
   },
-  "ExecuteScript": {
-    "apiId": 5,
-    "description": "Executes JavaScript in the WebView",
+  "AddContentLoading": {
+    "apiId": 77,
+    "description": "Registers handler for ContentLoading event",
     "happyPath": [
-      { "event": "WebView2_APICalled", "field": "API=5", "phase": "trigger", "required": true },
-      { "event": "WebView2_Event_ExecuteScriptCompleted", "phase": "host_event", "required": true, "terminal": true }
+      { "event": "WebView2_APICalled", "field": "API=77", "phase": "trigger", "required": true }
     ],
-    "expectedTimingKey": null,
-    "failureIndicators": ["ExecuteScriptCompleted never fires", "Script error in result"],
+    "expectedTimingKey": "event_handler_registration",
+    "failureIndicators": [],
     "knownIssues": []
   },
-  "PostWebMessage": {
-    "apiId": 8,
-    "description": "Posts a message to the WebView content",
+  "AddDOMContentLoaded": {
+    "apiId": 93,
+    "description": "Registers handler for DOMContentLoaded event",
     "happyPath": [
-      { "event": "WebView2_APICalled", "field": "API=8", "phase": "trigger", "required": true },
-      { "event": "WebView2_Event_WebMessageReceived", "phase": "host_event", "required": false, "notes": "Only if page posts back" }
+      { "event": "WebView2_APICalled", "field": "API=93", "phase": "trigger", "required": true }
+    ],
+    "expectedTimingKey": "event_handler_registration",
+    "failureIndicators": [],
+    "knownIssues": []
+  },
+  "AddWebResourceRequested": {
+    "apiId": 47,
+    "description": "Registers handler for WebResourceRequested event",
+    "happyPath": [
+      { "event": "WebView2_APICalled", "field": "API=47", "phase": "trigger", "required": true }
+    ],
+    "expectedTimingKey": "event_handler_registration",
+    "failureIndicators": ["WebView2_DroppedEvent if filter not added via AddWebResourceRequestedFilter"],
+    "knownIssues": []
+  },
+  "AddProcessFailed": {
+    "apiId": 55,
+    "description": "Registers handler for ProcessFailed event",
+    "happyPath": [
+      { "event": "WebView2_APICalled", "field": "API=55", "phase": "trigger", "required": true }
+    ],
+    "expectedTimingKey": "event_handler_registration",
+    "failureIndicators": [],
+    "knownIssues": []
+  },
+  "AddDownloadStarting": {
+    "apiId": 128,
+    "description": "Registers handler for DownloadStarting event",
+    "happyPath": [
+      { "event": "WebView2_APICalled", "field": "API=128", "phase": "trigger", "required": true }
+    ],
+    "expectedTimingKey": "event_handler_registration",
+    "failureIndicators": ["WebView2_NoEventDispatcher if registered too late or on wrong instance"],
+    "knownIssues": ["download_event_not_firing"]
+  },
+  "Print": {
+    "apiId": 177,
+    "description": "Prints the current page using the specified settings (async)",
+    "happyPath": [
+      { "event": "WebView2_APICalled", "field": "API=177", "phase": "trigger", "required": true },
+      { "event": "WebView2_ObjectCalled", "phase": "host_ipc", "required": false, "notes": "Print IPC to renderer" },
+      { "event": "WebView2_InvokeFinished", "phase": "host_dispatch", "required": true, "terminal": true }
+    ],
+    "expectedTimingKey": "print_operation",
+    "failureIndicators": [
+      "No WebView2_InvokeFinished (print hung)",
+      "WebView2_RendererUnresponsive during print",
+      "HRESULT error in print callback"
+    ],
+    "knownIssues": ["print_api_failure", "runtime_version_regression"],
+    "notes": "Known regression in runtime v144.0.3719.x — PrintAsync returns OtherError (GitHub #5499)"
+  },
+  "ShowPrintUIBrowser": {
+    "apiId": 175,
+    "description": "Shows the browser print preview dialog",
+    "happyPath": [
+      { "event": "WebView2_APICalled", "field": "API=175", "phase": "trigger", "required": true }
     ],
     "expectedTimingKey": null,
-    "failureIndicators": ["Message not received by page"],
+    "failureIndicators": ["Print dialog does not appear"],
+    "knownIssues": ["print_api_failure"]
+  },
+  "ShowPrintUISystem": {
+    "apiId": 176,
+    "description": "Shows the system print dialog",
+    "happyPath": [
+      { "event": "WebView2_APICalled", "field": "API=176", "phase": "trigger", "required": true }
+    ],
+    "expectedTimingKey": null,
+    "failureIndicators": ["System print dialog does not appear"],
+    "knownIssues": ["print_api_failure"]
+  },
+  "PrintToPdf": {
+    "apiId": 154,
+    "description": "Prints current page to a PDF file",
+    "happyPath": [
+      { "event": "WebView2_APICalled", "field": "API=154", "phase": "trigger", "required": true },
+      { "event": "WebView2_ObjectCalled", "phase": "host_ipc", "required": false },
+      { "event": "WebView2_InvokeFinished", "phase": "host_dispatch", "required": true, "terminal": true }
+    ],
+    "expectedTimingKey": "print_operation",
+    "failureIndicators": [
+      "No callback received",
+      "isSuccessful=false in callback"
+    ],
+    "knownIssues": ["print_api_failure"]
+  },
+  "PrintToPdfStream": {
+    "apiId": 178,
+    "description": "Prints current page to a PDF stream",
+    "happyPath": [
+      { "event": "WebView2_APICalled", "field": "API=178", "phase": "trigger", "required": true },
+      { "event": "WebView2_ObjectCalled", "phase": "host_ipc", "required": false },
+      { "event": "WebView2_InvokeFinished", "phase": "host_dispatch", "required": true, "terminal": true }
+    ],
+    "expectedTimingKey": "print_operation",
+    "failureIndicators": ["No stream returned"],
+    "knownIssues": ["print_api_failure"]
+  },
+  "ShowSaveAsUI": {
+    "apiId": 207,
+    "description": "Shows the SaveAs dialog for the current page",
+    "happyPath": [
+      { "event": "WebView2_APICalled", "field": "API=207", "phase": "trigger", "required": true },
+      { "event": "WebView2_Event", "phase": "host_dispatch", "required": false, "notes": "SaveAsUIShowing event if handler registered" },
+      { "event": "WebView2_InvokeFinished", "phase": "host_dispatch", "required": true, "terminal": true }
+    ],
+    "expectedTimingKey": null,
+    "failureIndicators": ["SaveAs dialog does not appear"],
+    "knownIssues": []
+  },
+  "Close": {
+    "apiId": 109,
+    "description": "Closes the WebView2 controller",
+    "happyPath": [
+      { "event": "WebView2_APICalled", "field": "API=109", "phase": "trigger", "required": true },
+      { "event": "WebView2_CloseInternal", "phase": "client", "required": true },
+      { "event": "WebView2_OnNcDestroy", "phase": "client", "required": false },
+      { "event": "WebView2_ShuttingDown", "phase": "process", "required": false },
+      { "event": "WebView2_ProcessExited", "phase": "process", "required": false, "notes": "Only if last controller" }
+    ],
+    "expectedTimingKey": null,
+    "failureIndicators": [
+      "WebView2_BrowserProcessFailure during close",
+      "WebView2_WaitForDescendantsTimeOut",
+      "WebView2_WatcherTerminateProcess (forced termination)"
+    ],
+    "knownIssues": ["dispose_teardown_crash"]
+  },
+  "TrySuspend": {
+    "apiId": 105,
+    "description": "Attempts to suspend the WebView to save resources",
+    "happyPath": [
+      { "event": "WebView2_APICalled", "field": "API=105", "phase": "trigger", "required": true },
+      { "event": "WebView2_CollectSuspendMemoryRequested", "phase": "client", "required": false },
+      { "event": "WebView2_CollectingSuspendMemory", "phase": "client", "required": false },
+      { "event": "WebView2_SuspendMemory", "phase": "client", "required": true, "terminal": true }
+    ],
+    "expectedTimingKey": null,
+    "failureIndicators": [
+      "WebView2_CollectSuspendMemoryCancelled (audio/video playing)",
+      "No WebView2_SuspendMemory (suspend rejected)"
+    ],
+    "knownIssues": []
+  },
+  "Resume": {
+    "apiId": 106,
+    "description": "Resumes a suspended WebView",
+    "happyPath": [
+      { "event": "WebView2_APICalled", "field": "API=106", "phase": "trigger", "required": true }
+    ],
+    "expectedTimingKey": null,
+    "failureIndicators": [],
+    "knownIssues": []
+  },
+  "PutIsVisible": {
+    "apiId": 6,
+    "description": "Sets WebView visibility (true/false)",
+    "happyPath": [
+      { "event": "WebView2_APICalled", "field": "API=6", "phase": "trigger", "required": true }
+    ],
+    "expectedTimingKey": null,
+    "failureIndicators": [
+      "WebView2_InvalidWindow (window handle invalid when setting visibility)"
+    ],
+    "knownIssues": ["blank_page_after_navigate"],
+    "notes": "PutIsVisible(false) prevents rendering — common cause of 'blank page' reports"
+  },
+  "PutBounds": {
+    "apiId": 28,
+    "description": "Sets the WebView bounds (position and size)",
+    "happyPath": [
+      { "event": "WebView2_APICalled", "field": "API=28", "phase": "trigger", "required": true },
+      { "event": "WebView2_SetWindowPos", "phase": "controller", "required": false }
+    ],
+    "expectedTimingKey": null,
+    "failureIndicators": [
+      "WebView2_InvalidWindow_WindowBoundsChanged",
+      "WebView2_InvalidParentWindowOperation"
+    ],
+    "knownIssues": ["dpi_scaling_rendering"]
+  },
+  "AddRemoteObject": {
+    "apiId": 67,
+    "description": "Adds a host object accessible to JavaScript via window.chrome.webview.hostObjects",
+    "happyPath": [
+      { "event": "WebView2_APICalled", "field": "API=67", "phase": "trigger", "required": true },
+      { "event": "WebView2_CallRemoteObject", "phase": "host_ipc", "required": false, "notes": "Fires when JS accesses the object" }
+    ],
+    "expectedTimingKey": null,
+    "failureIndicators": [
+      "WebView2_ObjectCallCrossThreadCOM (wrong threading model)"
+    ],
+    "knownIssues": ["webview_bridge_undefined"]
+  },
+  "CallDevToolsProtocolMethod": {
+    "apiId": 66,
+    "description": "Calls a Chrome DevTools Protocol method",
+    "happyPath": [
+      { "event": "WebView2_APICalled", "field": "API=66", "phase": "trigger", "required": true },
+      { "event": "WebView2_ObjectCalled", "phase": "host_ipc", "required": false },
+      { "event": "WebView2_ObjectCallResponse", "phase": "host_ipc", "required": false },
+      { "event": "WebView2_InvokeFinished", "phase": "host_dispatch", "required": true, "terminal": true }
+    ],
+    "expectedTimingKey": "cdp_method_call",
+    "failureIndicators": [
+      "WebView2_CallCDPMethodFailed"
+    ],
+    "knownIssues": []
+  },
+  "AddWebMessageReceived": {
+    "apiId": 57,
+    "description": "Registers handler for messages posted from web content",
+    "happyPath": [
+      { "event": "WebView2_APICalled", "field": "API=57", "phase": "trigger", "required": true }
+    ],
+    "expectedTimingKey": "event_handler_registration",
+    "failureIndicators": [],
+    "knownIssues": ["webview_bridge_undefined"]
+  },
+  "AddBasicAuthenticationRequested": {
+    "apiId": 155,
+    "description": "Registers handler for BasicAuthenticationRequested event",
+    "happyPath": [
+      { "event": "WebView2_APICalled", "field": "API=155", "phase": "trigger", "required": true }
+    ],
+    "expectedTimingKey": "event_handler_registration",
+    "failureIndicators": [],
+    "knownIssues": ["auth_proxy_block"]
+  },
+  "Mute": {
+    "apiId": 141,
+    "description": "Mutes audio in the WebView",
+    "happyPath": [
+      { "event": "WebView2_APICalled", "field": "API=141", "phase": "trigger", "required": true },
+      { "event": "WebView2_AudioStatus", "phase": "client", "required": false }
+    ],
+    "expectedTimingKey": null,
+    "failureIndicators": [],
+    "knownIssues": []
+  },
+  "PutMemoryUsageTargetLevel": {
+    "apiId": 137,
+    "description": "Sets memory usage target level (Normal/Low)",
+    "happyPath": [
+      { "event": "WebView2_APICalled", "field": "API=137", "phase": "trigger", "required": true },
+      { "event": "WebView2_SetRendererMemoryUsageTarget", "phase": "client", "required": false },
+      { "event": "WebView2_SetMemoryPressure", "phase": "client", "required": false }
+    ],
+    "expectedTimingKey": null,
+    "failureIndicators": [],
+    "knownIssues": ["memory_leak_high_usage"]
+  },
+  "AddScreenCaptureStarting": {
+    "apiId": 210,
+    "description": "Registers handler for ScreenCaptureStarting event",
+    "happyPath": [
+      { "event": "WebView2_APICalled", "field": "API=210", "phase": "trigger", "required": true }
+    ],
+    "expectedTimingKey": "event_handler_registration",
+    "failureIndicators": [],
+    "knownIssues": []
+  },
+  "AddNewWindowRequested": {
+    "apiId": 61,
+    "description": "Registers handler for NewWindowRequested event (popup blocking)",
+    "happyPath": [
+      { "event": "WebView2_APICalled", "field": "API=61", "phase": "trigger", "required": true }
+    ],
+    "expectedTimingKey": "event_handler_registration",
+    "failureIndicators": [],
     "knownIssues": []
   },
   "_metadata": {
-    "version": "1.0.0",
-    "description": "Maps WebView2 APIs to their expected event sequences (happy paths). Used by validate_trace to compare actual ETL events against expected behavior.",
+    "version": "2.0.0",
+    "description": "Maps WebView2 APIs to their expected event sequences verified against the Edge codebase (edge_embedded_browser/client/). Event names match actual TRACE_EVENT macros and events.json entries. Note: WebView2_Event is the generic event dispatch — the specific event type (NavigationCompleted, etc.) is dispatched via COM InvokeAll without a dedicated trace event per type.",
+    "verifiedAgainst": "edge_embedded_browser/client/win/current/ and edge_embedded_browser/public/constants/telemetry_constants.h",
     "autoMinedSequences": 0,
-    "manualSequences": 12,
-    "lastUpdated": "2026-02-20"
+    "manualSequences": 36,
+    "lastUpdated": "2025-07-21",
+    "codebaseNotes": {
+      "eventDispatchMechanism": "Navigation lifecycle events (NavigationStarting, NavigationCompleted, ContentLoading, etc.) are dispatched to the host via COM EventSource::InvokeAll(). There is NO dedicated WebView2_ trace event per navigation lifecycle event. The generic WebView2_Event trace fires for all dispatched events.",
+      "tracingCategories": {
+        "edge_webview": "WebView2 client-layer events (WebView2_* prefix)",
+        "navigation": "Chromium NavigationRequest lifecycle events",
+        "perftrack": "Navigation timing events (NavigationTotal, etc.)",
+        "browser,navigation": "Load tracking and transitions",
+        "browser,content,navigation": "WebContents-level events"
+      },
+      "noTraceEventsFor": "Print, Download, SaveAs operations have NO dedicated WebView2_ trace events in the client layer. They are tracked only via WebView2_APICalled + generic WebView2_ObjectCalled/InvokeFinished."
+    }
   }
 }

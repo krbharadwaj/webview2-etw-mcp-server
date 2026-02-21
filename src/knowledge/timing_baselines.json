@@ -104,5 +104,40 @@
     "p99_ms": 35000,
     "notes": "DLL loading on VDI cold start (all DLLs)",
     "sampleCount": 1
+  },
+  "execute_script": {
+    "p50_ms": 10,
+    "p95_ms": 100,
+    "p99_ms": 500,
+    "notes": "ExecuteScript/ExecuteScriptWithResult round-trip (API=5/173)",
+    "sampleCount": 0
+  },
+  "capture_preview": {
+    "p50_ms": 100,
+    "p95_ms": 500,
+    "p99_ms": 2000,
+    "notes": "CapturePreview screenshot generation (API=10)",
+    "sampleCount": 0
+  },
+  "cdp_method_call": {
+    "p50_ms": 5,
+    "p95_ms": 50,
+    "p99_ms": 200,
+    "notes": "CallDevToolsProtocolMethod round-trip (API=66)",
+    "sampleCount": 0
+  },
+  "print_operation": {
+    "p50_ms": 1000,
+    "p95_ms": 5000,
+    "p99_ms": 15000,
+    "notes": "Print/PrintToPdf/PrintToPdfStream operation (API=177/154/178)",
+    "sampleCount": 0
+  },
+  "did_commit_to_finish": {
+    "p50_ms": 50,
+    "p95_ms": 300,
+    "p99_ms": 1000,
+    "notes": "DidCommitToFinish phase (DOM/JS loading after commit)",
+    "sampleCount": 0
   }
 }

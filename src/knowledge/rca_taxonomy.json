@@ -1,51 +1,105 @@
 {
   "_metadata": {
-    "version": "1.0",
-    "description": "Expanded root-cause taxonomy with sub-causes and ETW signatures"
+    "version": "2.0",
+    "description": "Root-cause taxonomy with sub-causes, ETW signatures verified against codebase, scoring hints for triage, and community-derived issues from WebView2Feedback GitHub.",
+    "verifiedAgainst": "edge_embedded_browser/client/ TRACE_EVENT macros + events.json",
+    "lastUpdated": "2025-07-21"
   },
   "navigation": {
     "label": "Navigation Failures",
     "subCauses": {
       "nav_completed_not_received": {
         "symptom": "NavigationCompleted not received by host",
-        "etwSignature": ["WebView2_APICalled(API=3)", "!WebView2_Event_NavigationCompletedHandler"],
-        "expectedPresent": ["WebView2_NavigationStarting", "NavigationRequest::Create"],
-        "expectedAbsent": ["WebView2_Event_NavigationCompletedHandler"],
+        "etwSignature": ["WebView2_APICalled"],
+        "expectedPresent": ["WebView2_NewNavigationContext", "NavigationRequest::Create"],
+        "expectedAbsent": [],
         "distinctFrom": "nav_completed_suppressed",
-        "description": "Navigate was called, NavigationStarting fired, but NavigationCompleted never reached the host"
+        "description": "Navigate was called but NavigationCompleted never dispatched to host. Check NavigationRequest lifecycle — was DidCommitNavigation reached?",
+        "scoringHints": {
+          "mustPresent": ["WebView2_APICalled"],
+          "mustAbsent": [],
+          "mayPresent": ["NavigationRequest::Create", "NavigationRequest::BeginNavigation"],
+          "timingKeys": ["navigation_total"],
+          "symptomKeywords": ["navigation", "completed", "not received", "stuck", "no callback"]
+        },
+        "communityIssues": ["#4579", "#2757", "#3001"]
       },
       "nav_completed_suppressed": {
         "symptom": "NavigationCompleted generated but suppressed (about:blank)",
-        "etwSignature": ["WebView2_DocStateSuppressed", "WebView2_NavIdNotFound"],
-        "expectedPresent": ["WebView2_NavigationCompleted"],
-        "expectedAbsent": ["WebView2_Event_NavigationCompletedHandler"],
+        "etwSignature": ["WebView2_DifferentNavigationId"],
+        "expectedPresent": ["NavigationRequest::DidCommitNavigation"],
+        "expectedAbsent": [],
         "distinctFrom": "nav_completed_not_received",
-        "description": "Runtime generated NavigationCompleted but suppressed it via initializing_navigation_id_ check"
+        "description": "Runtime generated NavigationCompleted but suppressed it via initializing_navigation_id_ check. Look for WebView2_DifferentNavigationId events.",
+        "scoringHints": {
+          "mustPresent": ["WebView2_DifferentNavigationId"],
+          "mustAbsent": [],
+          "mayPresent": ["NavigationRequest::DidCommitNavigation"],
+          "timingKeys": [],
+          "symptomKeywords": ["suppressed", "about:blank", "initial navigation", "nav id"]
+        }
       },
       "nav_id_mismatch": {
         "symptom": "NavigationId mismatch causes event to be dropped",
         "etwSignature": ["WebView2_DifferentNavigationId"],
-        "description": "Event generated with a NavigationId that doesn't match the current navigation"
+        "description": "Event generated with a NavigationId that doesn't match the current navigation",
+        "scoringHints": {
+          "mustPresent": ["WebView2_DifferentNavigationId"],
+          "mustAbsent": [],
+          "mayPresent": [],
+          "timingKeys": [],
+          "symptomKeywords": ["navigation id", "mismatch", "wrong id"]
+        }
       },
       "nav_handler_not_registered": {
         "symptom": "No handler registered for navigation event",
-        "etwSignature": ["WebView2_NoHandlers_NavigationCompleted", "WebView2_NoHandlers_NavigationStarting"],
-        "description": "Event fired but no handler was registered to receive it"
-      },
-      "nav_iframe_removed": {
-        "symptom": "Iframe removed mid-navigation",
-        "etwSignature": ["WebView2_IFrameNotFound"],
-        "description": "Navigation was in progress but the target iframe was removed from the DOM"
+        "etwSignature": ["WebView2_NoEventDispatcher", "WebView2_DroppedEvent"],
+        "description": "Event fired but no handler was registered to receive it. Look for WebView2_DroppedEvent or WebView2_NoEventDispatcher.",
+        "scoringHints": {
+          "mustPresent": ["WebView2_DroppedEvent"],
+          "mustAbsent": [],
+          "mayPresent": ["WebView2_NoEventDispatcher"],
+          "timingKeys": [],
+          "symptomKeywords": ["no handler", "not registered", "dropped", "missing event"]
+        }
       },
       "nav_request_failed": {
         "symptom": "Navigation request failed in browser process",
-        "etwSignature": ["NavigationRequest::OnRequestFailedInternal", "WebView2_NavigationFailed"],
-        "description": "Network error, SSL error, or server error prevented navigation from completing"
+        "etwSignature": ["NavigationRequest::OnRequestFailedInternal"],
+        "description": "Network error, SSL error, or server error prevented navigation from completing",
+        "scoringHints": {
+          "mustPresent": ["NavigationRequest::OnRequestFailedInternal"],
+          "mustAbsent": ["NavigationRequest::DidCommitNavigation"],
+          "mayPresent": ["NavigationRequest::OnFailureChecksComplete"],
+          "timingKeys": ["navigation_total"],
+          "symptomKeywords": ["failed", "network error", "SSL", "server error", "404", "500"]
+        }
       },
       "nav_redirect_loop": {
         "symptom": "Navigation stuck in redirect loop",
-        "etwSignature": ["WebView2_NavigationStarting", "WebView2_NavigationStarting"],
-        "description": "Multiple NavigationStarting events without NavigationCompleted indicates redirect loop"
+        "etwSignature": ["NavigationRequest::OnRequestRedirected"],
+        "description": "Multiple redirect events without DidCommitNavigation indicates redirect loop",
+        "scoringHints": {
+          "mustPresent": ["NavigationRequest::OnRequestRedirected"],
+          "mustAbsent": ["NavigationRequest::DidCommitNavigation"],
+          "mayPresent": [],
+          "timingKeys": ["navigation_total"],
+          "symptomKeywords": ["redirect", "loop", "infinite", "too many redirects"]
+        }
+      },
+      "nav_blank_page_after_success": {
+        "symptom": "Page appears blank/white after NavigationCompleted reports success",
+        "etwSignature": ["NavigationRequest::DidCommitNavigation"],
+        "expectedPresent": ["NavigationRequest::DidCommitNavigation"],
+        "description": "Navigation succeeded but page renders blank. Check PutIsVisible(false), zero-size bounds, or GPU process crash.",
+        "scoringHints": {
+          "mustPresent": ["NavigationRequest::DidCommitNavigation"],
+          "mustAbsent": [],
+          "mayPresent": ["WebView2_APICalled"],
+          "timingKeys": [],
+          "symptomKeywords": ["blank", "white", "empty", "nothing shown", "no content"]
+        },
+        "communityIssues": ["#4763", "#1077", "#3191", "#1042"]
       }
     }
   },
@@ -54,18 +108,66 @@
     "subCauses": {
       "init_cold_start_timeout": {
         "symptom": "Cold start takes >5s or times out",
-        "etwSignature": ["WebView2_WebViewProcessLaunchType(type=0)", "WebView2_Creation_Client(duration>5000)"],
-        "description": "First-ever WebView2 launch requires full browser process initialization"
+        "etwSignature": ["WebView2_WebViewProcessLaunchType", "WebView2_Creation_Client"],
+        "description": "First-ever WebView2 launch requires full browser process initialization. Check WebView2_Creation_Client async duration.",
+        "scoringHints": {
+          "mustPresent": ["WebView2_Creation_Client"],
+          "mustAbsent": [],
+          "mayPresent": ["WebView2_WebViewProcessLaunchType", "WebView2_LaunchProcess_Attempt"],
+          "timingKeys": ["creation_client_cold_start"],
+          "symptomKeywords": ["slow", "timeout", "creation", "cold start", "first launch", "takes long"]
+        },
+        "communityIssues": ["#2226", "#5149"]
       },
       "init_about_blank_deadlock": {
         "symptom": "Host waits for about:blank NavigationCompleted that is suppressed",
-        "etwSignature": ["!WebView2_APICalled(API=3)", "WebView2_DocStateSuppressed"],
-        "description": "XAML/host control waits for NavigationCompleted before calling Navigate, but about:blank completion is suppressed"
+        "etwSignature": ["WebView2_DifferentNavigationId"],
+        "description": "XAML/host control waits for NavigationCompleted before calling Navigate, but about:blank completion is suppressed by initializing_navigation_id_ check",
+        "scoringHints": {
+          "mustPresent": [],
+          "mustAbsent": ["WebView2_APICalled"],
+          "mayPresent": ["WebView2_DifferentNavigationId"],
+          "timingKeys": [],
+          "symptomKeywords": ["deadlock", "about:blank", "stuck", "waiting", "initial navigation"]
+        }
       },
       "init_handler_registration_race": {
-        "symptom": "Event handler registered too late",
-        "etwSignature": ["WebView2_APICalled(API=37)", "WebView2_Event_NavigationCompletedHandler"],
-        "description": "add_NavigationCompleted registered after about:blank already completed"
+        "symptom": "Event handler registered too late (after about:blank completed)",
+        "etwSignature": ["WebView2_APICalled"],
+        "description": "add_NavigationCompleted (API=37) registered after about:blank already completed. Check timing of API=37 call relative to WebView2_FirstNavigationTime.",
+        "scoringHints": {
+          "mustPresent": ["WebView2_APICalled"],
+          "mustAbsent": [],
+          "mayPresent": ["WebView2_FirstNavigationTime"],
+          "timingKeys": [],
+          "symptomKeywords": ["race", "late registration", "handler", "too late", "missed event"]
+        }
+      },
+      "init_creation_failure": {
+        "symptom": "WebView2 creation fails with error HRESULT",
+        "etwSignature": ["WebView2_CreationFailure"],
+        "description": "Environment or controller creation failed. Check WebView2_CreationFailure, WebView2_CreationFailureExe, and WebView2_FactoryConnectionError.",
+        "scoringHints": {
+          "mustPresent": ["WebView2_CreationFailure"],
+          "mustAbsent": ["WebView2_CreationTime"],
+          "mayPresent": ["WebView2_CreationFailureExe", "WebView2_FactoryConnectionError", "WebView2_Invalid_Version", "WebView2_version_too_old"],
+          "timingKeys": ["creation_client_cold_start"],
+          "symptomKeywords": ["creation failed", "cannot create", "error", "HRESULT", "initialization failed"]
+        },
+        "communityIssues": ["#2226", "#960"]
+      },
+      "headless_creation_failure": {
+        "symptom": "WebView2 creation fails in headless/windowless/service context",
+        "etwSignature": ["WebView2_CreationFailure", "WebView2_WindowImpl_Init_Failed"],
+        "description": "Creation fails because no interactive desktop session is available (Windows services, session 0). Check WebView2_WindowImpl_Init_Failed.",
+        "scoringHints": {
+          "mustPresent": ["WebView2_CreationFailure"],
+          "mustAbsent": ["WebView2_ClientWindowInit"],
+          "mayPresent": ["WebView2_WindowImpl_Init_Failed", "WebView2_InvalidWindow"],
+          "timingKeys": [],
+          "symptomKeywords": ["headless", "windowless", "service", "session 0", "no desktop", "invisible"]
+        },
+        "communityIssues": ["#3458", "#960", "#5123"]
       }
     }
   },
@@ -74,18 +176,52 @@
     "subCauses": {
       "perf_vdi_dll_loading": {
         "symptom": "Extremely slow first navigation in VDI environment",
-        "etwSignature": ["WebView2_WebViewProcessLaunchType(type=0)", "CommitToDidCommit(>5000ms)"],
-        "description": "DLL streaming over network in VDI/Citrix causes cold-start delays"
+        "etwSignature": ["WebView2_WebViewProcessLaunchType", "CommitToDidCommit"],
+        "description": "DLL streaming over network in VDI/Citrix causes cold-start delays. Check CommitToDidCommit duration > 5000ms.",
+        "scoringHints": {
+          "mustPresent": ["WebView2_Creation_Client"],
+          "mustAbsent": [],
+          "mayPresent": ["WebView2_WebViewProcessLaunchType"],
+          "timingKeys": ["dll_loading_cold_vdi", "creation_client_cold_start"],
+          "symptomKeywords": ["VDI", "Citrix", "slow", "DLL", "remote desktop", "virtual"]
+        }
       },
       "perf_service_worker_activation": {
         "symptom": "First PWA navigation slow due to service worker cold activation",
-        "etwSignature": ["ForwardServiceWorkerToWorkerReady(>1000ms)", "EmbeddedWorkerInstance::Start"],
-        "description": "Service worker needs cold activation before fetch handler runs"
+        "etwSignature": ["ForwardServiceWorkerToWorkerReady", "EmbeddedWorkerInstance::Start"],
+        "description": "Service worker needs cold activation before fetch handler runs. Check ForwardServiceWorkerToWorkerReady duration.",
+        "scoringHints": {
+          "mustPresent": ["EmbeddedWorkerInstance::Start"],
+          "mustAbsent": [],
+          "mayPresent": ["ForwardServiceWorkerToWorkerReady", "FetchHandlerStartToFetchHandlerEnd"],
+          "timingKeys": ["sw_forward_to_worker_ready", "sw_fetch_handler_execution"],
+          "symptomKeywords": ["service worker", "PWA", "slow", "first load", "fetch handler"]
+        }
       },
       "perf_renderer_hung": {
         "symptom": "Renderer becomes unresponsive",
         "etwSignature": ["WebView2_RendererUnresponsive"],
-        "description": "Heavy JS execution or infinite loop causes renderer to hang"
+        "description": "Heavy JS execution or infinite loop causes renderer to hang. Look for WebView2_RendererUnresponsive event.",
+        "scoringHints": {
+          "mustPresent": ["WebView2_RendererUnresponsive"],
+          "mustAbsent": [],
+          "mayPresent": [],
+          "timingKeys": [],
+          "symptomKeywords": ["hung", "unresponsive", "frozen", "not responding", "stuck"]
+        }
+      },
+      "memory_leak_renderer_growth": {
+        "symptom": "Memory grows unbounded, many renderer processes",
+        "etwSignature": ["WebView2_MemoryUsage"],
+        "description": "Renderer count growing without cleanup. Check for excessive WebView2_ProcessExited vs creation events. Check WebView2_SetMemoryPressure calls.",
+        "scoringHints": {
+          "mustPresent": [],
+          "mustAbsent": [],
+          "mayPresent": ["WebView2_MemoryUsage", "WebView2_SetMemoryPressure", "WebView2_TrimNonRendererWorkingSet"],
+          "timingKeys": [],
+          "symptomKeywords": ["memory", "leak", "high memory", "out of memory", "OOM", "growing"]
+        },
+        "communityIssues": ["#1713", "#1096"]
       }
     }
   },
@@ -94,18 +230,40 @@
     "subCauses": {
       "auth_wam_token_failure": {
         "symptom": "WAM token request fails",
-        "etwSignature": ["WebTokenRequestResultOperation_ActivityStop(status!=0)"],
-        "description": "Web Account Manager token acquisition failed"
+        "etwSignature": ["WebTokenRequestResultOperation_ActivityStop"],
+        "description": "Web Account Manager token acquisition failed. Check status field in ActivityStop.",
+        "scoringHints": {
+          "mustPresent": ["WebTokenRequestResultOperation_ActivityStop"],
+          "mustAbsent": [],
+          "mayPresent": ["WebTokenRequestResultOperation_ActivityError"],
+          "timingKeys": ["wam_token_request"],
+          "symptomKeywords": ["WAM", "token", "authentication", "SSO", "sign in", "login"]
+        }
       },
       "auth_network_unreachable": {
         "symptom": "Auth endpoint unreachable",
-        "etwSignature": ["WebTokenRequestResultOperation_ActivityError(hresult=0x800704CF)"],
-        "description": "Network connectivity prevents reaching AAD/MSA endpoints"
+        "etwSignature": ["WebTokenRequestResultOperation_ActivityError"],
+        "description": "Network connectivity prevents reaching AAD/MSA endpoints",
+        "scoringHints": {
+          "mustPresent": ["WebTokenRequestResultOperation_ActivityError"],
+          "mustAbsent": [],
+          "mayPresent": [],
+          "timingKeys": ["wam_token_request"],
+          "symptomKeywords": ["network", "unreachable", "offline", "DNS", "connection"]
+        }
       },
       "auth_proxy_block": {
         "symptom": "Corporate proxy blocks auth flow",
-        "etwSignature": ["WebView2_NavigationFailed", "WebTokenRequestResultOperation_ActivityError"],
-        "description": "Corporate proxy or firewall blocks authentication redirects"
+        "etwSignature": ["NavigationRequest::OnRequestFailedInternal", "WebTokenRequestResultOperation_ActivityError"],
+        "description": "Corporate proxy or firewall blocks authentication redirects. Check for NavigationRequest failures + WAM errors together.",
+        "scoringHints": {
+          "mustPresent": ["NavigationRequest::OnRequestFailedInternal"],
+          "mustAbsent": [],
+          "mayPresent": ["WebTokenRequestResultOperation_ActivityError"],
+          "timingKeys": [],
+          "symptomKeywords": ["proxy", "firewall", "blocked", "corporate", "PAC"]
+        },
+        "communityIssues": ["#2532", "#5456"]
       }
     }
   },
@@ -115,17 +273,162 @@
       "crash_browser_process": {
         "symptom": "Browser process crashed",
         "etwSignature": ["WebView2_BrowserProcessFailure"],
-        "description": "The browser process exited unexpectedly"
+        "description": "The browser process exited unexpectedly. Check exit_code parameter.",
+        "scoringHints": {
+          "mustPresent": ["WebView2_BrowserProcessFailure"],
+          "mustAbsent": [],
+          "mayPresent": ["WebView2_ProcessExited", "WebView2_BrowserProcessExit"],
+          "timingKeys": [],
+          "symptomKeywords": ["crash", "browser process", "exited", "ProcessFailed"]
+        },
+        "communityIssues": ["#2747", "#4141", "#5220"]
       },
       "crash_renderer_process": {
         "symptom": "Renderer process crashed",
         "etwSignature": ["WebView2_ProcessExited", "WebView2_ProcessFailureTypeWithExitCode"],
-        "description": "A renderer process exited with a crash exit code"
+        "description": "A renderer process exited with a crash exit code",
+        "scoringHints": {
+          "mustPresent": ["WebView2_ProcessExited"],
+          "mustAbsent": [],
+          "mayPresent": ["WebView2_ProcessFailureTypeWithExitCode", "WebView2_ProcessFailureTypeWithReason"],
+          "timingKeys": [],
+          "symptomKeywords": ["renderer crash", "renderer process", "page crash"]
+        }
       },
       "crash_gpu_process": {
         "symptom": "GPU process crashed causing visual corruption",
-        "etwSignature": ["WebView2_ProcessExited(type=gpu)"],
-        "description": "GPU process crash, may cause blank page or visual artifacts"
+        "etwSignature": ["WebView2_ProcessExited"],
+        "description": "GPU process crash, may cause blank page or visual artifacts. Check process_type in WebView2_ProcessExited.",
+        "scoringHints": {
+          "mustPresent": ["WebView2_ProcessExited"],
+          "mustAbsent": [],
+          "mayPresent": [],
+          "timingKeys": [],
+          "symptomKeywords": ["GPU", "visual", "blank", "rendering", "artifacts"]
+        }
+      },
+      "dispose_crash_during_async": {
+        "symptom": "Crash or exception during Close/Dispose while async op in progress",
+        "etwSignature": ["WebView2_CloseInternal"],
+        "description": "Dispose called while async operation (print, navigate, script) is in progress. Check if WebView2_APICalled for async APIs appears near WebView2_CloseInternal.",
+        "scoringHints": {
+          "mustPresent": ["WebView2_CloseInternal"],
+          "mustAbsent": [],
+          "mayPresent": ["WebView2_BrowserProcessFailure", "WebView2_WaitForDescendantsTimeOut"],
+          "timingKeys": [],
+          "symptomKeywords": ["dispose", "teardown", "close", "COMException", "0x8007139F"]
+        },
+        "communityIssues": ["#1767", "#4317", "#588"]
+      }
+    }
+  },
+  "api_failures": {
+    "label": "API Failures",
+    "subCauses": {
+      "print_api_failure": {
+        "symptom": "PrintAsync, PrintToPdf, or ShowPrintUI fails",
+        "etwSignature": ["WebView2_APICalled"],
+        "description": "Print API returns error. Known regression in runtime v144.0.3719.x (OtherError). Check if navigation completed before print.",
+        "scoringHints": {
+          "mustPresent": ["WebView2_APICalled"],
+          "mustAbsent": [],
+          "mayPresent": ["WebView2_InvokeFinished", "WebView2_RendererUnresponsive"],
+          "timingKeys": ["print_operation"],
+          "symptomKeywords": ["print", "PrintAsync", "PrintToPdf", "PrintToPdfStream", "OtherError"]
+        },
+        "communityIssues": ["#5499", "#3284", "#2389"]
+      },
+      "execute_script_failure": {
+        "symptom": "ExecuteScript times out or fails",
+        "etwSignature": ["WebView2_APICalled"],
+        "description": "ExecuteScript called but no callback received. Check if called before navigation completed or if renderer is alive.",
+        "scoringHints": {
+          "mustPresent": ["WebView2_APICalled"],
+          "mustAbsent": ["WebView2_InvokeFinished"],
+          "mayPresent": ["WebView2_RendererUnresponsive", "WebView2_CallCDPMethodFailed"],
+          "timingKeys": ["execute_script"],
+          "symptomKeywords": ["ExecuteScript", "script", "timeout", "no callback", "javascript"]
+        },
+        "communityIssues": ["#136"]
+      },
+      "download_event_not_firing": {
+        "symptom": "DownloadStarting event not firing when download occurs",
+        "etwSignature": ["WebView2_APICalled"],
+        "description": "AddDownloadStarting was registered but DownloadStarting event doesn't fire. Check if handler registered before download trigger.",
+        "scoringHints": {
+          "mustPresent": ["WebView2_APICalled"],
+          "mustAbsent": [],
+          "mayPresent": ["WebView2_NoEventDispatcher", "WebView2_DroppedEvent"],
+          "timingKeys": [],
+          "symptomKeywords": ["download", "DownloadStarting", "not firing", "missing event"]
+        },
+        "communityIssues": ["#2180"]
+      }
+    }
+  },
+  "input_rendering": {
+    "label": "Input & Rendering Issues",
+    "subCauses": {
+      "input_frozen_mouse": {
+        "symptom": "Mouse/input stops working, UI appears frozen",
+        "etwSignature": ["WebView2_RendererUnresponsive"],
+        "description": "Mouse events stop being processed. Common cause: WM_PAINT flooding with WS_EX_COMPOSITED style, or renderer main thread blocked.",
+        "scoringHints": {
+          "mustPresent": [],
+          "mustAbsent": [],
+          "mayPresent": ["WebView2_RendererUnresponsive"],
+          "timingKeys": [],
+          "symptomKeywords": ["mouse", "input", "frozen", "click", "not responding", "stuck"]
+        },
+        "communityIssues": ["#3003", "#3685"]
+      },
+      "dpi_scaling_rendering": {
+        "symptom": "Content renders at wrong scale or position after DPI change",
+        "etwSignature": ["WebView2_APICalled"],
+        "description": "Multi-monitor with different DPIs causes scaling issues. Check PutBounds/GetBounds calls around DPI change events.",
+        "scoringHints": {
+          "mustPresent": [],
+          "mustAbsent": [],
+          "mayPresent": ["WebView2_SetWindowPos", "WebView2_GetDpiAwareness", "WebView2_IncompatibleDPI"],
+          "timingKeys": [],
+          "symptomKeywords": ["DPI", "scaling", "zoom", "blurry", "size", "multi-monitor"]
+        },
+        "communityIssues": ["#5253"]
+      }
+    }
+  },
+  "compatibility": {
+    "label": "Compatibility Issues",
+    "subCauses": {
+      "runtime_version_regression": {
+        "symptom": "Feature that worked breaks after runtime update",
+        "etwSignature": [],
+        "description": "Runtime version update introduces regression. Compare runtime version in WebView2_SDKVersion against known regression versions.",
+        "scoringHints": {
+          "mustPresent": [],
+          "mustAbsent": [],
+          "mayPresent": ["WebView2_SDKVersion"],
+          "timingKeys": [],
+          "symptomKeywords": ["regression", "update", "version", "worked before", "broke", "runtime"]
+        },
+        "knownRegressionVersions": [
+          { "version": "144.0.3719.x", "issue": "PrintAsync returns OtherError" },
+          { "version": "125.0.x", "issue": "NavigationCompleted not invoked in some cases" }
+        ],
+        "communityIssues": ["#5499", "#4579"]
+      },
+      "webview_bridge_undefined": {
+        "symptom": "window.chrome.webview is undefined in web content",
+        "etwSignature": [],
+        "description": "JavaScript bridge not available. Usually because script runs before CoreWebView2 initialization completes, or navigation targets wrong origin.",
+        "scoringHints": {
+          "mustPresent": [],
+          "mustAbsent": [],
+          "mayPresent": ["WebView2_APICalled"],
+          "timingKeys": [],
+          "symptomKeywords": ["undefined", "window.chrome.webview", "bridge", "hostObjects", "not defined"]
+        },
+        "communityIssues": ["#5449"]
       }
     }
   }
