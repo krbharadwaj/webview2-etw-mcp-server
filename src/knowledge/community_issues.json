@@ -9,9 +9,19 @@
   "navigation_completed_not_invoked": {
     "category": "Navigation",
     "symptom": "NavigationCompleted event not received by host app after calling Navigate",
-    "expectedPresent": ["WebView2_APICalled", "WebView2_NewNavigationContext", "NavigationRequest::Create", "NavigationRequest::BeginNavigation"],
+    "expectedPresent": [
+      "WebView2_APICalled",
+      "WebView2_NewNavigationContext",
+      "NavigationRequest::Create",
+      "NavigationRequest::BeginNavigation"
+    ],
     "expectedAbsent": [],
-    "diagnosticEvents": ["WebView2_DifferentNavigationId", "WebView2_DroppedEvent", "WebView2_NoEventDispatcher", "NavigationRequest::OnRequestFailedInternal"],
+    "diagnosticEvents": [
+      "WebView2_DifferentNavigationId",
+      "WebView2_DroppedEvent",
+      "WebView2_NoEventDispatcher",
+      "NavigationRequest::OnRequestFailedInternal"
+    ],
     "keyChecks": [
       "Was NavigationRequest::DidCommitNavigation reached? If not, navigation failed at browser level.",
       "Is WebView2_DifferentNavigationId present? Indicates nav ID mismatch suppression.",
@@ -19,14 +29,28 @@
       "Is this an about:blank initial navigation? Check for suppression via initializing_navigation_id_."
     ],
     "taxonomyRef": "nav_completed_not_received",
-    "relatedIssues": ["#4579", "#2757", "#3001"]
+    "relatedIssues": [
+      "#4579",
+      "#2757",
+      "#3001"
+    ]
   },
   "blank_page_after_navigate": {
     "category": "Navigation",
     "symptom": "Page appears blank/white after navigation completes successfully",
-    "expectedPresent": ["WebView2_APICalled", "NavigationRequest::DidCommitNavigation"],
-    "expectedAbsent": ["WebView2_BrowserProcessFailure", "WebView2_ProcessExited"],
-    "diagnosticEvents": ["WebView2_APICalled", "WebView2_SetWindowPos", "WebView2_InvalidWindow"],
+    "expectedPresent": [
+      "WebView2_APICalled",
+      "NavigationRequest::DidCommitNavigation"
+    ],
+    "expectedAbsent": [
+      "WebView2_BrowserProcessFailure",
+      "WebView2_ProcessExited"
+    ],
+    "diagnosticEvents": [
+      "WebView2_APICalled",
+      "WebView2_SetWindowPos",
+      "WebView2_InvalidWindow"
+    ],
     "keyChecks": [
       "Was PutIsVisible(false) (API=6) called? Hidden WebViews don't render.",
       "Are bounds zero-size? Check PutBounds (API=28) calls.",
@@ -35,14 +59,27 @@
       "Is WebView2_SetWindowPos showing non-zero dimensions?"
     ],
     "taxonomyRef": "nav_blank_page_after_success",
-    "relatedIssues": ["#4763", "#1077", "#3191", "#1042", "#491"]
+    "relatedIssues": [
+      "#4763",
+      "#1077",
+      "#3191",
+      "#1042",
+      "#491"
+    ]
   },
   "process_failed_browser_crash": {
     "category": "Crash",
     "symptom": "ProcessFailed event fires or browser process crashes unexpectedly",
-    "expectedPresent": ["WebView2_BrowserProcessFailure"],
+    "expectedPresent": [
+      "WebView2_BrowserProcessFailure"
+    ],
     "expectedAbsent": [],
-    "diagnosticEvents": ["WebView2_ProcessExited", "WebView2_ProcessFailureTypeWithExitCode", "WebView2_ProcessFailureTypeWithReason", "WebView2_BrowserProcessExit"],
+    "diagnosticEvents": [
+      "WebView2_ProcessExited",
+      "WebView2_ProcessFailureTypeWithExitCode",
+      "WebView2_ProcessFailureTypeWithReason",
+      "WebView2_BrowserProcessExit"
+    ],
     "keyChecks": [
       "What is the exit_code in WebView2_BrowserProcessFailure?",
       "Is WebView2_ProcessFailureTypeWithReason present? What reason?",
@@ -50,14 +87,32 @@
       "Are multiple WebView2 browser processes restarting (restart loop)?"
     ],
     "taxonomyRef": "crash_browser_process",
-    "relatedIssues": ["#2747", "#4141", "#5220", "#4199", "#4839"]
+    "relatedIssues": [
+      "#2747",
+      "#4141",
+      "#5220",
+      "#4199",
+      "#4839"
+    ]
   },
   "initialization_failure_timeout": {
     "category": "Initialization",
     "symptom": "WebView2 creation fails, times out, or takes very long",
-    "expectedPresent": ["WebView2_FactoryCreate"],
-    "expectedAbsent": ["WebView2_CreationTime"],
-    "diagnosticEvents": ["WebView2_CreationFailure", "WebView2_CreationFailureExe", "WebView2_FactoryConnectionError", "WebView2_LaunchProcess_Failed", "WebView2_Invalid_Version", "WebView2_version_too_old", "WebView2_WindowImpl_Init_Failed"],
+    "expectedPresent": [
+      "WebView2_FactoryCreate"
+    ],
+    "expectedAbsent": [
+      "WebView2_CreationTime"
+    ],
+    "diagnosticEvents": [
+      "WebView2_CreationFailure",
+      "WebView2_CreationFailureExe",
+      "WebView2_FactoryConnectionError",
+      "WebView2_LaunchProcess_Failed",
+      "WebView2_Invalid_Version",
+      "WebView2_version_too_old",
+      "WebView2_WindowImpl_Init_Failed"
+    ],
     "keyChecks": [
       "Is WebView2_Creation_Client async pair complete? Check duration.",
       "Is WebView2_WebViewProcessLaunchType=0 (cold start)? Cold starts are slower.",
@@ -66,14 +121,22 @@
       "Is runtime version valid? Check WebView2_Invalid_Version / WebView2_version_too_old."
     ],
     "taxonomyRef": "init_cold_start_timeout",
-    "relatedIssues": ["#2226", "#3458", "#960", "#5149"]
+    "relatedIssues": [
+      "#2226",
+      "#3458",
+      "#960",
+      "#5149"
+    ]
   },
   "input_frozen_mouse_unresponsive": {
     "category": "Input & Rendering",
     "symptom": "Mouse/keyboard input stops working, WebView appears frozen",
     "expectedPresent": [],
     "expectedAbsent": [],
-    "diagnosticEvents": ["WebView2_RendererUnresponsive", "WebView2_SetWindowPos"],
+    "diagnosticEvents": [
+      "WebView2_RendererUnresponsive",
+      "WebView2_SetWindowPos"
+    ],
     "keyChecks": [
       "Is WebView2_RendererUnresponsive present? Renderer main thread is blocked.",
       "Is WM_PAINT flooding? Check for WS_EX_COMPOSITED window style.",
@@ -81,14 +144,23 @@
       "Are focus events (API=43/45 GotFocus/LostFocus) still firing?"
     ],
     "taxonomyRef": "input_frozen_mouse",
-    "relatedIssues": ["#3003", "#3685"]
+    "relatedIssues": [
+      "#3003",
+      "#3685"
+    ]
   },
   "print_api_failure": {
     "category": "API Failures",
     "symptom": "PrintAsync, PrintToPdf, or ShowPrintUI fails or returns error",
-    "expectedPresent": ["WebView2_APICalled"],
+    "expectedPresent": [
+      "WebView2_APICalled"
+    ],
     "expectedAbsent": [],
-    "diagnosticEvents": ["WebView2_InvokeFinished", "WebView2_ObjectCalled", "WebView2_RendererUnresponsive"],
+    "diagnosticEvents": [
+      "WebView2_InvokeFinished",
+      "WebView2_ObjectCalled",
+      "WebView2_RendererUnresponsive"
+    ],
     "keyChecks": [
       "Was navigation fully complete before printing? Print requires loaded content.",
       "Is this a windowless/visual hosting controller? Some print paths require windowed.",
@@ -97,17 +169,31 @@
       "Was Close/Dispose called during print? Check WebView2_CloseInternal timing."
     ],
     "taxonomyRef": "print_api_failure",
-    "relatedIssues": ["#5499", "#3284", "#2389"],
+    "relatedIssues": [
+      "#5499",
+      "#3284",
+      "#2389"
+    ],
     "knownRegressions": [
-      { "version": "144.0.3719.x", "description": "PrintAsync returns OtherError" }
+      {
+        "version": "144.0.3719.x",
+        "description": "PrintAsync returns OtherError"
+      }
     ]
   },
   "dispose_teardown_crash": {
     "category": "Crash",
     "symptom": "Exception or crash when calling Close/Dispose on WebView2",
-    "expectedPresent": ["WebView2_CloseInternal"],
+    "expectedPresent": [
+      "WebView2_CloseInternal"
+    ],
     "expectedAbsent": [],
-    "diagnosticEvents": ["WebView2_BrowserProcessFailure", "WebView2_WaitForDescendantsTimeOut", "WebView2_WatcherTerminateProcess", "WebView2_OnNcDestroy"],
+    "diagnosticEvents": [
+      "WebView2_BrowserProcessFailure",
+      "WebView2_WaitForDescendantsTimeOut",
+      "WebView2_WatcherTerminateProcess",
+      "WebView2_OnNcDestroy"
+    ],
     "keyChecks": [
       "Was Dispose called while async operation in progress (print, navigate, script)?",
       "Was print dialog open when Dispose was called?",
@@ -116,28 +202,47 @@
       "Was WebView2_WatcherTerminateProcess needed (forced kill)?"
     ],
     "taxonomyRef": "dispose_crash_during_async",
-    "relatedIssues": ["#1767", "#588", "#4206", "#2398", "#4317"]
+    "relatedIssues": [
+      "#1767",
+      "#588",
+      "#4206",
+      "#2398",
+      "#4317"
+    ]
   },
   "download_event_not_firing": {
     "category": "API Failures",
     "symptom": "DownloadStarting event doesn't fire when user downloads a file",
-    "expectedPresent": ["WebView2_APICalled"],
+    "expectedPresent": [
+      "WebView2_APICalled"
+    ],
     "expectedAbsent": [],
-    "diagnosticEvents": ["WebView2_NoEventDispatcher", "WebView2_DroppedEvent"],
+    "diagnosticEvents": [
+      "WebView2_NoEventDispatcher",
+      "WebView2_DroppedEvent"
+    ],
     "keyChecks": [
       "Was AddDownloadStarting (API=128) called before the download was triggered?",
       "Is WebView2_NoEventDispatcher or WebView2_DroppedEvent present?",
       "Is the download triggered by navigation (content-disposition) or anchor click?"
     ],
     "taxonomyRef": "download_event_not_firing",
-    "relatedIssues": ["#2180"]
+    "relatedIssues": [
+      "#2180"
+    ]
   },
   "memory_leak_high_usage": {
     "category": "Performance",
     "symptom": "Memory usage grows unbounded, multiple renderer processes",
     "expectedPresent": [],
     "expectedAbsent": [],
-    "diagnosticEvents": ["WebView2_MemoryUsage", "WebView2_SetMemoryPressure", "WebView2_TrimNonRendererWorkingSet", "WebView2_CollectingSuspendMemory", "WebView2_ProcessExited"],
+    "diagnosticEvents": [
+      "WebView2_MemoryUsage",
+      "WebView2_SetMemoryPressure",
+      "WebView2_TrimNonRendererWorkingSet",
+      "WebView2_CollectingSuspendMemory",
+      "WebView2_ProcessExited"
+    ],
     "keyChecks": [
       "Is renderer count growing? Compare WebView2_Creation_Client count vs WebView2_ProcessExited count.",
       "Are navigations creating new renderers without closing old? (cross-origin navigations)",
@@ -145,14 +250,25 @@
       "Are TrySuspend (API=105) calls being made for inactive WebViews?"
     ],
     "taxonomyRef": "memory_leak_renderer_growth",
-    "relatedIssues": ["#1713", "#1096"]
+    "relatedIssues": [
+      "#1713",
+      "#1096"
+    ]
   },
   "headless_creation_fails": {
     "category": "Initialization",
     "symptom": "WebView2 creation fails in headless, windowless, or Windows service context",
-    "expectedPresent": ["WebView2_FactoryCreate"],
-    "expectedAbsent": ["WebView2_ClientWindowInit"],
-    "diagnosticEvents": ["WebView2_CreationFailure", "WebView2_WindowImpl_Init_Failed", "WebView2_InvalidWindow"],
+    "expectedPresent": [
+      "WebView2_FactoryCreate"
+    ],
+    "expectedAbsent": [
+      "WebView2_ClientWindowInit"
+    ],
+    "diagnosticEvents": [
+      "WebView2_CreationFailure",
+      "WebView2_WindowImpl_Init_Failed",
+      "WebView2_InvalidWindow"
+    ],
     "keyChecks": [
       "Is interactive desktop session available? Windows services run in session 0.",
       "Check WebView2_WindowImpl_Init_Failed for window creation errors.",
@@ -160,14 +276,22 @@
       "Consider using CreateCoreWebView2CompositionController for windowless hosting."
     ],
     "taxonomyRef": "headless_creation_failure",
-    "relatedIssues": ["#3458", "#960", "#5123"]
+    "relatedIssues": [
+      "#3458",
+      "#960",
+      "#5123"
+    ]
   },
   "webview_bridge_undefined": {
     "category": "Compatibility",
     "symptom": "window.chrome.webview is undefined in JavaScript",
-    "expectedPresent": ["NavigationRequest::DidCommitNavigation"],
+    "expectedPresent": [
+      "NavigationRequest::DidCommitNavigation"
+    ],
     "expectedAbsent": [],
-    "diagnosticEvents": ["WebView2_APICalled"],
+    "diagnosticEvents": [
+      "WebView2_APICalled"
+    ],
     "keyChecks": [
       "Is window.chrome.webview accessed before CoreWebView2 fully initialized?",
       "Is the page navigated to the correct origin (file://, https://)?",
@@ -175,14 +299,19 @@
       "Was AddScriptToExecuteOnDocumentCreated (API=11) used to inject scripts?"
     ],
     "taxonomyRef": "webview_bridge_undefined",
-    "relatedIssues": ["#5449"]
+    "relatedIssues": [
+      "#5449"
+    ]
   },
   "runtime_version_regression": {
     "category": "Compatibility",
     "symptom": "Feature that previously worked breaks after WebView2 runtime update",
     "expectedPresent": [],
     "expectedAbsent": [],
-    "diagnosticEvents": ["WebView2_SDKVersion", "WebView2_SDKVersionFolder"],
+    "diagnosticEvents": [
+      "WebView2_SDKVersion",
+      "WebView2_SDKVersionFolder"
+    ],
     "keyChecks": [
       "Compare runtime version from WebView2_SDKVersion against known regression versions.",
       "Is the issue reproducible with a pinned/fixed runtime version?",
@@ -190,17 +319,32 @@
     ],
     "taxonomyRef": "runtime_version_regression",
     "knownRegressionVersions": [
-      { "version": "144.0.3719.x", "issue": "PrintAsync returns OtherError", "githubIssue": "#5499" },
-      { "version": "125.0.x", "issue": "NavigationCompleted not invoked in failure cases", "githubIssue": "#4579" }
+      {
+        "version": "144.0.3719.x",
+        "issue": "PrintAsync returns OtherError",
+        "githubIssue": "#5499"
+      },
+      {
+        "version": "125.0.x",
+        "issue": "NavigationCompleted not invoked in failure cases",
+        "githubIssue": "#4579"
+      }
     ],
-    "relatedIssues": ["#5499", "#4579"]
+    "relatedIssues": [
+      "#5499",
+      "#4579"
+    ]
   },
   "proxy_network_auth_blocks": {
     "category": "Authentication",
     "symptom": "Corporate proxy or network blocks WebView2 authentication flow",
     "expectedPresent": [],
     "expectedAbsent": [],
-    "diagnosticEvents": ["NavigationRequest::OnRequestFailedInternal", "WebTokenRequestResultOperation_ActivityError", "WebView2_ResponseLoadingBlocked"],
+    "diagnosticEvents": [
+      "NavigationRequest::OnRequestFailedInternal",
+      "WebTokenRequestResultOperation_ActivityError",
+      "WebView2_ResponseLoadingBlocked"
+    ],
     "keyChecks": [
       "Is NavigationRequest::OnRequestFailedInternal present for auth URLs?",
       "Is WebTokenRequestResultOperation_ActivityError present?",
@@ -208,14 +352,24 @@
       "Is BasicAuthenticationRequested handler (API=155) registered?"
     ],
     "taxonomyRef": "auth_proxy_block",
-    "relatedIssues": ["#2532", "#5456"]
+    "relatedIssues": [
+      "#2532",
+      "#5456"
+    ]
   },
   "execute_script_timeout": {
     "category": "API Failures",
     "symptom": "ExecuteScript call never returns or times out",
-    "expectedPresent": ["WebView2_APICalled"],
-    "expectedAbsent": ["WebView2_InvokeFinished"],
-    "diagnosticEvents": ["WebView2_RendererUnresponsive", "WebView2_CallCDPMethodFailed"],
+    "expectedPresent": [
+      "WebView2_APICalled"
+    ],
+    "expectedAbsent": [
+      "WebView2_InvokeFinished"
+    ],
+    "diagnosticEvents": [
+      "WebView2_RendererUnresponsive",
+      "WebView2_CallCDPMethodFailed"
+    ],
     "keyChecks": [
       "Was ExecuteScript (API=5) called before navigation completed?",
       "Is the renderer process alive? Check WebView2_RendererUnresponsive.",
@@ -223,14 +377,21 @@
       "Check CPU trace for renderer main thread — is it blocked?"
     ],
     "taxonomyRef": "execute_script_failure",
-    "relatedIssues": ["#136"]
+    "relatedIssues": [
+      "#136"
+    ]
   },
   "dpi_scaling_rendering": {
     "category": "Input & Rendering",
     "symptom": "Content renders at wrong scale, size, or position after DPI change or on multi-monitor",
     "expectedPresent": [],
     "expectedAbsent": [],
-    "diagnosticEvents": ["WebView2_GetDpiAwareness", "WebView2_IncompatibleDPI", "WebView2_SetWindowPos", "WebView2_VisualHostingOSVersion"],
+    "diagnosticEvents": [
+      "WebView2_GetDpiAwareness",
+      "WebView2_IncompatibleDPI",
+      "WebView2_SetWindowPos",
+      "WebView2_VisualHostingOSVersion"
+    ],
     "keyChecks": [
       "Multi-monitor with different DPIs? Check WebView2_GetDpiAwareness.",
       "Is WebView2_IncompatibleDPI present? App and WebView2 have different DPI awareness.",
@@ -238,6 +399,224 @@
       "Is NotifyParentWindowPositionChanged (API=74) being called after window moves?"
     ],
     "taxonomyRef": "dpi_scaling_rendering",
-    "relatedIssues": ["#5253"]
+    "relatedIssues": [
+      "#5253"
+    ]
+  },
+  "nav_blocked_by_pending_commit": {
+    "category": "Navigation",
+    "symptom": "Navigation deferred because about:blank commit is still pending (kBlockedByPendingCommit)",
+    "expectedPresent": [
+      "WebView2_APICalled",
+      "NavigationRequest::BeginNavigation"
+    ],
+    "expectedAbsent": [
+      "NavigationRequest::DidCommitNavigation"
+    ],
+    "diagnosticEvents": [
+      "WebView2_FirstDocState",
+      "WebView2_InitComplete",
+      "ThrottlingURLLoader_OnReceiveResponse"
+    ],
+    "keyChecks": [
+      "Is about:blank commit still pending when real navigation starts?",
+      "Look for kBlockedByPendingCommit in ETL — navigation queued behind about:blank",
+      "Check gap between LoadURLWithParams and actual commit — >1s indicates blocking",
+      "Is service worker activation delaying the about:blank commit?",
+      "Check if 'Resume task posted' appears with multi-second delay after network response"
+    ],
+    "taxonomyRef": "nav_blocked_pending_commit",
+    "relatedIssues": []
+  },
+  "sw_activation_blocking_navigation": {
+    "category": "Navigation",
+    "symptom": "Service worker synchronous cache deletion blocks navigation for 8-10 seconds",
+    "expectedPresent": [
+      "EmbeddedWorkerInstance::Start",
+      "ForwardServiceWorkerToWorkerReady"
+    ],
+    "expectedAbsent": [
+      "NavigationRequest::DidCommitNavigation"
+    ],
+    "diagnosticEvents": [
+      "WebView2_NavStarting_Kind",
+      "WebView2_FirstDocState"
+    ],
+    "keyChecks": [
+      "Is SW activation handler doing synchronous cache iteration + deletion?",
+      "Check ForwardServiceWorkerToWorkerReady duration — >2s is problematic",
+      "Test with offline bundle to bypass service worker and confirm root cause",
+      "Look for sequential await caches.keys() + await caches.delete() — should use Promise.all",
+      "Is SW registration end vs activation timing mismatched?"
+    ],
+    "taxonomyRef": "perf_service_worker_activation",
+    "relatedIssues": []
+  },
+  "integrity_level_perf_regression": {
+    "category": "Performance",
+    "symptom": "WebView2 creation and visibility perf regressed when switching from LowIL to MediumIL (full trust)",
+    "expectedPresent": [
+      "WebView2_Creation_Client",
+      "WebView2_APICalled"
+    ],
+    "expectedAbsent": [],
+    "diagnosticEvents": [
+      "WebView2_CreationTime",
+      "WebView2_WebViewProcessLaunchType"
+    ],
+    "keyChecks": [
+      "Compare WebView2_Creation_Client duration between LowIL and MediumIL builds",
+      "Check CPU trace for increased regkey queries/permission checks during creation",
+      "Is HandleVisibilityChanged showing higher cost in full trust?",
+      "Compare PutIsVisible timing between integrity levels"
+    ],
+    "taxonomyRef": "perf_integrity_level_regression",
+    "relatedIssues": []
+  },
+  "shutdown_blocking_new_launch": {
+    "category": "Initialization",
+    "symptom": "WebView2 fails to launch because a previous WebView2 shutdown is still in progress",
+    "expectedPresent": [
+      "WebView2_FactoryCreate"
+    ],
+    "expectedAbsent": [
+      "WebView2_FactoryAcquired"
+    ],
+    "diagnosticEvents": [
+      "WebView2_CloseInternal",
+      "WebView2_WaitForDescendantsTimeOut",
+      "WebView2_WatcherTerminateProcess"
+    ],
+    "keyChecks": [
+      "Is a previous WebView2_CloseInternal still pending when new FactoryCreate arrives?",
+      "Check WaitForDescendantsTimeOut — processes not cleaning up fast enough",
+      "Was WatcherTerminateProcess needed (forced kill)?",
+      "Is this a SearchHost restart scenario where old instance hasn't fully exited?"
+    ],
+    "taxonomyRef": "init_shutdown_race",
+    "relatedIssues": [
+      "Bug 61008208"
+    ],
+    "adoPR": "14689460"
+  },
+  "white_flash_dark_mode": {
+    "category": "Input & Rendering",
+    "symptom": "Search flashes white in dark mode before painting the screen — WS_VISIBLE style missing on Chrome_WidgetWin_0",
+    "expectedPresent": [
+      "WebView2_Creation_Client",
+      "WebView2_APICalled"
+    ],
+    "expectedAbsent": [],
+    "diagnosticEvents": [
+      "WebView2_SetWindowPos",
+      "WebView2_ClientWindowInit"
+    ],
+    "keyChecks": [
+      "Is WS_VISIBLE style missing for Chrome_WidgetWin_0 during startup?",
+      "Compare cold vs warm launch ETLs — is flash only on cold?",
+      "Check putDefaultBackground timing relative to first paint",
+      "Is WebView2_SetWindowPos showing the window becoming visible before content is ready?"
+    ],
+    "taxonomyRef": "nav_blank_page_after_success",
+    "relatedIssues": [
+      "Bug 60522914"
+    ]
+  },
+  "nav_not_started_memory_pressure": {
+    "category": "Navigation",
+    "symptom": "Navigation fails to start within 10s window due to memory pressure — SearchHost recovery kills and restarts",
+    "expectedPresent": [
+      "WebView2_Creation_Client"
+    ],
+    "expectedAbsent": [
+      "NavigationRequest::BeginNavigation"
+    ],
+    "diagnosticEvents": [
+      "WebView2_SetMemoryPressure",
+      "WebView2_MemoryUsage"
+    ],
+    "keyChecks": [
+      "Does WV2 wait ~5s after memory recovery before attempting navigation?",
+      "Is E_NOINTERFACE (0x80004002) observed — indicates COM interface issue under pressure",
+      "Is BeyondTrust Defendpoint or other DLP/AV software present and interfering?",
+      "Check if older WV2 versions are deployed in this environment",
+      "Is the 10s navigation timeout being hit before WV2 becomes ready?"
+    ],
+    "taxonomyRef": "nav_completed_not_received",
+    "relatedIssues": []
+  },
+  "searchhost_init_error_0x8007023E": {
+    "category": "Initialization",
+    "symptom": "SearchControl_WebView_Initialized reports error 0x8007023E — WebView2 created but no Navigate call observed",
+    "expectedPresent": [
+      "WebView2_FactoryCreate",
+      "WebView2_Creation_Client"
+    ],
+    "expectedAbsent": [
+      "WebView2_APICalled"
+    ],
+    "diagnosticEvents": [
+      "WebView2_InitComplete",
+      "WebView2_FirstDocState"
+    ],
+    "keyChecks": [
+      "Was CreateCoreWebView2ControllerAsync called and completed? Check timing.",
+      "Was about:blank navigation successful from WebView2 side?",
+      "Is there any Navigate call after initialization? Check for zero API=3 events.",
+      "Check putDefaultBackground and other setup calls between init and navigate",
+      "HRESULT 0x8007023E = ERROR_RESOURCE_LANG_NOT_FOUND — may indicate resource/locale issue"
+    ],
+    "taxonomyRef": "init_about_blank_deadlock",
+    "relatedIssues": [
+      "Bug 61116615"
+    ],
+    "icm": "642489650"
+  },
+  "udf_bloat_perf_degradation": {
+    "category": "Performance",
+    "symptom": "Gradual performance degradation in long-running apps due to User Data Folder bloat",
+    "expectedPresent": [],
+    "expectedAbsent": [],
+    "diagnosticEvents": [
+      "WebView2_MemoryUsage",
+      "WebView2_SetMemoryPressure",
+      "WebView2_TrimNonRendererWorkingSet"
+    ],
+    "keyChecks": [
+      "Is HTTP cache, IndexedDB, or SW storage growing unbounded?",
+      "Are LocalStorage synchronous operations increasing in latency?",
+      "Is memory footprint growing over time without corresponding renderer cleanup?",
+      "Compare navigation latency early vs late in app session"
+    ],
+    "taxonomyRef": "memory_leak_renderer_growth",
+    "relatedIssues": []
+  },
+  "blank_but_responsive_js_works": {
+    "category": "Navigation",
+    "symptom": "Search box blank yet responsive — JavaScript running, keyboard nav works, but WV2 not rendering",
+    "expectedPresent": [
+      "NavigationRequest::DidCommitNavigation",
+      "WebView2_DOMContentLoaded"
+    ],
+    "expectedAbsent": [
+      "WebView2_BrowserProcessFailure"
+    ],
+    "diagnosticEvents": [
+      "WebView2_SetWindowPos",
+      "WebView2_APICalled",
+      "WebView2_RendererUnresponsive"
+    ],
+    "keyChecks": [
+      "Is navigation fully committed and DOMContentLoaded fired?",
+      "Is PutIsVisible(true) called? Check API=6 calls.",
+      "Are bounds non-zero? Check PutBounds (API=28).",
+      "Is GPU process alive? Check WebView2_ProcessExited for GPU type.",
+      "Is Chrome_WidgetWin_0 WS_VISIBLE set?"
+    ],
+    "taxonomyRef": "nav_blank_page_after_success",
+    "relatedIssues": [
+      "Bug 59882062"
+    ],
+    "webview2Version": "141.0.3537.71"
   }
 }

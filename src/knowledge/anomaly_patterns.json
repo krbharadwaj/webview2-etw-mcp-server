@@ -7,178 +7,379 @@
   "rules": [
     {
       "id": "creation_failure",
-      "patterns": { "present": ["WebView2_CreationFailure"], "absent": [] },
+      "patterns": {
+        "present": [
+          "WebView2_CreationFailure"
+        ],
+        "absent": []
+      },
       "severity": "critical",
       "message": "🔴 WebView2 creation FAILED",
       "evidenceTemplate": "WebView2_CreationFailure detected — check HRESULT and WebView2_CreationFailureExe for details"
     },
     {
       "id": "factory_connection_error",
-      "patterns": { "present": ["WebView2_FactoryConnectionError"], "absent": [] },
+      "patterns": {
+        "present": [
+          "WebView2_FactoryConnectionError"
+        ],
+        "absent": []
+      },
       "severity": "critical",
       "message": "🔴 Factory IPC connection to browser process FAILED",
       "evidenceTemplate": "WebView2_FactoryConnectionError — browser process may not have started or crashed during connection"
     },
     {
       "id": "browser_process_crash",
-      "patterns": { "present": ["WebView2_BrowserProcessFailure"], "absent": [] },
+      "patterns": {
+        "present": [
+          "WebView2_BrowserProcessFailure"
+        ],
+        "absent": []
+      },
       "severity": "critical",
       "message": "🔴 Browser process CRASHED",
       "evidenceTemplate": "WebView2_BrowserProcessFailure with exit_code — all WebView2 instances affected"
     },
     {
       "id": "renderer_unresponsive",
-      "patterns": { "present": ["WebView2_RendererUnresponsive"], "absent": [] },
+      "patterns": {
+        "present": [
+          "WebView2_RendererUnresponsive"
+        ],
+        "absent": []
+      },
       "severity": "warning",
       "message": "🟡 Renderer became UNRESPONSIVE",
       "evidenceTemplate": "WebView2_RendererUnresponsive — heavy JS or infinite loop suspected"
     },
     {
       "id": "process_failure_with_exit_code",
-      "patterns": { "present": ["WebView2_ProcessFailureTypeWithExitCode"], "absent": [] },
+      "patterns": {
+        "present": [
+          "WebView2_ProcessFailureTypeWithExitCode"
+        ],
+        "absent": []
+      },
       "severity": "critical",
       "message": "🔴 Process failure with non-zero exit code",
       "evidenceTemplate": "WebView2_ProcessFailureTypeWithExitCode — check exit code and process type"
     },
     {
       "id": "process_failure_with_reason",
-      "patterns": { "present": ["WebView2_ProcessFailureTypeWithReason"], "absent": [] },
+      "patterns": {
+        "present": [
+          "WebView2_ProcessFailureTypeWithReason"
+        ],
+        "absent": []
+      },
       "severity": "critical",
       "message": "🔴 Process failure with specific reason",
       "evidenceTemplate": "WebView2_ProcessFailureTypeWithReason — check failure reason"
     },
     {
       "id": "navigation_request_failed",
-      "patterns": { "present": ["NavigationRequest::OnRequestFailedInternal"], "absent": [] },
+      "patterns": {
+        "present": [
+          "NavigationRequest::OnRequestFailedInternal"
+        ],
+        "absent": []
+      },
       "severity": "warning",
       "message": "🟡 Navigation request FAILED in browser",
       "evidenceTemplate": "NavigationRequest::OnRequestFailedInternal — network/SSL/server error"
     },
     {
       "id": "navigation_id_mismatch",
-      "patterns": { "present": ["WebView2_DifferentNavigationId"], "absent": [] },
+      "patterns": {
+        "present": [
+          "WebView2_DifferentNavigationId"
+        ],
+        "absent": []
+      },
       "severity": "warning",
       "message": "🟡 Navigation ID mismatch — event may be suppressed",
       "evidenceTemplate": "WebView2_DifferentNavigationId — about:blank suppression or stale navigation ID"
     },
     {
       "id": "event_dropped",
-      "patterns": { "present": ["WebView2_DroppedEvent"], "absent": [] },
+      "patterns": {
+        "present": [
+          "WebView2_DroppedEvent"
+        ],
+        "absent": []
+      },
       "severity": "warning",
       "message": "🟡 Event DROPPED — dispatch failed",
       "evidenceTemplate": "WebView2_DroppedEvent — event constructed but not delivered to host"
     },
     {
       "id": "no_event_dispatcher",
-      "patterns": { "present": ["WebView2_NoEventDispatcher"], "absent": [] },
+      "patterns": {
+        "present": [
+          "WebView2_NoEventDispatcher"
+        ],
+        "absent": []
+      },
       "severity": "warning",
       "message": "🟡 No event dispatcher registered for event type",
       "evidenceTemplate": "WebView2_NoEventDispatcher — handler not registered before event fired"
     },
     {
       "id": "invalid_version",
-      "patterns": { "present": ["WebView2_Invalid_Version"], "absent": [] },
+      "patterns": {
+        "present": [
+          "WebView2_Invalid_Version"
+        ],
+        "absent": []
+      },
       "severity": "critical",
       "message": "🔴 WebView2 runtime version INVALID",
       "evidenceTemplate": "WebView2_Invalid_Version — runtime installation may be corrupted"
     },
     {
       "id": "version_too_old",
-      "patterns": { "present": ["WebView2_version_too_old"], "absent": [] },
+      "patterns": {
+        "present": [
+          "WebView2_version_too_old"
+        ],
+        "absent": []
+      },
       "severity": "critical",
       "message": "🔴 WebView2 runtime version TOO OLD for requested SDK features",
       "evidenceTemplate": "WebView2_version_too_old — update runtime or lower SDK version requirement"
     },
     {
       "id": "launch_process_failed",
-      "patterns": { "present": ["WebView2_LaunchProcess_Failed"], "absent": [] },
+      "patterns": {
+        "present": [
+          "WebView2_LaunchProcess_Failed"
+        ],
+        "absent": []
+      },
       "severity": "critical",
       "message": "🔴 Failed to launch browser process",
       "evidenceTemplate": "WebView2_LaunchProcess_Failed — check exe path, permissions, antivirus blocks"
     },
     {
       "id": "window_init_failed",
-      "patterns": { "present": ["WebView2_WindowImpl_Init_Failed"], "absent": [] },
+      "patterns": {
+        "present": [
+          "WebView2_WindowImpl_Init_Failed"
+        ],
+        "absent": []
+      },
       "severity": "critical",
       "message": "🔴 Window initialization FAILED — possibly headless/service context",
       "evidenceTemplate": "WebView2_WindowImpl_Init_Failed — no interactive desktop available?"
     },
     {
       "id": "invalid_window",
-      "patterns": { "present": ["WebView2_InvalidWindow"], "absent": [] },
+      "patterns": {
+        "present": [
+          "WebView2_InvalidWindow"
+        ],
+        "absent": []
+      },
       "severity": "warning",
       "message": "🟡 Invalid window handle detected",
       "evidenceTemplate": "WebView2_InvalidWindow — parent window may have been destroyed"
     },
     {
       "id": "wam_auth_error",
-      "patterns": { "present": ["WebTokenRequestResultOperation_ActivityError"], "absent": [] },
+      "patterns": {
+        "present": [
+          "WebTokenRequestResultOperation_ActivityError"
+        ],
+        "absent": []
+      },
       "severity": "warning",
       "message": "🟡 WAM authentication error",
       "evidenceTemplate": "WebTokenRequestResultOperation_ActivityError — check HRESULT for network/auth details"
     },
     {
       "id": "response_loading_blocked",
-      "patterns": { "present": ["WebView2_ResponseLoadingBlocked"], "absent": [] },
+      "patterns": {
+        "present": [
+          "WebView2_ResponseLoadingBlocked"
+        ],
+        "absent": []
+      },
       "severity": "warning",
       "message": "🟡 HTTP response loading BLOCKED",
       "evidenceTemplate": "WebView2_ResponseLoadingBlocked — content blocked by proxy, CORS, or CSP"
     },
     {
       "id": "cdp_method_failed",
-      "patterns": { "present": ["WebView2_CallCDPMethodFailed"], "absent": [] },
+      "patterns": {
+        "present": [
+          "WebView2_CallCDPMethodFailed"
+        ],
+        "absent": []
+      },
       "severity": "warning",
       "message": "🟡 DevTools Protocol method call FAILED",
       "evidenceTemplate": "WebView2_CallCDPMethodFailed — CDP communication issue with renderer"
     },
     {
       "id": "suspend_memory_cancelled",
-      "patterns": { "present": ["WebView2_CollectSuspendMemoryCancelled"], "absent": [] },
+      "patterns": {
+        "present": [
+          "WebView2_CollectSuspendMemoryCancelled"
+        ],
+        "absent": []
+      },
       "severity": "info",
       "message": "ℹ️ Suspend memory collection cancelled (audio/video may be playing)",
       "evidenceTemplate": "WebView2_CollectSuspendMemoryCancelled — TrySuspend rejected"
     },
     {
       "id": "descendants_timeout",
-      "patterns": { "present": ["WebView2_WaitForDescendantsTimeOut"], "absent": [] },
+      "patterns": {
+        "present": [
+          "WebView2_WaitForDescendantsTimeOut"
+        ],
+        "absent": []
+      },
       "severity": "warning",
       "message": "🟡 Timed out waiting for descendant processes to exit",
       "evidenceTemplate": "WebView2_WaitForDescendantsTimeOut — processes not cleaning up after browser exit"
     },
     {
       "id": "forced_process_termination",
-      "patterns": { "present": ["WebView2_WatcherTerminateProcess"], "absent": [] },
+      "patterns": {
+        "present": [
+          "WebView2_WatcherTerminateProcess"
+        ],
+        "absent": []
+      },
       "severity": "warning",
       "message": "🟡 Process FORCIBLY TERMINATED after shutdown timeout",
       "evidenceTemplate": "WebView2_WatcherTerminateProcess — process did not exit gracefully"
     },
     {
       "id": "service_worker_fallback",
-      "patterns": { "present": ["FetchHandlerEndToFallbackNetwork"], "absent": [] },
+      "patterns": {
+        "present": [
+          "FetchHandlerEndToFallbackNetwork"
+        ],
+        "absent": []
+      },
       "severity": "info",
       "message": "ℹ️ Service worker fell back to network (cache miss)",
       "evidenceTemplate": "FetchHandlerEndToFallbackNetwork — SW did not serve from cache"
     },
     {
       "id": "incompatible_config",
-      "patterns": { "present": ["WebView2_IncompatibleConfig"], "absent": [] },
+      "patterns": {
+        "present": [
+          "WebView2_IncompatibleConfig"
+        ],
+        "absent": []
+      },
       "severity": "critical",
       "message": "🔴 Incompatible WebView2 configuration detected",
       "evidenceTemplate": "WebView2_IncompatibleConfig — check for conflicting settings or environment"
     },
     {
       "id": "first_navigation_failed",
-      "patterns": { "present": ["WebView2_FirstNavigationFailed"], "absent": [] },
+      "patterns": {
+        "present": [
+          "WebView2_FirstNavigationFailed"
+        ],
+        "absent": []
+      },
       "severity": "critical",
       "message": "🔴 First navigation after creation FAILED",
       "evidenceTemplate": "WebView2_FirstNavigationFailed — initial page load did not succeed"
     },
     {
       "id": "shared_memory_failed",
-      "patterns": { "present": ["WebView2_CreateSharedMemoryRegionFailed"], "absent": [] },
+      "patterns": {
+        "present": [
+          "WebView2_CreateSharedMemoryRegionFailed"
+        ],
+        "absent": []
+      },
       "severity": "critical",
       "message": "🔴 Shared memory allocation FAILED",
       "evidenceTemplate": "WebView2_CreateSharedMemoryRegionFailed — system may be low on memory"
+    },
+    {
+      "id": "nav_blocked_pending_commit",
+      "patterns": {
+        "present": [
+          "kBlockedByPendingCommit"
+        ],
+        "absent": []
+      },
+      "severity": "warning",
+      "message": "🟡 Navigation BLOCKED by pending about:blank commit",
+      "evidenceTemplate": "kBlockedByPendingCommit — real navigation deferred until about:blank completes. Check service worker activation."
+    },
+    {
+      "id": "throttling_url_loader_stall",
+      "patterns": {
+        "present": [
+          "ThrottlingURLLoader::OnReceiveResponse"
+        ],
+        "absent": [
+          "NavigationRequest::DidCommitNavigation"
+        ]
+      },
+      "severity": "warning",
+      "message": "🟡 Network response received but commit never happened",
+      "evidenceTemplate": "ThrottlingURLLoader::OnReceiveResponse present but DidCommitNavigation missing — response may be blocked or deferred"
+    },
+    {
+      "id": "nav_id_duplication",
+      "patterns": {
+        "present": [
+          "WebView2_NavStarting_DupNavId"
+        ],
+        "absent": []
+      },
+      "severity": "warning",
+      "message": "🟡 Navigation ID collision — about:blank ID reused for new navigation",
+      "evidenceTemplate": "WebView2_NavStarting_DupNavId — browser reused init navigation ID, may cause event suppression"
+    },
+    {
+      "id": "iframe_torn_mid_navigation",
+      "patterns": {
+        "present": [
+          "WebView2_NavStarting_IFrameNotFound"
+        ],
+        "absent": []
+      },
+      "severity": "warning",
+      "message": "🟡 IFrame torn down mid-navigation — events will be silently dropped",
+      "evidenceTemplate": "WebView2_NavStarting_IFrameNotFound — frame destroyed during active navigation lifecycle"
+    },
+    {
+      "id": "shutdown_race_launch_failure",
+      "patterns": {
+        "present": [
+          "WebView2_FactoryCreate"
+        ],
+        "absent": [
+          "WebView2_FactoryAcquired"
+        ]
+      },
+      "severity": "critical",
+      "message": "🔴 WebView2 factory created but never acquired — possible shutdown race",
+      "evidenceTemplate": "WebView2_FactoryCreate without WebView2_FactoryAcquired — another WV2 shutdown may be blocking"
+    },
+    {
+      "id": "nav_with_webresource_failed",
+      "patterns": {
+        "present": [
+          "WebView2_NavWithWebResource_Failed"
+        ],
+        "absent": []
+      },
+      "severity": "critical",
+      "message": "🔴 NavigateWithWebResourceRequest failed — silent ERR_UNEXPECTED injected",
+      "evidenceTemplate": "WebView2_NavWithWebResource_Failed — async body-read error caused synthetic error injection"
     }
   ]
 }

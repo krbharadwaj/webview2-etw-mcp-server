@@ -1872,5 +1872,158 @@
     "autoDiscovered": true,
     "firstSeenDate": "2026-02-20",
     "seenCount": 5
+  },
+  "WebView2_FireNavStarting": {
+    "description": "Logs when NavigationStarting is about to be dispatched to host, includes has_handlers flag",
+    "category": "Navigation Diagnostics",
+    "severity": "Info",
+    "params": [
+      "has_handlers"
+    ],
+    "relatedEvents": [
+      "WebView2_NavigationStarting",
+      "WebView2_NoHandlers"
+    ]
+  },
+  "WebView2_FireNavCompleted": {
+    "description": "Logs when NavigationCompleted is about to be dispatched to host, includes has_handlers flag",
+    "category": "Navigation Diagnostics",
+    "severity": "Info",
+    "params": [
+      "has_handlers"
+    ],
+    "relatedEvents": [
+      "WebView2_NavigationCompleted",
+      "WebView2_NoHandlers"
+    ]
+  },
+  "WebView2_NavStarting_DupNavId": {
+    "description": "Navigation ID collision — browser reused the init about:blank navigation ID for a new navigation",
+    "category": "Navigation Diagnostics",
+    "severity": "Warning",
+    "params": [
+      "nav_id"
+    ],
+    "relatedEvents": [
+      "WebView2_DifferentNavigationId",
+      "WebView2_FirstDocState"
+    ]
+  },
+  "WebView2_FirstDocState": {
+    "description": "First document commit with navigation ID — marks when WebView2 is truly ready after about:blank",
+    "category": "Navigation Diagnostics",
+    "severity": "Info",
+    "params": [
+      "nav_id"
+    ],
+    "relatedEvents": [
+      "WebView2_InitComplete",
+      "WebView2_DocStateChanged"
+    ]
+  },
+  "WebView2_NavStarting_Kind": {
+    "description": "Navigation kind classification — distinguishes normal, service worker intercepted, and prefetch navigations",
+    "category": "Navigation Diagnostics",
+    "severity": "Info",
+    "params": [
+      "kind"
+    ],
+    "relatedEvents": [
+      "WebView2_NavigationStarting",
+      "WebView2_FireNavStarting"
+    ]
+  },
+  "WebView2_NavCompleted_NavIdNotFound": {
+    "description": "NavigationCompleted generated but no matching NavId found — often SW/prefetch interception completing without prior NavStarting",
+    "category": "Navigation Diagnostics",
+    "severity": "Warning",
+    "params": [
+      "nav_id"
+    ],
+    "relatedEvents": [
+      "WebView2_NavIdNotFound",
+      "WebView2_NavStarting_Kind"
+    ]
+  },
+  "WebView2_NavWithWebResource_Failed": {
+    "description": "NavigateWithWebResourceRequest failed due to async body-read error — silently injects ERR_UNEXPECTED",
+    "category": "Navigation Diagnostics",
+    "severity": "Error",
+    "params": [
+      "hresult"
+    ],
+    "relatedEvents": [
+      "WebView2_APICalled",
+      "NavigationRequest::OnRequestFailedInternal"
+    ]
+  },
+  "WebView2_InitComplete": {
+    "description": "WebView2 initialization complete — fires after synthetic about:blank commit, signals readiness",
+    "category": "Factory & Creation",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [
+      "WebView2_FirstDocState",
+      "WebView2_Creation_Client"
+    ]
+  },
+  "WebView2_NavStarting_IFrameNotFound": {
+    "description": "NavigationStarting for an iframe that was already torn down",
+    "category": "Navigation Diagnostics",
+    "severity": "Warning",
+    "params": [
+      "frame_id"
+    ],
+    "relatedEvents": [
+      "WebView2_IFrameNotFound",
+      "WebView2_FrameDetached"
+    ]
+  },
+  "WebView2_DocState_IFrameNotFound": {
+    "description": "Document state change for an iframe that was already torn down",
+    "category": "Navigation Diagnostics",
+    "severity": "Warning",
+    "params": [
+      "frame_id"
+    ],
+    "relatedEvents": [
+      "WebView2_IFrameNotFound",
+      "WebView2_FrameDetached"
+    ]
+  },
+  "WebView2_NavCompleted_IFrameNotFound": {
+    "description": "NavigationCompleted for an iframe that was already torn down — silent navigation failure",
+    "category": "Navigation Diagnostics",
+    "severity": "Warning",
+    "params": [
+      "frame_id"
+    ],
+    "relatedEvents": [
+      "WebView2_IFrameNotFound",
+      "WebView2_FrameDetached"
+    ]
+  },
+  "WebView2_DOMContentLoaded_IFrameNotFound": {
+    "description": "DOMContentLoaded for an iframe that was already torn down",
+    "category": "Navigation Diagnostics",
+    "severity": "Warning",
+    "params": [
+      "frame_id"
+    ],
+    "relatedEvents": [
+      "WebView2_IFrameNotFound",
+      "WebView2_FrameDetached"
+    ]
+  },
+  "ThrottlingURLLoader_OnReceiveResponse": {
+    "description": "Network response received by throttling URL loader — key for diagnosing navigation commit delays",
+    "category": "Network & Loading",
+    "severity": "Info",
+    "params": [
+      "url"
+    ],
+    "relatedEvents": [
+      "NavigationRequest::CommitNavigation"
+    ]
   }
 }
