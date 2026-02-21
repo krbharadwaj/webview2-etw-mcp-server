@@ -3,7 +3,7 @@
  *
  * Phase 1 (no filtered_file): generates extraction commands.
  * Phase 2 (filtered_file provided): runs full analysis pipeline:
- *   triage → nav_playbook → evidence_pack → timeline_slice → CPU (opt-in)
+ *   config → process tree → activity → initial issues → triage → nav_playbook → evidence_pack → timeline_slice → CPU (opt-in)
  *
  * All sub-analyses are combined into one comprehensive report.
  */
@@ -17,6 +17,7 @@ import { timelineSlice } from "./timeline_slice.js";
 import { analyzeCpu } from "./analyze_cpu.js";
 import { validateTrace } from "./validate_trace.js";
 import { compareEtls } from "./compare_etls.js";
+import { extractTraceStructure, formatTraceStructureReport } from "./trace_structure.js";
 
 export interface UnifiedParams {
   etlPath: string;
@@ -93,6 +94,16 @@ function runFullAnalysis(params: UnifiedParams): string {
     `**Filtered Data**: ${filteredFile}`,
     "",
   ].filter(Boolean).join("\n"));
+
+  // ── Structured Analysis: Config → Process Tree → Activity → Issues ──
+  try {
+    const structure = extractTraceStructure(filteredFile, hostApp);
+    const structuredReport = formatTraceStructureReport(structure, hostApp);
+    sections.push(structuredReport);
+    sections.push("---\n");
+  } catch (err) {
+    sections.push(`> ⚠️ Structured trace analysis skipped: ${(err as Error).message}\n`);
+  }
 
   // ── Step 1: TRIAGE — fast root-cause scoring ──
   const triageResult = triage(filteredFile, symptom);
