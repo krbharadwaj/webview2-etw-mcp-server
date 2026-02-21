@@ -1,7 +1,7 @@
 {
   "name": "webview2-etw-mcp-server",
-  "version": "1.0.0",
-  "description": "MCP server for WebView2 ETW/ETL trace analysis — 11 tools, 189 events, auto-learning knowledge base",
+  "version": "2.0.0",
+  "description": "MCP server for WebView2 ETW/ETL trace analysis — 18 tools, root-cause-first triage, navigation playbooks, evidence packs, auto-learning knowledge base",
   "type": "module",
   "main": "dist/index.js",
   "bin": {
@@ -15,7 +15,7 @@
   ],
   "scripts": {
     "build": "tsc && npm run copy-knowledge",
-    "copy-knowledge": "node -e \"const fs=require('fs');const p=require('path');fs.mkdirSync('knowledge',{recursive:true});['api_ids.json','events.json','root_causes.json','timing_baselines.json','api_sequences.json'].forEach(f=>fs.copyFileSync(p.join('src','knowledge',f),p.join('knowledge',f)))\"",
+    "copy-knowledge": "node -e \"const fs=require('fs');const p=require('path');fs.mkdirSync('knowledge',{recursive:true});['api_ids.json','events.json','root_causes.json','timing_baselines.json','api_sequences.json','nav_playbooks.json','rca_taxonomy.json'].forEach(f=>{const src=p.join('src','knowledge',f);if(fs.existsSync(src))fs.copyFileSync(src,p.join('knowledge',f))})\"",
     "prepare": "npm run build",
     "prepublishOnly": "npm run build",
     "start": "node dist/index.js",

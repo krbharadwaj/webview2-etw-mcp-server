@@ -1,6 +1,6 @@
 # ⭐ WebView2 ETW Analysis MCP Server
 
-Analyze WebView2 ETL traces with AI. **14 tools**, 189+ known events, 175 API IDs, 7 root causes, auto-learning & shared knowledge base.
+Analyze WebView2 ETL traces with AI. **18 tools**, root-cause-first triage, navigation playbooks, evidence packs, 189+ known events, 175 API IDs, auto-learning & shared knowledge base.
 
 ---
 
@@ -16,14 +16,15 @@ Click the button above → VS Code opens → MCP server is configured. **That's 
 ## 📄 Table of Contents
 
 1. [📺 Overview](#-overview)
-2. [⚙️ All 14 Tools](#️-all-14-tools)
-3. [🔌 Installation](#-installation)
-4. [🎩 Usage Examples](#-usage-examples)
-5. [📚 Knowledge Base](#-knowledge-base)
-6. [🧠 How Auto-Learning Works](#-how-auto-learning-works)
-7. [📤 Sharing Learnings](#-sharing-learnings)
-8. [🏗️ Architecture](#️-architecture)
-9. [📌 Contributing](#-contributing)
+2. [🎯 Root-Cause-First Workflow](#-root-cause-first-workflow)
+3. [⚙️ All 18 Tools](#️-all-18-tools)
+4. [🔌 Installation](#-installation)
+5. [🎩 Usage Examples](#-usage-examples)
+6. [📚 Knowledge Base](#-knowledge-base)
+7. [🧠 How Auto-Learning Works](#-how-auto-learning-works)
+8. [📤 Sharing Learnings](#-sharing-learnings)
+9. [🏗️ Architecture](#️-architecture)
+10. [📌 Contributing](#-contributing)
 
 ---
 
@@ -33,6 +34,9 @@ The WebView2 ETW MCP Server brings WebView2 ETL trace analysis directly into Git
 
 - *"What is API ID 33?"* → `AddNavigationStarting` (category, critical flag, related events)
 - *"Analyze C:\traces\stuck.etl for Teams"* → PowerShell extraction commands + feature flag extraction
+- *"Triage this trace — NavigationCompleted not received"* → Fast Triage Card with top 3 root causes + confidence + evidence pointers
+- *"Run the navigation playbook"* → Deterministic lifecycle pipeline check — shows exactly where navigation breaks
+- *"Build evidence pack for navigation_stalled"* → Structured RCA: hypothesis, evidence, counter-evidence, timeline, confidence
 - *"My WebView2 app is stuck"* → decision tree + known root causes + investigation commands
 - *"What happened between timestamps X and Y?"* → event breakdown by category, errors, silent gaps
 - *"Compare good.etl vs bad.etl for Outlook"* → side-by-side diff of events, timings, errors
@@ -42,41 +46,82 @@ The WebView2 ETW MCP Server brings WebView2 ETL trace analysis directly into Git
 
 ---
 
-## ⚙️ All 14 Tools
+## 🎯 Root-Cause-First Workflow
+
+The server defaults to a **fast triage → deep dive → evidence pack → learning** workflow:
+
+```
+Step 0: Intake
+  "Analyze C:\traces\stuck.etl for Teams"
+  → Extract & filter ETL → filtered.txt
+
+Step 1: Fast Triage (NEW)
+  "Triage this trace — NavigationCompleted not received"
+  → Triage Card: top 3 suspects + confidence + evidence + missing signals
+
+Step 2: Scenario Playbook (NEW)
+  "Run the navigation playbook"
+  → Deterministic lifecycle check: ✅ NavigationStarting → ❌ NavigationCompleted
+  → Host ↔ Runtime boundary checks
+  → Exact stage where pipeline breaks
+
+Step 3: Evidence Pack (NEW)
+  "Build evidence pack for navigation_stalled"
+  → Hypothesis + evidence table + timeline + counter-evidence
+  → Confidence: 0.82 — would increase to 0.95 with DocStateSuppressed
+
+Step 4: Feedback & Learning (NEW)
+  "Confirm root cause: yes, navigation_stalled"
+  → KB updated: confirmed_count++, timing baseline refined
+  → "Share my learnings" → pushed to GitHub for all users
+```
+
+---
+
+## ⚙️ All 18 Tools
+
+### 🎯 Root-Cause-First Tools (NEW)
+
+| # | Tool | What It Does |
+|---|------|-------------|
+| 1 | `triage` | **Start here.** Fast root-cause-first triage of filtered ETL traces. Produces a compact Triage Card with top 2-3 suspected root causes, confidence scores, evidence pointers, missing signals, and next actions. |
+| 2 | `evidence_pack` | Build a structured, RCA-ready evidence pack for a hypothesis. Includes evidence table, timeline, counter-evidence, alternative explanations, and confidence scoring with "what would change confidence". |
+| 3 | `nav_playbook` | Deterministic navigation lifecycle playbook. Checks each stage (Navigate→NavigationStarting→SourceChanged→ContentLoading→HistoryChanged→DOMContentLoaded→NavigationCompleted), correlates by NavigationId, detects host-vs-runtime boundary issues, IFrame removal, NoHandlers. |
+| 4 | `rca_feedback` | Capture structured feedback: confirmed root cause? Missing events? Timing updates? Applies safe KB updates automatically; logs destructive changes for review. |
 
 ### 🔍 Analysis Tools
 
 | # | Tool | What It Does |
 |---|------|-------------|
-| 1 | `decode_api_id` | Decode WebView2 API ID numbers (0-174) → human-readable names, categories, critical flags. Supports batch decoding and category listing. |
-| 2 | `lookup_event` | Look up any of 189+ ETW events by name (partial match supported) → description, parameters, severity, related events. List events by category. |
-| 3 | `diagnose` | Decision trees for 7 symptoms: `stuck`, `crash`, `slow_init`, `slow_navigation`, `auth_failure`, `blank_page`, `event_missing`. Returns investigation commands and known root causes. |
-| 4 | `analyze_etl` | Generate PowerShell commands to extract and filter ETL traces. Includes process discovery, WebView2 event filtering, feature flag extraction, and timeline building. |
-| 5 | `analyze_cpu` | CPU profiling with 3 symbol servers (Chromium, Edge, Microsoft). Generates symbolized extraction commands or parses pre-extracted data for CPU time breakdown. |
-| 6 | `timeline_slice` | Show what happened between two timestamps — events by category, active processes, errors, silent gaps. |
+| 5 | `decode_api_id` | Decode WebView2 API ID numbers (0-174) → human-readable names, categories, critical flags. Supports batch decoding and category listing. |
+| 6 | `lookup_event` | Look up any of 189+ ETW events by name (partial match supported) → description, parameters, severity, related events. List events by category. |
+| 7 | `diagnose` | Decision trees for 7 symptoms: `stuck`, `crash`, `slow_init`, `slow_navigation`, `auth_failure`, `blank_page`, `event_missing`. Returns investigation commands and known root causes. |
+| 8 | `analyze_etl` | Generate PowerShell commands to extract and filter ETL traces. Includes process discovery, WebView2 event filtering, feature flag extraction, and timeline building. |
+| 9 | `analyze_cpu` | CPU profiling with 3 symbol servers (Chromium, Edge, Microsoft). Generates symbolized extraction commands or parses pre-extracted data for CPU time breakdown. |
+| 10 | `timeline_slice` | Show what happened between two timestamps — events by category, active processes, errors, silent gaps. |
 
 ### 🔄 Comparison Tools
 
 | # | Tool | What It Does |
 |---|------|-------------|
-| 7 | `compare_incarnations` | Compare SUCCESS vs FAILURE WebView2 incarnations side-by-side from filtered ETL dumps. Identifies the first divergence point. |
-| 8 | `compare_etls` | Compare two ETL files end-to-end. Setup mode generates extraction commands; compare mode analyzes event differences, missing events, timing gaps, and failure-only errors. |
+| 11 | `compare_incarnations` | Compare SUCCESS vs FAILURE WebView2 incarnations side-by-side from filtered ETL dumps. Identifies the first divergence point. |
+| 12 | `compare_etls` | Compare two ETL files end-to-end. Setup mode generates extraction commands; compare mode analyzes event differences, missing events, timing gaps, and failure-only errors. |
 
 ### 🧪 Validation & Learning Tools
 
 | # | Tool | What It Does |
 |---|------|-------------|
-| 9 | `validate_trace` | Validate filtered ETL against 12 known API happy-path sequences. Reports missing events, wrong ordering, and deviations. Extracts feature flags. **`learn_good`** mode mines patterns from successful traces; **`learn_bad`** captures failure patterns. |
-| 10 | `share_learnings` | **Preview** what new knowledge you've discovered locally (diff vs GitHub), then **confirm** to push — so all users benefit. Two-step flow: preview → review → confirm. |
-| 11 | `sync_status` | Check if GitHub sync is active and whether your learnings are being shared. |
+| 13 | `validate_trace` | Validate filtered ETL against 12 known API happy-path sequences. Reports missing events, wrong ordering, and deviations. Extracts feature flags. **`learn_good`** mode mines patterns from successful traces; **`learn_bad`** captures failure patterns. |
+| 14 | `share_learnings` | **Preview** what new knowledge you've discovered locally (diff vs GitHub), then **confirm** to push — so all users benefit. Two-step flow: preview → review → confirm. |
+| 15 | `sync_status` | Check if GitHub sync is active and whether your learnings are being shared. |
 
 ### 📝 Manual Contribution Tools
 
 | # | Tool | What It Does |
 |---|------|-------------|
-| 12 | `contribute_event` | Add a new ETW event to the knowledge base with description, parameters, category, severity. |
-| 13 | `contribute_root_cause` | Add a new root cause pattern with symptom, evidence, classification, and resolution. |
-| 14 | `contribute_timing` | Update timing baselines with new observations. Running averages improve anomaly detection. |
+| 16 | `contribute_event` | Add a new ETW event to the knowledge base with description, parameters, category, severity. |
+| 17 | `contribute_root_cause` | Add a new root cause pattern with symptom, evidence, classification, and resolution. |
+| 18 | `contribute_timing` | Update timing baselines with new observations. Running averages improve anomaly detection. |
 
 See **[TOOLS_GUIDE.md](TOOLS_GUIDE.md)** for the complete reference with human-language examples.
 
@@ -157,6 +202,38 @@ Then point to the local build:
 
 Switch to **Agent Mode** in GitHub Copilot Chat, then just ask:
 
+### Root-Cause-First Workflow (NEW — Recommended)
+
+```
+You: "I have a filtered trace at C:\temp\filtered.txt. NavigationCompleted not received."
+
+  → triage: Triage Card
+     🔴 #1 navigation_stalled (confidence 0.85) — Navigate API called but no NavigationCompleted
+     🟡 #2 initializing_navigation_suppression (0.62) — DocStateSuppressed found
+     Evidence: L142 WebView2_APICalled, L389 WebView2_NavigationStarting, ...
+     Missing: WebView2_NavigationCompleted, WebView2_Event_NavigationCompletedHandler
+
+You: "Run the navigation playbook"
+
+  → nav_playbook: Lifecycle Pipeline
+     ✅ Navigate API → ✅ NavigationStarting → ✅ SourceChanged → ❌ NavigationCompleted
+     🔴 Pipeline breaks at stage 9: NavigationCompleted
+     ❌ NavigationCompleted: Runtime → Host — generated but not delivered to host
+     ❌ Handler Registration — NoHandlers detected
+
+You: "Build evidence pack for navigation_stalled"
+
+  → evidence_pack: RCA-Ready Evidence Pack
+     Hypothesis: navigation_stalled
+     Confidence: 0.82 — would increase to 0.95 if DocStateSuppressed confirmed
+     Evidence: 8 items | Counter-evidence: 1 item | Timeline: 12 events
+     Alternative: initializing_navigation_suppression (0.45)
+
+You: "Confirm root cause: yes, navigation_stalled, timing: {NavigationTotal: 3200}"
+
+  → rca_feedback: KB updated — confirmed_count=4, timing baseline refined
+```
+
 ### Full ETL Analysis Workflow
 
 ```
@@ -223,6 +300,8 @@ Ships pre-loaded — no setup required:
 | `root_causes.json` | 7 root causes (about:blank deadlock, VDI DLL loading, WAM failure, ...) | ✅ Via contribute |
 | `timing_baselines.json` | 16 timing baselines with p50/p95/p99 | ✅ Via auto-extract |
 | `api_sequences.json` | 12 API happy-path sequences (Navigate→events, Initialize→events, ...) | ✅ Via learn_good/learn_bad |
+| `nav_playbooks.json` | Navigation & initialization lifecycle stages with expected events and failure variants | ✅ Via rca_feedback |
+| `rca_taxonomy.json` | Expanded root-cause taxonomy: 5 categories, ~15 sub-causes with ETW signatures | ✅ Via rca_feedback |
 
 ---
 
@@ -363,8 +442,12 @@ To enable sharing, do ONE of:
 ```
 webview2-etw-mcp-server/
 ├── src/
-│   ├── index.ts                MCP server entry point (14 tools registered)
+│   ├── index.ts                MCP server entry point (18 tools registered)
 │   ├── tools/
+│   │   ├── triage.ts           ⭐ Fast root-cause-first triage → Triage Card
+│   │   ├── evidence_pack.ts    ⭐ Structured RCA evidence pack with confidence scoring
+│   │   ├── nav_playbook.ts     ⭐ Deterministic navigation lifecycle playbook
+│   │   ├── rca_feedback.ts     ⭐ Structured feedback capture → guarded KB updates
 │   │   ├── decode.ts           API ID decoding (175 IDs, batch mode, category listing)
 │   │   ├── lookup.ts           Event lookup with fuzzy/partial matching
 │   │   ├── diagnose.ts         7 symptom decision trees with root cause matching
@@ -383,8 +466,13 @@ webview2-etw-mcp-server/
 │   │   ├── api_sequences.json  12 API happy-path sequences with confidence scores
 │   │   ├── events.json         189+ ETW events across 15 categories
 │   │   ├── root_causes.json    7 known root causes with evidence patterns
-│   │   └── timing_baselines.json  16 timing baselines with running p50/p95/p99
+│   │   ├── timing_baselines.json  16 timing baselines with running p50/p95/p99
+│   │   ├── nav_playbooks.json  ⭐ Navigation & init lifecycle playbooks
+│   │   └── rca_taxonomy.json   ⭐ Expanded root-cause taxonomy (5 categories, ~15 sub-causes)
 │   └── test.ts                 21 smoke tests
+├── .github/
+│   └── workflows/
+│       └── process-learnings.yml  GitHub Actions: auto-process learning submissions
 ├── TOOLS_GUIDE.md              Human-language tool reference with examples
 ├── LICENSE                     MIT License
 └── README.md                   This file
@@ -395,6 +483,10 @@ webview2-etw-mcp-server/
 | Decision | Rationale |
 |----------|-----------|
 | **JSON knowledge base** (not a database) | Version-controlled, diffable, works offline, syncs via GitHub API |
+| **Root-cause-first workflow** | Triage Card before deep dive — reduces time-to-first-signal |
+| **Deterministic playbooks** | Repeatable, evidence-backed lifecycle checks (not heuristic) |
+| **Confidence scoring** | Explicit "what would change confidence" — prevents false certainty |
+| **Guarded KB updates** | Feedback only auto-applies safe changes (timings, event names); destructive changes logged |
 | **Additive merge** (never delete) | Multiple users can learn concurrently without data loss |
 | **Preview before push** | Users see exactly what's being shared — no surprises |
 | **Pull on startup only** | Avoids API rate limits; 60-second cooldown between syncs |

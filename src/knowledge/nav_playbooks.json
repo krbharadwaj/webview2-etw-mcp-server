@@ -1,0 +1,171 @@
+{
+  "navigation_lifecycle": {
+    "description": "Standard WebView2 navigation lifecycle stages per public docs",
+    "reference": "https://learn.microsoft.com/en-us/microsoft-edge/webview2/concepts/navigation-events",
+    "stages": [
+      {
+        "order": 1,
+        "name": "NavigateAPI",
+        "events": ["WebView2_APICalled(API=3)"],
+        "phase": "host",
+        "required": true,
+        "description": "Host calls Navigate/NavigateToString",
+        "checkQuestion": "Was navigation API invoked?"
+      },
+      {
+        "order": 2,
+        "name": "NavigationStarting",
+        "events": ["WebView2_NavigationStarting", "WebView2_Event_NavigationStartingHandler"],
+        "phase": "host_event",
+        "required": true,
+        "description": "WebView2 client receives NavigationStarting and fires to host",
+        "checkQuestion": "Did the WebView2 client fire NavigationStarting to the host?",
+        "failureVariants": ["WebView2_NoHandlers_NavigationStarting"]
+      },
+      {
+        "order": 3,
+        "name": "NavigationRequest",
+        "events": ["NavigationRequest::Create", "NavigationRequest::BeginNavigation"],
+        "phase": "browser",
+        "required": true,
+        "description": "Browser process creates and begins the navigation request",
+        "checkQuestion": "Did the browser begin the navigation?"
+      },
+      {
+        "order": 4,
+        "name": "SourceChanged",
+        "events": ["WebView2_SourceChanged", "WebView2_Event_SourceChangedHandler"],
+        "phase": "host_event",
+        "required": false,
+        "description": "Source URI changed notification",
+        "checkQuestion": "Was SourceChanged dispatched?"
+      },
+      {
+        "order": 5,
+        "name": "ContentLoading",
+        "events": ["WebView2_ContentLoading", "WebView2_Event_ContentLoadingHandler"],
+        "phase": "host_event",
+        "required": false,
+        "description": "Content began loading in the renderer",
+        "checkQuestion": "Did ContentLoading fire?"
+      },
+      {
+        "order": 6,
+        "name": "DocumentCommit",
+        "events": ["NavigationRequest::CommitNavigation", "NavigationRequest::DidCommitNavigation", "WebView2_DocStateChanged"],
+        "phase": "browser",
+        "required": true,
+        "description": "Document committed in browser process",
+        "checkQuestion": "Did document commit occur?",
+        "failureVariants": ["WebView2_DocStateSuppressed", "WebView2_NavIdNotFound"]
+      },
+      {
+        "order": 7,
+        "name": "HistoryChanged",
+        "events": ["WebView2_HistoryChanged"],
+        "phase": "host_event",
+        "required": false,
+        "description": "Browser history updated",
+        "checkQuestion": "Was HistoryChanged dispatched?"
+      },
+      {
+        "order": 8,
+        "name": "DOMContentLoaded",
+        "events": ["WebView2_DOMContentLoaded", "WebView2_Event_DOMContentLoadedHandler"],
+        "phase": "host_event",
+        "required": false,
+        "description": "DOM fully parsed",
+        "checkQuestion": "Did DOMContentLoaded fire?"
+      },
+      {
+        "order": 9,
+        "name": "NavigationCompleted",
+        "events": ["WebView2_NavigationCompleted", "WebView2_Event_NavigationCompletedHandler"],
+        "phase": "host_event",
+        "required": true,
+        "description": "Navigation finished — success or failure reported to host",
+        "checkQuestion": "Did NavigationCompleted fire and reach the host?",
+        "failureVariants": [
+          "WebView2_NavIdNotFound_NavigationCompleted",
+          "WebView2_IFrameNotFound",
+          "WebView2_NoHandlers_NavigationCompleted",
+          "WebView2_DifferentNavigationId"
+        ]
+      }
+    ],
+    "boundaryChecks": [
+      {
+        "name": "runtime_to_host_dispatch",
+        "description": "Check if event was generated in runtime but not dispatched to host",
+        "indicators": {
+          "dispatched": ["WebView2_Event_*Handler"],
+          "dropped": ["WebView2_DroppedEvent", "WebView2_NoEventDispatcher"],
+          "no_handler": ["WebView2_NoHandlers_*"]
+        }
+      },
+      {
+        "name": "navigation_id_correlation",
+        "description": "Check NavigationId consistency across events",
+        "indicators": {
+          "mismatch": ["WebView2_DifferentNavigationId"],
+          "not_found": ["WebView2_NavIdNotFound"],
+          "suppressed": ["WebView2_DocStateSuppressed"]
+        }
+      },
+      {
+        "name": "iframe_lifecycle",
+        "description": "Check for iframe removal mid-navigation",
+        "indicators": {
+          "removed": ["WebView2_IFrameNotFound"],
+          "detached": ["WebView2_FrameDetached"]
+        }
+      }
+    ]
+  },
+  "initialization_lifecycle": {
+    "description": "WebView2 initialization and creation lifecycle",
+    "stages": [
+      {
+        "order": 1,
+        "name": "EnvironmentCreate",
+        "events": ["WebView2_FactoryCreate", "WebView2_Factory_Start"],
+        "phase": "host",
+        "required": true,
+        "description": "Environment creation initiated"
+      },
+      {
+        "order": 2,
+        "name": "BrowserProcess",
+        "events": ["WebView2_BrowserProcess_Start", "WebView2_WebViewProcessLaunchType"],
+        "phase": "browser",
+        "required": true,
+        "description": "Browser process started (cold or warm)"
+      },
+      {
+        "order": 3,
+        "name": "ControllerCreate",
+        "events": ["WebView2_Creation_Client", "WebView2_Creation_Server"],
+        "phase": "host",
+        "required": true,
+        "description": "Controller creation (client + server side)"
+      },
+      {
+        "order": 4,
+        "name": "AboutBlankNav",
+        "events": ["WebView2_NavigationStarting", "WebView2_NavigationCompleted"],
+        "phase": "browser",
+        "required": false,
+        "description": "Initial about:blank navigation (may be suppressed)",
+        "notes": "NavigationCompleted for about:blank is intentionally suppressed via initializing_navigation_id_"
+      },
+      {
+        "order": 5,
+        "name": "Ready",
+        "events": ["WebView2_Creation_Client_End"],
+        "phase": "host",
+        "required": true,
+        "description": "WebView2 ready for use"
+      }
+    ]
+  }
+}

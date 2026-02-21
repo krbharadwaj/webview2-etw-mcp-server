@@ -14,6 +14,10 @@ import { compareEtls } from "./tools/compare_etls.js";
 import { analyzeCpu } from "./tools/analyze_cpu.js";
 import { timelineSlice } from "./tools/timeline_slice.js";
 import { validateTrace } from "./tools/validate_trace.js";
+import { triage } from "./tools/triage.js";
+import { evidencePack } from "./tools/evidence_pack.js";
+import { navPlaybook } from "./tools/nav_playbook.js";
+import { rcaFeedback } from "./tools/rca_feedback.js";
 import { initSync, pullLatest, pushLearnings, getSyncStatus, previewLearnings, confirmAndPush } from "./knowledge/sync.js";
 import { dirname } from "path";
 import { fileURLToPath } from "url";
@@ -256,6 +260,62 @@ server.tool(
       learningSummary = "\n\n💡 **Tip**: Run `share_learnings` to preview and push these learnings to the shared knowledge base.";
     }
     return { content: [{ type: "text", text: result + learningSummary }] };
+  }
+);
+
+// ─── Tool: triage ───
+server.tool(
+  "triage",
+  "Fast root-cause-first triage of a filtered ETL trace. Produces a compact Triage Card with top 2-3 suspected root causes, confidence scores, evidence pointers, missing signals, and recommended next actions. Use as the FIRST tool when analyzing any ETL trace — before deep dives.",
+  {
+    filtered_file: z.string().describe("Path to the filtered ETL text file (from analyze_etl extraction)"),
+    symptom: z.string().optional().describe("User-reported symptom (e.g., 'NavigationCompleted not received', 'WebView2 stuck', 'blank page'). Improves root-cause matching."),
+  },
+  async ({ filtered_file, symptom }) => {
+    const result = triage(filtered_file, symptom || "");
+    return { content: [{ type: "text", text: result }] };
+  }
+);
+
+// ─── Tool: evidence_pack ───
+server.tool(
+  "evidence_pack",
+  "Generate a structured, RCA-ready evidence pack for a specific hypothesis. Includes evidence table, timeline, counter-evidence, alternative explanations, confidence scoring, and timing anomalies. Use AFTER triage to build a complete root-cause narrative.",
+  {
+    filtered_file: z.string().describe("Path to the filtered ETL text file"),
+    hypothesis: z.string().describe("The root-cause hypothesis to build evidence for (e.g., 'navigation_stalled', 'initializing_navigation_suppression')"),
+    symptom: z.string().optional().describe("Original symptom for context"),
+  },
+  async ({ filtered_file, hypothesis, symptom }) => {
+    const result = evidencePack(filtered_file, hypothesis, symptom || "");
+    return { content: [{ type: "text", text: result }] };
+  }
+);
+
+// ─── Tool: nav_playbook ───
+server.tool(
+  "nav_playbook",
+  "Run a deterministic navigation lifecycle playbook against a filtered ETL trace. Checks each stage of the WebView2 navigation pipeline (Navigate→NavigationStarting→SourceChanged→ContentLoading→HistoryChanged→DOMContentLoaded→NavigationCompleted), correlates by NavigationId, and identifies exactly where the pipeline breaks. Also checks host-vs-runtime boundary delivery and detects IFrame removal, NoHandlers, and NavIdNotFound issues.",
+  {
+    filtered_file: z.string().describe("Path to the filtered ETL text file"),
+    scenario: z.string().optional().describe("Scenario to check (default: 'nav_completed_not_received'). Future: 'slow_navigation', 'init_lifecycle'."),
+  },
+  async ({ filtered_file, scenario }) => {
+    const result = navPlaybook(filtered_file, scenario);
+    return { content: [{ type: "text", text: result }] };
+  }
+);
+
+// ─── Tool: rca_feedback ───
+server.tool(
+  "rca_feedback",
+  "Capture structured feedback after an RCA analysis. Updates the knowledge base with confirmed root causes, missing event names, and timing baselines. Only safe, additive changes are auto-applied; destructive changes are logged for review.",
+  {
+    feedback: z.string().describe("JSON object with: { confirmedRootCause: 'yes'|'no'|'unknown', proposedRootCause: string, wrongSuspects?: [{name, reason}], missingEvents?: string[], timingUpdates?: {stage: ms}, goodEtlPath?: string, notes?: string }"),
+  },
+  async ({ feedback }) => {
+    const result = await rcaFeedback(feedback);
+    return { content: [{ type: "text", text: result }] };
   }
 );
 

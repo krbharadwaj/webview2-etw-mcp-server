@@ -1,0 +1,132 @@
+{
+  "_metadata": {
+    "version": "1.0",
+    "description": "Expanded root-cause taxonomy with sub-causes and ETW signatures"
+  },
+  "navigation": {
+    "label": "Navigation Failures",
+    "subCauses": {
+      "nav_completed_not_received": {
+        "symptom": "NavigationCompleted not received by host",
+        "etwSignature": ["WebView2_APICalled(API=3)", "!WebView2_Event_NavigationCompletedHandler"],
+        "expectedPresent": ["WebView2_NavigationStarting", "NavigationRequest::Create"],
+        "expectedAbsent": ["WebView2_Event_NavigationCompletedHandler"],
+        "distinctFrom": "nav_completed_suppressed",
+        "description": "Navigate was called, NavigationStarting fired, but NavigationCompleted never reached the host"
+      },
+      "nav_completed_suppressed": {
+        "symptom": "NavigationCompleted generated but suppressed (about:blank)",
+        "etwSignature": ["WebView2_DocStateSuppressed", "WebView2_NavIdNotFound"],
+        "expectedPresent": ["WebView2_NavigationCompleted"],
+        "expectedAbsent": ["WebView2_Event_NavigationCompletedHandler"],
+        "distinctFrom": "nav_completed_not_received",
+        "description": "Runtime generated NavigationCompleted but suppressed it via initializing_navigation_id_ check"
+      },
+      "nav_id_mismatch": {
+        "symptom": "NavigationId mismatch causes event to be dropped",
+        "etwSignature": ["WebView2_DifferentNavigationId"],
+        "description": "Event generated with a NavigationId that doesn't match the current navigation"
+      },
+      "nav_handler_not_registered": {
+        "symptom": "No handler registered for navigation event",
+        "etwSignature": ["WebView2_NoHandlers_NavigationCompleted", "WebView2_NoHandlers_NavigationStarting"],
+        "description": "Event fired but no handler was registered to receive it"
+      },
+      "nav_iframe_removed": {
+        "symptom": "Iframe removed mid-navigation",
+        "etwSignature": ["WebView2_IFrameNotFound"],
+        "description": "Navigation was in progress but the target iframe was removed from the DOM"
+      },
+      "nav_request_failed": {
+        "symptom": "Navigation request failed in browser process",
+        "etwSignature": ["NavigationRequest::OnRequestFailedInternal", "WebView2_NavigationFailed"],
+        "description": "Network error, SSL error, or server error prevented navigation from completing"
+      },
+      "nav_redirect_loop": {
+        "symptom": "Navigation stuck in redirect loop",
+        "etwSignature": ["WebView2_NavigationStarting", "WebView2_NavigationStarting"],
+        "description": "Multiple NavigationStarting events without NavigationCompleted indicates redirect loop"
+      }
+    }
+  },
+  "initialization": {
+    "label": "Initialization Failures",
+    "subCauses": {
+      "init_cold_start_timeout": {
+        "symptom": "Cold start takes >5s or times out",
+        "etwSignature": ["WebView2_WebViewProcessLaunchType(type=0)", "WebView2_Creation_Client(duration>5000)"],
+        "description": "First-ever WebView2 launch requires full browser process initialization"
+      },
+      "init_about_blank_deadlock": {
+        "symptom": "Host waits for about:blank NavigationCompleted that is suppressed",
+        "etwSignature": ["!WebView2_APICalled(API=3)", "WebView2_DocStateSuppressed"],
+        "description": "XAML/host control waits for NavigationCompleted before calling Navigate, but about:blank completion is suppressed"
+      },
+      "init_handler_registration_race": {
+        "symptom": "Event handler registered too late",
+        "etwSignature": ["WebView2_APICalled(API=37)", "WebView2_Event_NavigationCompletedHandler"],
+        "description": "add_NavigationCompleted registered after about:blank already completed"
+      }
+    }
+  },
+  "performance": {
+    "label": "Performance Issues",
+    "subCauses": {
+      "perf_vdi_dll_loading": {
+        "symptom": "Extremely slow first navigation in VDI environment",
+        "etwSignature": ["WebView2_WebViewProcessLaunchType(type=0)", "CommitToDidCommit(>5000ms)"],
+        "description": "DLL streaming over network in VDI/Citrix causes cold-start delays"
+      },
+      "perf_service_worker_activation": {
+        "symptom": "First PWA navigation slow due to service worker cold activation",
+        "etwSignature": ["ForwardServiceWorkerToWorkerReady(>1000ms)", "EmbeddedWorkerInstance::Start"],
+        "description": "Service worker needs cold activation before fetch handler runs"
+      },
+      "perf_renderer_hung": {
+        "symptom": "Renderer becomes unresponsive",
+        "etwSignature": ["WebView2_RendererUnresponsive"],
+        "description": "Heavy JS execution or infinite loop causes renderer to hang"
+      }
+    }
+  },
+  "authentication": {
+    "label": "Authentication Failures",
+    "subCauses": {
+      "auth_wam_token_failure": {
+        "symptom": "WAM token request fails",
+        "etwSignature": ["WebTokenRequestResultOperation_ActivityStop(status!=0)"],
+        "description": "Web Account Manager token acquisition failed"
+      },
+      "auth_network_unreachable": {
+        "symptom": "Auth endpoint unreachable",
+        "etwSignature": ["WebTokenRequestResultOperation_ActivityError(hresult=0x800704CF)"],
+        "description": "Network connectivity prevents reaching AAD/MSA endpoints"
+      },
+      "auth_proxy_block": {
+        "symptom": "Corporate proxy blocks auth flow",
+        "etwSignature": ["WebView2_NavigationFailed", "WebTokenRequestResultOperation_ActivityError"],
+        "description": "Corporate proxy or firewall blocks authentication redirects"
+      }
+    }
+  },
+  "crash": {
+    "label": "Crash / Process Failure",
+    "subCauses": {
+      "crash_browser_process": {
+        "symptom": "Browser process crashed",
+        "etwSignature": ["WebView2_BrowserProcessFailure"],
+        "description": "The browser process exited unexpectedly"
+      },
+      "crash_renderer_process": {
+        "symptom": "Renderer process crashed",
+        "etwSignature": ["WebView2_ProcessExited", "WebView2_ProcessFailureTypeWithExitCode"],
+        "description": "A renderer process exited with a crash exit code"
+      },
+      "crash_gpu_process": {
+        "symptom": "GPU process crashed causing visual corruption",
+        "etwSignature": ["WebView2_ProcessExited(type=gpu)"],
+        "description": "GPU process crash, may cause blank page or visual artifacts"
+      }
+    }
+  }
+}
