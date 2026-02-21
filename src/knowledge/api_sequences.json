@@ -6,12 +6,19 @@
       { "event": "WebView2_APICalled", "field": "API=3", "phase": "trigger", "required": true },
       { "event": "WebView2_NewNavigationContext", "phase": "client", "required": false, "notes": "Client creates new navigation context" },
       { "event": "WebView2_SetPendingNavigation", "phase": "client", "required": false, "notes": "Marks navigation as pending" },
+      { "event": "WebView2_NavigationStarting", "phase": "host_event", "required": true, "notes": "Client fires NavigationStarting to host app" },
       { "event": "NavigationRequest::Create", "phase": "browser", "required": false },
       { "event": "NavigationRequest::BeginNavigation", "phase": "browser", "required": true },
       { "event": "NavigationRequest::StartNavigation", "phase": "browser", "required": true },
+      { "event": "WebView2_SourceChanged", "phase": "host_event", "required": false, "notes": "Source URI changed notification" },
+      { "event": "WebView2_ContentLoading", "phase": "host_event", "required": false, "notes": "Content began loading in renderer" },
       { "event": "NavigationRequest::CommitNavigation", "phase": "browser", "required": true },
       { "event": "NavigationRequest::DidCommitNavigation", "phase": "browser", "required": true },
-      { "event": "WebView2_Event", "phase": "host_dispatch", "required": true, "notes": "Generic event dispatch for NavigationCompleted", "terminal": true }
+      { "event": "WebView2_DocStateChanged", "phase": "client", "required": true, "notes": "Document state updated after commit" },
+      { "event": "WebView2_HistoryChanged", "phase": "host_event", "required": false, "notes": "Browser history updated" },
+      { "event": "WebView2_DOMContentLoaded", "phase": "host_event", "required": false, "notes": "DOM fully parsed" },
+      { "event": "WebView2_NavigationCompleted", "phase": "host_event", "required": true, "notes": "Navigation finished — success or failure reported to host" },
+      { "event": "WebView2_Event_NavigationCompletedHandler", "phase": "host_dispatch", "required": true, "notes": "Host handler invoked for NavigationCompleted", "terminal": true }
     ],
     "timingEvents": ["NavigationTotal", "BeginNavigationToCommit", "CommitToDidCommit", "DidCommitToFinish"],
     "expectedTimingKey": "navigation_total",
@@ -29,11 +36,17 @@
     "happyPath": [
       { "event": "WebView2_APICalled", "field": "API=4", "phase": "trigger", "required": true },
       { "event": "WebView2_NewNavigationContext", "phase": "client", "required": false },
+      { "event": "WebView2_NavigationStarting", "phase": "host_event", "required": true, "notes": "Client fires NavigationStarting to host" },
       { "event": "NavigationRequest::Create", "phase": "browser", "required": false },
       { "event": "NavigationRequest::BeginNavigation", "phase": "browser", "required": true },
+      { "event": "WebView2_SourceChanged", "phase": "host_event", "required": false },
+      { "event": "WebView2_ContentLoading", "phase": "host_event", "required": false },
       { "event": "NavigationRequest::CommitNavigation", "phase": "browser", "required": true },
       { "event": "NavigationRequest::DidCommitNavigation", "phase": "browser", "required": true },
-      { "event": "WebView2_Event", "phase": "host_dispatch", "required": true, "terminal": true }
+      { "event": "WebView2_DocStateChanged", "phase": "client", "required": true },
+      { "event": "WebView2_DOMContentLoaded", "phase": "host_event", "required": false },
+      { "event": "WebView2_NavigationCompleted", "phase": "host_event", "required": true },
+      { "event": "WebView2_Event_NavigationCompletedHandler", "phase": "host_dispatch", "required": true, "terminal": true }
     ],
     "timingEvents": ["NavigationTotal"],
     "expectedTimingKey": "navigation_total",
@@ -49,11 +62,17 @@
     "happyPath": [
       { "event": "WebView2_APICalled", "field": "API=95", "phase": "trigger", "required": true },
       { "event": "WebView2_NewNavigationContext", "phase": "client", "required": false },
+      { "event": "WebView2_NavigationStarting", "phase": "host_event", "required": true, "notes": "Client fires NavigationStarting to host" },
       { "event": "NavigationRequest::Create", "phase": "browser", "required": false },
       { "event": "NavigationRequest::BeginNavigation", "phase": "browser", "required": true },
+      { "event": "WebView2_SourceChanged", "phase": "host_event", "required": false },
+      { "event": "WebView2_ContentLoading", "phase": "host_event", "required": false },
       { "event": "NavigationRequest::CommitNavigation", "phase": "browser", "required": true },
       { "event": "NavigationRequest::DidCommitNavigation", "phase": "browser", "required": true },
-      { "event": "WebView2_Event", "phase": "host_dispatch", "required": true, "terminal": true }
+      { "event": "WebView2_DocStateChanged", "phase": "client", "required": true },
+      { "event": "WebView2_DOMContentLoaded", "phase": "host_event", "required": false },
+      { "event": "WebView2_NavigationCompleted", "phase": "host_event", "required": true },
+      { "event": "WebView2_Event_NavigationCompletedHandler", "phase": "host_dispatch", "required": true, "terminal": true }
     ],
     "timingEvents": ["NavigationTotal", "BeginNavigationToCommit"],
     "expectedTimingKey": "navigation_total",
@@ -97,11 +116,16 @@
     "happyPath": [
       { "event": "WebView2_APICalled", "field": "API=9", "phase": "trigger", "required": true },
       { "event": "WebView2_NewNavigationContext", "phase": "client", "required": false },
+      { "event": "WebView2_NavigationStarting", "phase": "host_event", "required": true },
       { "event": "NavigationRequest::Create", "phase": "browser", "required": false },
       { "event": "NavigationRequest::BeginNavigation", "phase": "browser", "required": true },
+      { "event": "WebView2_ContentLoading", "phase": "host_event", "required": false },
       { "event": "NavigationRequest::CommitNavigation", "phase": "browser", "required": true },
       { "event": "NavigationRequest::DidCommitNavigation", "phase": "browser", "required": true },
-      { "event": "WebView2_Event", "phase": "host_dispatch", "required": true, "terminal": true }
+      { "event": "WebView2_DocStateChanged", "phase": "client", "required": true },
+      { "event": "WebView2_DOMContentLoaded", "phase": "host_event", "required": false },
+      { "event": "WebView2_NavigationCompleted", "phase": "host_event", "required": true },
+      { "event": "WebView2_Event_NavigationCompletedHandler", "phase": "host_dispatch", "required": true, "terminal": true }
     ],
     "timingEvents": ["NavigationTotal"],
     "expectedTimingKey": "navigation_total",
@@ -116,11 +140,16 @@
     "description": "Navigates back in history",
     "happyPath": [
       { "event": "WebView2_APICalled", "field": "API=21", "phase": "trigger", "required": true },
+      { "event": "WebView2_NavigationStarting", "phase": "host_event", "required": true },
       { "event": "NavigationRequest::Create", "phase": "browser", "required": false },
       { "event": "NavigationRequest::BeginNavigation", "phase": "browser", "required": true },
+      { "event": "WebView2_ContentLoading", "phase": "host_event", "required": false },
       { "event": "NavigationRequest::CommitNavigation", "phase": "browser", "required": true },
       { "event": "NavigationRequest::DidCommitNavigation", "phase": "browser", "required": true },
-      { "event": "WebView2_Event", "phase": "host_dispatch", "required": true, "terminal": true }
+      { "event": "WebView2_DocStateChanged", "phase": "client", "required": true },
+      { "event": "WebView2_DOMContentLoaded", "phase": "host_event", "required": false },
+      { "event": "WebView2_NavigationCompleted", "phase": "host_event", "required": true },
+      { "event": "WebView2_Event_NavigationCompletedHandler", "phase": "host_dispatch", "required": true, "terminal": true }
     ],
     "timingEvents": ["NavigationTotal"],
     "expectedTimingKey": "navigation_total",
@@ -132,11 +161,16 @@
     "description": "Navigates forward in history",
     "happyPath": [
       { "event": "WebView2_APICalled", "field": "API=22", "phase": "trigger", "required": true },
+      { "event": "WebView2_NavigationStarting", "phase": "host_event", "required": true },
       { "event": "NavigationRequest::Create", "phase": "browser", "required": false },
       { "event": "NavigationRequest::BeginNavigation", "phase": "browser", "required": true },
+      { "event": "WebView2_ContentLoading", "phase": "host_event", "required": false },
       { "event": "NavigationRequest::CommitNavigation", "phase": "browser", "required": true },
       { "event": "NavigationRequest::DidCommitNavigation", "phase": "browser", "required": true },
-      { "event": "WebView2_Event", "phase": "host_dispatch", "required": true, "terminal": true }
+      { "event": "WebView2_DocStateChanged", "phase": "client", "required": true },
+      { "event": "WebView2_DOMContentLoaded", "phase": "host_event", "required": false },
+      { "event": "WebView2_NavigationCompleted", "phase": "host_event", "required": true },
+      { "event": "WebView2_Event_NavigationCompletedHandler", "phase": "host_dispatch", "required": true, "terminal": true }
     ],
     "timingEvents": ["NavigationTotal"],
     "expectedTimingKey": "navigation_total",

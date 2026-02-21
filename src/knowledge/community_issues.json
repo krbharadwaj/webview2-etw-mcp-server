@@ -618,5 +618,106 @@
       "Bug 59882062"
     ],
     "webview2Version": "141.0.3537.71"
+  },
+  "transparent_window_memory_regression": {
+    "category": "Performance",
+    "symptom": "Memory regression (7-16%) after transparent window fix, detected via Performance Lab bisection",
+    "expectedPresent": [
+      "WebView2_FactoryCreate",
+      "WebView2_Creation_Client",
+      "WebView2_CreationTime"
+    ],
+    "expectedAbsent": [
+      "WebView2_CreationFailure"
+    ],
+    "diagnosticEvents": [
+      "WebView2_CreationTime",
+      "WebView2_Creation_Client"
+    ],
+    "keyChecks": [
+      "Compare WebView2_CreationTime values before/after the regression window.",
+      "Check memory:chrome:all_processes:reported_by_chrome:effective_size via Iriscope.",
+      "Is edge_webview.system_health_memory elevated vs baseline?",
+      "Was transparent window codepath activated? Check for multi-content view feature flags."
+    ],
+    "taxonomyRef": "perf_memory_regression",
+    "relatedIssues": [
+      "PerfLab regression alert"
+    ],
+    "notes": "Detected by automated bisection — transparent window PR caused 7.23-16.21% memory increase in edge_webview benchmarks."
+  },
+  "shared_worker_init_failure_reload": {
+    "category": "Initialization",
+    "symptom": "SharedWorker initializes on first load but fails silently on reload when using the same worker URL",
+    "expectedPresent": [
+      "WebView2_APICalled",
+      "WebView2_NavigationStarting",
+      "WebView2_NavigationCompleted"
+    ],
+    "expectedAbsent": [
+      "WebView2_BrowserProcessFailure"
+    ],
+    "diagnosticEvents": [
+      "WebView2_APICalled",
+      "WebView2_NavigationCompleted"
+    ],
+    "keyChecks": [
+      "Does the SharedWorker script fetch (e.g., cw.js) show empty response body on reload?",
+      "Is the worker URL identical across first load and reload?",
+      "Check network events — is the worker script served from SW cache vs network?",
+      "Reproducible in WebView2 sample app — not Teams-specific."
+    ],
+    "taxonomyRef": "init_shared_worker_failure",
+    "relatedIssues": [],
+    "notes": "Worker becomes non-functional after page reload with same URL. Main thread and SW thread both fetch worker script but response may be empty."
+  },
+  "minimal_init_missing_objects": {
+    "category": "Initialization",
+    "symptom": "Navigation or UI queries fail because objects were never created during minimal/optimized initialization",
+    "expectedPresent": [
+      "WebView2_FactoryCreate",
+      "WebView2_Creation_Client"
+    ],
+    "expectedAbsent": [
+      "WebView2_CreationFailure"
+    ],
+    "diagnosticEvents": [
+      "WebView2_Creation_Client",
+      "WebView2_ClientWindowInit"
+    ],
+    "keyChecks": [
+      "Was WebView2_ClientWindowInit fired? If not, window-dependent UI may fail.",
+      "Is minimal window optimization enabled? Some code paths expect objects created during full init.",
+      "Do navigation or rendering paths query presentation-layer objects that no longer exist?",
+      "Check if the failure is path-dependent — some UI flows work while others fail."
+    ],
+    "taxonomyRef": "init_minimal_window_failure",
+    "relatedIssues": [],
+    "notes": "Minimal window / minimal initialization optimizations remove creation of components that some code paths still depend on. Not a crash — a missing object race."
+  },
+  "tls_tpm_networking_failure": {
+    "category": "Network",
+    "symptom": "TLS connections terminate unexpectedly due to TPM-backed RSA-PSS signature incompatibility",
+    "expectedPresent": [
+      "WebView2_APICalled",
+      "WebView2_NavigationStarting",
+      "NavigationRequest::BeginNavigation"
+    ],
+    "expectedAbsent": [
+      "NavigationRequest::DidCommitNavigation"
+    ],
+    "diagnosticEvents": [
+      "NavigationRequest::OnRequestFailedInternal"
+    ],
+    "keyChecks": [
+      "Does the TLS handshake complete? Check for FIN after encrypted closure alert.",
+      "Is TLS 1.3 in use? TPM-backed RSA-PSS may fail with BoringSSL.",
+      "Check net-export logs for NCrypt failure on Windows.",
+      "Is the failure environment-specific (e.g., corporate proxy, HSM/TPM-backed certs)?",
+      "Browser process TTD trace may be needed for deeper investigation."
+    ],
+    "taxonomyRef": "network_tls_failure",
+    "relatedIssues": [],
+    "notes": "Chromium/BoringSSL may fail when TPMs cannot produce TLS-compatible RSA-PSS signatures. Requires net-export logs and possibly browser process TTD trace."
   }
 }
