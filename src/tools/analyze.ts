@@ -1,8 +1,18 @@
 import { execSync } from "child_process";
 import { existsSync, readFileSync } from "fs";
+import { join, dirname } from "path";
+import { fileURLToPath } from "url";
 import { generatePreprocessStep } from "./etlx_cache.js";
 
 const XPERF_PATH = "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\xperf.exe";
+
+// TraceEvent-based extractor (fast, single-pass, no xperf text dump)
+function getEtlExtractPath(): string {
+  // Resolve relative to this file: ../tools/etl-extract/bin/EtlExtract.exe
+  const thisDir = dirname(fileURLToPath(import.meta.url));
+  const toolPath = join(thisDir, "..", "..", "tools", "etl-extract", "bin", "EtlExtract.exe");
+  return toolPath;
+}
 
 interface AnalyzeResult {
   processMap: ProcessInfo[];
@@ -30,22 +40,81 @@ export function analyzeEtl(etlPath: string, hostApp: string, outDir?: string): s
     return `❌ ETL file not found: ${etlPath}`;
   }
 
-  if (!existsSync(XPERF_PATH)) {
+  const outputDir = outDir || "C:\\temp\\etl_analysis";
+  const etlExtractPath = getEtlExtractPath();
+  const useTraceEvent = existsSync(etlExtractPath);
+
+  if (!useTraceEvent && !existsSync(XPERF_PATH)) {
     return [
-      "❌ xperf not found at expected path.",
+      "❌ No ETL extraction tool found.",
       "",
-      "Install Windows Performance Toolkit from Windows SDK:",
-      "https://developer.microsoft.com/en-us/windows/downloads/windows-sdk/",
+      "Option 1 (fast): Build the TraceEvent extractor:",
+      "  cd tools/etl-extract/EtlExtract && dotnet publish -c Release -r win-x64 --self-contained false -o ../bin",
       "",
-      "Or set XPERF_PATH environment variable to your xperf.exe location.",
+      "Option 2 (legacy): Install Windows Performance Toolkit from Windows SDK:",
+      "  https://developer.microsoft.com/en-us/windows/downloads/windows-sdk/",
     ].join("\n");
   }
 
-  const outputDir = outDir || "C:\\temp\\etl_analysis";
+  if (useTraceEvent) {
+    // Fast path: single-pass extraction using TraceEvent (replaces Steps 0-3)
+    return [
+      `## ETL Analysis Setup for ${hostApp}`,
+      "",
+      "### Extract & Filter (single-pass, ~20-30s via TraceEvent)",
+      "```powershell",
+      `$outDir = "${outputDir}"`,
+      `New-Item -ItemType Directory -Path $outDir -Force | Out-Null`,
+      ``,
+      `# Fast extraction using TraceEvent — replaces xperf dumper + Select-String`,
+      `# Single pass extracts both filtered events and feature flags`,
+      `& "${etlExtractPath}" "${etlPath}" "${hostApp}" "$outDir\\filtered.txt" --feature-flags "$outDir\\feature_flags.txt"`,
+      ``,
+      `$filtered = "$outDir\\filtered.txt"`,
+      `$featureFlags = "$outDir\\feature_flags.txt"`,
+      "```",
+      "",
+      "### Parse Feature Flags",
+      "```powershell",
+      `Write-Host "=== ENABLED FEATURES ==="`,
+      `Select-String -Path $featureFlags -Pattern "enable-features[=:]([^\\s;]+)" -AllMatches | ForEach-Object {`,
+      `  $_.Matches | ForEach-Object { $_.Groups[1].Value -split ',' } } | Sort-Object -Unique`,
+      ``,
+      `Write-Host "=== DISABLED FEATURES ==="`,
+      `Select-String -Path $featureFlags -Pattern "disable-features[=:]([^\\s;]+)" -AllMatches | ForEach-Object {`,
+      `  $_.Matches | ForEach-Object { $_.Groups[1].Value -split ',' } } | Sort-Object -Unique`,
+      ``,
+      `Write-Host "=== WebView2-SPECIFIC FLAGS ==="`,
+      `Select-String -Path $featureFlags -Pattern "msWebView2\\w+|EdgeWebView\\w+|WebView2Feature\\w+" -AllMatches | ForEach-Object {`,
+      `  $_.Matches | ForEach-Object { $_.Value } } | Sort-Object -Unique`,
+      "```",
+      "",
+      "### Process Discovery",
+      "```powershell",
+      `Select-String -Path $filtered -Pattern "${hostApp}" | ForEach-Object { if ($_.Line -match '${hostApp}\\.exe\\s*\\((\\d+)\\)') { $matches[1] } } | Sort-Object -Unique`,
+      `Select-String -Path $filtered -Pattern "msedgewebview2" | ForEach-Object { if ($_.Line -match 'msedgewebview2\\.exe.*?\\((\\d+)\\)') { $matches[1] } } | Sort-Object -Unique`,
+      "```",
+      "",
+      "### Build Timeline",
+      "```powershell",
+      `Select-String -Path $filtered -Pattern "WebView2_Creation_Client|WebView2_APICalled|WebView2_Event|NavigationRequest|WebView2_CreationFailure|WebView2_BrowserProcessFailure" |`,
+      `  Sort-Object { if ($_.Line -match ',\\s*(\\d+)') { [long]$matches[1] } } |`,
+      `  Select-Object -First 100`,
+      "```",
+      "",
+      "### Next Steps",
+      "After running the above, use these tools:",
+      "- `validate_trace` — validate API calls against expected happy-path sequences",
+      "- `decode_api_id` — to decode API IDs from WebView2_APICalled events",
+      "- `lookup_event` — to understand unfamiliar events",
+      "- `diagnose` — if you spot a symptom (stuck, crash, slow_init, etc.)",
+      "- `timeline_slice` — to zoom into a specific time window",
+    ].join("\n");
+  }
 
-  // Generate the analysis commands — don't execute directly (ETL analysis is slow)
+  // Legacy fallback: xperf-based extraction (slow, two passes)
   return [
-    `## ETL Analysis Setup for ${hostApp}`,
+    `## ETL Analysis Setup for ${hostApp} (xperf — legacy mode)`,
     "",
     "### Step 1: Set Variables",
     "```powershell",
@@ -71,12 +140,10 @@ export function analyzeEtl(etlPath: string, hostApp: string, outDir?: string): s
     "",
     "### Step 3: Extract Feature Flags & Experiments",
     "```powershell",
-    `# Extract feature flags from process command lines and runtime events`,
     `& $xperf -i $etl -quiet -a dumper 2>$null |`,
     `  Select-String -Pattern "enable-features|disable-features|field-trial|msWebView2|EdgeWebView|WebView2Feature|ExperimentalFeature|FeatureList|CommandLine|Process/Start" |`,
     `  Out-File $featureFlags -Encoding utf8`,
     ``,
-    `# Parse enabled/disabled features`,
     `Write-Host "=== ENABLED FEATURES ==="`,
     `Select-String -Path $featureFlags -Pattern "enable-features[=:]([^\\s;]+)" -AllMatches | ForEach-Object {`,
     `  $_.Matches | ForEach-Object { $_.Groups[1].Value -split ',' } } | Sort-Object -Unique`,
@@ -85,10 +152,6 @@ export function analyzeEtl(etlPath: string, hostApp: string, outDir?: string): s
     `Select-String -Path $featureFlags -Pattern "disable-features[=:]([^\\s;]+)" -AllMatches | ForEach-Object {`,
     `  $_.Matches | ForEach-Object { $_.Groups[1].Value -split ',' } } | Sort-Object -Unique`,
     ``,
-    `Write-Host "=== FIELD TRIALS ==="`,
-    `Select-String -Path $featureFlags -Pattern "field-trial[^\\s]*[=:]([^\\s;]+)" -AllMatches | ForEach-Object {`,
-    `  $_.Matches | ForEach-Object { $_.Groups[1].Value } }`,
-    ``,
     `Write-Host "=== WebView2-SPECIFIC FLAGS ==="`,
     `Select-String -Path $featureFlags -Pattern "msWebView2\\w+|EdgeWebView\\w+|WebView2Feature\\w+" -AllMatches | ForEach-Object {`,
     `  $_.Matches | ForEach-Object { $_.Value } } | Sort-Object -Unique`,
@@ -96,16 +159,12 @@ export function analyzeEtl(etlPath: string, hostApp: string, outDir?: string): s
     "",
     "### Step 4: Process Discovery",
     "```powershell",
-    `# Find host app PIDs`,
     `Select-String -Path $filtered -Pattern "${hostApp}" | ForEach-Object { if ($_.Line -match '${hostApp}\\.exe\\s*\\((\\d+)\\)') { $matches[1] } } | Sort-Object -Unique`,
-    "",
-    `# Find WebView2 PIDs`,
     `Select-String -Path $filtered -Pattern "msedgewebview2" | ForEach-Object { if ($_.Line -match 'msedgewebview2\\.exe.*?\\((\\d+)\\)') { $matches[1] } } | Sort-Object -Unique`,
     "```",
     "",
     "### Step 5: Build Timeline",
     "```powershell",
-    `# Key lifecycle events (replace PID with actual)`,
     `Select-String -Path $filtered -Pattern "WebView2_Creation_Client|WebView2_APICalled|WebView2_Event|NavigationRequest::(Create|CommitNavigation|DidCommitNavigation|OnRequestFailed)|WebView2_CreationFailure|WebView2_BrowserProcessFailure" |`,
     `  Sort-Object { if ($_.Line -match ',\\s*(\\d+)') { [long]$matches[1] } } |`,
     `  Select-Object -First 100`,
@@ -122,6 +181,16 @@ export function analyzeEtl(etlPath: string, hostApp: string, outDir?: string): s
 }
 
 export function generateFilterCommand(etlPath: string, hostApp: string, additionalPatterns?: string[]): string {
+  const etlExtractPath = getEtlExtractPath();
+  if (existsSync(etlExtractPath)) {
+    return [
+      "```powershell",
+      `& "${etlExtractPath}" "${etlPath}" "${hostApp}" "C:\\temp\\etl_analysis\\filtered.txt" --feature-flags "C:\\temp\\etl_analysis\\feature_flags.txt"`,
+      "```",
+    ].join("\n");
+  }
+
+  // Legacy xperf fallback
   const patterns = [
     hostApp,
     "WebView2_",

@@ -8,11 +8,11 @@
     "sampleCount": 1
   },
   "creation_client_cold_start": {
-    "p50_ms": 3500,
-    "p95_ms": 5000,
-    "p99_ms": 8000,
+    "p50_ms": 1080.1466000000003,
+    "p95_ms": 1080.1466000000003,
+    "p99_ms": 1080.1466000000003,
     "notes": "Cold start (WebViewProcessLaunchType=0) — first WebView2 in session",
-    "sampleCount": 1
+    "sampleCount": 9
   },
   "creation_client_warm_start": {
     "p50_ms": 200,
@@ -22,11 +22,11 @@
     "sampleCount": 1
   },
   "first_navigation_to_web": {
-    "p50_ms": 300,
-    "p95_ms": 1500,
-    "p99_ms": 3000,
+    "p50_ms": 612.293,
+    "p95_ms": 612.293,
+    "p99_ms": 612.293,
     "notes": "First navigation to a web URL (not about:blank)",
-    "sampleCount": 0
+    "sampleCount": 8
   },
   "event_handler_registration": {
     "p50_ms": 1,
@@ -57,39 +57,39 @@
     "sampleCount": 0
   },
   "navigation_total": {
-    "p50_ms": 500,
-    "p95_ms": 2000,
-    "p99_ms": 5000,
+    "p50_ms": 166331.53333333333,
+    "p95_ms": 166331.53333333333,
+    "p99_ms": 166331.53333333333,
     "notes": "End-to-end navigation duration (NavigationTotal)",
-    "sampleCount": 1
+    "sampleCount": 9
   },
   "begin_navigation_to_commit": {
-    "p50_ms": 200,
-    "p95_ms": 1000,
-    "p99_ms": 3000,
+    "p50_ms": 2533.2666666666664,
+    "p95_ms": 2533.2666666666664,
+    "p99_ms": 2533.2666666666664,
     "notes": "BeginNavigationToCommit phase (network/server)",
-    "sampleCount": 1
+    "sampleCount": 9
   },
   "commit_to_did_commit": {
-    "p50_ms": 100,
-    "p95_ms": 500,
-    "p99_ms": 2000,
+    "p50_ms": 5157.533333333333,
+    "p95_ms": 5157.533333333333,
+    "p99_ms": 5157.533333333333,
     "notes": "CommitToDidCommit phase (renderer startup)",
-    "sampleCount": 1
+    "sampleCount": 9
   },
   "sw_forward_to_worker_ready": {
-    "p50_ms": 50,
-    "p95_ms": 500,
-    "p99_ms": 2000,
+    "p50_ms": 205.4,
+    "p95_ms": 205.4,
+    "p99_ms": 205.4,
     "notes": "ForwardServiceWorkerToWorkerReady (SW activation wait)",
-    "sampleCount": 1
+    "sampleCount": 9
   },
   "sw_fetch_handler_execution": {
-    "p50_ms": 10,
-    "p95_ms": 100,
-    "p99_ms": 500,
+    "p50_ms": 93690.13333333333,
+    "p95_ms": 93690.13333333333,
+    "p99_ms": 93690.13333333333,
     "notes": "FetchHandlerStartToFetchHandlerEnd (SW JS execution)",
-    "sampleCount": 1
+    "sampleCount": 9
   },
   "wam_token_request": {
     "p50_ms": 100,
