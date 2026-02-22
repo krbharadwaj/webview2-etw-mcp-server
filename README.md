@@ -1,6 +1,6 @@
 # ⭐ WebView2 ETW Analysis MCP Server
 
-Analyze WebView2 ETL traces with AI. **4 tools** — that's all you need.
+Analyze WebView2 ETL traces with AI. **5 tools** — full structured analysis with root cause attribution.
 
 ---
 
@@ -16,14 +16,15 @@ Click the button above → VS Code opens → MCP server is configured. **That's 
 ## 📄 Table of Contents
 
 1. [📺 Overview](#-overview)
-2. [⚙️ The 4 Tools](#️-the-4-tools)
+2. [⚙️ The 5 Tools](#️-the-5-tools)
 3. [🎯 How It Works](#-how-it-works)
-4. [🔌 Installation](#-installation)
-5. [🎩 Usage Examples](#-usage-examples)
-6. [📚 Knowledge Base](#-knowledge-base)
-7. [📤 Sharing Learnings](#-sharing-learnings)
-8. [🏗️ Architecture](#️-architecture)
-9. [📌 Contributing](#-contributing)
+4. [📊 Structured Analysis Report](#-structured-analysis-report)
+5. [🔌 Installation](#-installation)
+6. [🎩 Usage Examples](#-usage-examples)
+7. [📚 Knowledge Base](#-knowledge-base)
+8. [📤 Sharing Learnings](#-sharing-learnings)
+9. [🏗️ Architecture](#️-architecture)
+10. [📌 Contributing](#-contributing)
 
 ---
 
@@ -31,22 +32,24 @@ Click the button above → VS Code opens → MCP server is configured. **That's 
 
 The WebView2 ETW MCP Server brings WebView2 ETL trace analysis directly into GitHub Copilot Chat. Just talk in plain English:
 
-- *"Analyze C:\traces\stuck.etl for Teams"* → extraction commands
-- *"Here's the filtered data — NavigationCompleted not received"* → **automatic** triage + navigation playbook + evidence pack
+- *"Analyze C:\traces\stuck.etl for Teams"* → extraction commands (fast TraceEvent or xperf fallback)
+- *"Here's the filtered data — NavigationCompleted not received"* → **automatic** triage + navigation playbook + evidence pack + structured report
 - *"What API ID is 33?"* → `AddNavigationStarting`
 - *"What events should I see for navigation?"* → expected event sequence with phases
+- *"What flags help with blank pages?"* → relevant feature flags with risk levels
 - *"Share my learnings"* → push to GitHub for all users
 
 ---
 
-## ⚙️ The 4 Tools
+## ⚙️ The 5 Tools
 
 | # | Tool | What It Does |
 |---|------|-------------|
-| 1 | **`analyze_etl`** | **The main tool.** Phase 1: generates extraction commands. Phase 2 (with filtered data): runs full analysis automatically — triage, navigation playbook, evidence pack, timeline slice, CPU profiling, ETL comparison. Everything in one call. |
+| 1 | **`analyze_etl`** | **The main tool.** Phase 1: generates extraction commands (TraceEvent fast path or xperf fallback). Phase 2: runs full analysis — triage, navigation playbook, evidence pack, structured report with incarnation grouping and KB-powered metrics. Optional: timeline slice, CPU profiling, ETL comparison. |
 | 2 | **`decode_api_id`** | Decode WebView2 API ID numbers (0-174) → human-readable names and categories. Batch mode supported. |
 | 3 | **`get_expected_trace_events`** | Get the expected set of ETW events for a specific flow (navigation, initialization, Navigate, GoBack, etc.). Optionally checks a trace file to show found vs missing events. |
-| 4 | **`share_learnings`** | Preview what you've learned locally → confirm → pushed to GitHub for all users. |
+| 4 | **`lookup_feature_flags`** | Look up WebView2 feature flags (browser arguments) — purpose, risk level, and when to use them. Search by flag name, category, or problem scenario. |
+| 5 | **`share_learnings`** | Preview what you've learned locally → confirm → pushed to GitHub for all users. |
 
 That's it. No need to remember which sub-tool to call — `analyze_etl` handles everything.
 
@@ -58,7 +61,8 @@ That's it. No need to remember which sub-tool to call — `analyze_etl` handles 
 ┌─────────────────────────────────────────────────────────────────────┐
 │  STEP 1: "Analyze C:\traces\stuck.etl for Teams"                   │
 │                                                                     │
-│  → analyze_etl generates PowerShell extraction commands             │
+│  → analyze_etl generates extraction commands                        │
+│  → Uses TraceEvent C# extractor (23s) or xperf fallback (5-15min) │
 │  → You run them → get filtered.txt                                  │
 ├─────────────────────────────────────────────────────────────────────┤
 │  STEP 2: "Here's the filtered file — NavigationCompleted missing"  │
@@ -76,6 +80,10 @@ That's it. No need to remember which sub-tool to call — `analyze_etl` handles 
 │    │ Hypothesis + evidence + counter-evidence + timeline   │         │
 │    │ Confidence: 0.82 — what would change it              │         │
 │    └───────────────────────────────────────────────────────┘        │
+│    ┌─ STRUCTURED REPORT ──────────────────────────────────┐         │
+│    │ 14-section analysis with incarnations, KB metrics,   │         │
+│    │ sequence validation, root cause, recommendations     │         │
+│    └───────────────────────────────────────────────────────┘        │
 │                                                                     │
 │  Optional params (same tool, just add):                             │
 │  • start_time + end_time → adds TIMELINE SLICE                     │
@@ -84,11 +92,130 @@ That's it. No need to remember which sub-tool to call — `analyze_etl` handles 
 └─────────────────────────────────────────────────────────────────────┘
 ```
 
-**CPU profiling is NOT run by default** — only when you explicitly pass `include_cpu=true`. Initial analysis focuses on event-level root causes which is faster and usually sufficient.
-
 ---
 
-See **[TOOLS_GUIDE.md](TOOLS_GUIDE.md)** for the complete reference with human-language examples.
+## 📊 Structured Analysis Report
+
+Phase 2 generates a **14-section structured JSON report** with a human-readable narrative:
+
+```
+ETLAnalysisReport
+├── 1.  Metadata              — ETL file info, versions, analysis window
+├── 2.  ProcessTopology        — Chromium process model (browser, renderers, GPU, utility)
+├── 3.  Incarnations           — WebView2 instance lifecycle groupings with process tables
+├── 4.  NavigationTimeline     — Commit-level navigation tracking (start → commit → complete)
+├── 5.  RenderingPipeline      — GPU health, frame production, D3D device status
+├── 6.  StorageAndPartition    — Renderer recreation, PID changes mid-navigation
+├── 7.  NetworkActivity        — Request tracking, stall detection
+├── 8.  InjectionAndEnvironment — DLL injection, VDI detection, third-party modules
+├── 9.  FailureSignals         — Boolean flags for all detected failure modes
+├── 10. ComputedMetrics        — Key timing deltas (creation, nav, renderer, GPU)
+├── 11. RootCauseAnalysis      — Primary + secondary root causes with evidence
+├── 12. ConfidenceModel        — Signal agreement, temporal correlation, noise scoring
+├── 13. SequenceValidation     — Expected vs observed events from KB (api_sequences.json)
+└── 14. Recommendations        — Actionable next steps
+```
+
+### Human-Readable Output
+
+The report is rendered as a 7-section narrative:
+
+1. **Executive Summary** — Primary finding, confidence level, key evidence
+2. **Chronological Timeline** — Sortable event table with interpretation
+3. **Incarnations** — WebView2 instance groupings with process tables and issue flags
+4. **Key Observations** — Renderer behavior, GPU health, DLL injection, network activity
+5. **Root Cause Analysis** — Primary + contributing factors with evidence chains
+6. **Metrics Summary** — Observed vs KB-expected values (from `timing_baselines.json`)
+7. **Expected vs Observed Events** — Happy-path validation (from `api_sequences.json`)
+8. **What This Means** — Plain-English explanation for the application
+9. **Recommended Next Steps** — Numbered actionable guidance
+
+### Knowledge Base Integration
+
+The structured report actively uses the knowledge base:
+
+| KB File | Used For |
+|---------|----------|
+| `timing_baselines.json` | Metrics Summary — expected p95 values for creation, navigation, renderer startup |
+| `api_sequences.json` | Sequence Validation — compares Navigate happy path against actual trace events |
+| `root_causes.json` | Evidence pack — enriches root cause descriptions |
+| `events.json` | Auto-discovered event metadata, categories, severity |
+
+### Sample Output
+
+<details>
+<summary>📎 Example Human-Readable Report (click to expand)</summary>
+
+```markdown
+# 📄 WebView2 ETL Analysis Report
+
+## 1️⃣ Executive Summary
+
+**Primary Finding:**
+Renderer process crashed during navigation, leading to blank screen or content loss.
+
+**Confidence Level:** High (86%)
+
+**Why this conclusion?**
+- Renderer exited 2.5s after navigation start
+- Navigation commit occurred but completion missing
+- Renderer PID changed during navigation
+- No GPU failure detected.
+
+## 2️⃣ What Happened (Chronological Timeline)
+
+| Time | Event |
+|------|-------|
+| 0.120s | SearchHost.exe started (PID 1234) — Host application |
+| 4.322s | msedgewebview2.exe started (PID 2345) — Browser process |
+| 8.775s | Navigation started (http://127.0.0.1:8080) |
+| 13.122s | Navigation committed |
+| 15.611s | Renderer exited (PID 2345) — 2.5s lifetime |
+| — | NavigationCompleted event **not observed** ❌ |
+
+## 📦 WebView2 Incarnations
+
+**1 incarnation(s)** detected
+
+### 🔴 Incarnation 1
+- Created at: **4.322s**
+- Host PID: **1234**
+- Browser PID: **2345**
+- Duration: **11.3s**
+- Processes: **4**
+
+| PID | Name | Role |
+|-----|------|------|
+| 1234 | SearchHost.exe | host |
+| 2345 | msedgewebview2.exe | browser |
+| 3456 | msedgewebview2.exe | renderer |
+| 4567 | msedgewebview2.exe | gpu |
+
+⚠️ **Issue:** Renderer exited unexpectedly during navigation
+
+## 5️⃣ Metrics Summary
+
+| Metric | Observed | Expected (KB p95) | Status |
+|--------|----------|-------------------|--------|
+| WebView2 Creation | 1.1s | < 1.1s | ✅ Normal |
+| Navigation Start → Commit | 4.3s | < 2.5s | ⚠️ Slow |
+| Commit → Complete | Not observed | < 2000 ms | ❌ Failed |
+
+## 🔬 Expected vs Observed Events
+
+**Flow:** Navigate | **Completion:** 57%
+**Pipeline breaks at:** browser: NavigationRequest::CommitNavigation
+
+| Step | Expected Event | Status |
+|------|---------------|--------|
+| | WebView2_APICalled | ✅ Found |
+| | WebView2_NavigationStarting | ✅ Found |
+| | NavigationRequest::BeginNavigation | ✅ Found |
+| | NavigationRequest::CommitNavigation | ❌ Missing (required) |
+| | WebView2_NavigationCompleted | ❌ Missing (required) |
+```
+
+</details>
 
 ---
 
@@ -97,8 +224,10 @@ See **[TOOLS_GUIDE.md](TOOLS_GUIDE.md)** for the complete reference with human-l
 ### Prerequisites
 
 - **Node.js 18+** — [Download](https://nodejs.org/)
-- **Windows** — ETL analysis uses PowerShell + xperf
-- **Windows Performance Toolkit** — [Windows SDK](https://developer.microsoft.com/en-us/windows/downloads/windows-sdk/)
+- **Windows** — ETL analysis uses PowerShell
+- **ETL Extraction** (one of):
+  - **.NET 8+** — for the fast TraceEvent-based extractor (recommended, ~23 seconds for 1.5GB ETL)
+  - **Windows Performance Toolkit** — xperf fallback (~5-15 minutes per pass)
 
 ### ✨ One-Click Install (Recommended)
 
@@ -137,7 +266,7 @@ Or add to your VS Code user `settings.json` (global — applies to all workspace
 }
 ```
 
-> **No `GITHUB_TOKEN` needed!** The server auto-detects your GitHub authentication from `gh` CLI or VS Code. See [Sharing Learnings](#-sharing-learnings) for details.
+> **No `GITHUB_TOKEN` needed!** The server auto-detects your GitHub authentication from `gh` CLI or VS Code.
 
 ### 🔧 From Source (for development)
 
@@ -146,6 +275,15 @@ git clone https://github.com/krbharadwaj/webview2-etw-mcp-server.git
 cd webview2-etw-mcp-server
 npm install && npm run build
 ```
+
+#### Building the Fast TraceEvent Extractor (optional, recommended)
+
+```bash
+cd tools/etl-extract/EtlExtract
+dotnet publish -c Release -o ../bin
+```
+
+This builds `tools/etl-extract/bin/EtlExtract.exe` which extracts ETL events in ~23 seconds (vs 5-15 minutes with xperf). The MCP server auto-detects it if built; otherwise falls back to xperf.
 
 Then point to the local build:
 
@@ -172,7 +310,8 @@ Switch to **Agent Mode** in GitHub Copilot Chat, then just ask:
 ```
 CALL 1 — EXTRACT:
 You: "I have an ETL at C:\traces\teams_stuck.etl. Teams is stuck."
-  → analyze_etl generates PowerShell extraction commands
+  → analyze_etl generates extraction commands
+  → Uses TraceEvent (23s) or xperf fallback (5-15min)
   → You run them → get C:\temp\etl_analysis\filtered.txt
 
 CALL 2 — FULL ANALYSIS (automatic):
@@ -187,10 +326,12 @@ You: "Here's the filtered data at C:\temp\etl_analysis\filtered.txt.
   ├── NAVIGATION PLAYBOOK ─────────────────────────────────┤
   │ ✅ Navigate → ✅ Starting → ✅ Source → ❌ Completed    │
   │ 🔴 Pipeline breaks at stage 9                          │
-  │ ❌ Runtime generated but host never received            │
   ├── EVIDENCE PACK ───────────────────────────────────────┤
   │ Hypothesis: navigation_stalled | Confidence: 0.82      │
   │ Evidence: 8 items | Counter-evidence: 1                 │
+  ├── STRUCTURED REPORT ───────────────────────────────────┤
+  │ 14-section analysis with incarnations, KB metrics,     │
+  │ root cause attribution, and next steps                  │
   └─────────────────────────────────────────────────────────┘
 ```
 
@@ -198,13 +339,13 @@ You: "Here's the filtered data at C:\temp\etl_analysis\filtered.txt.
 
 ```
 You: "Analyze with timeline between 32456789012 and 32461789012"
-  → Same analyze_etl + start_time + end_time → adds TIMELINE SLICE to report
+  → Same analyze_etl + start_time + end_time → adds TIMELINE SLICE
 
 You: "Include CPU analysis for PID 27528"
-  → Same analyze_etl + include_cpu=true + pid → adds CPU PROFILING to report
+  → Same analyze_etl + include_cpu=true + pid → adds CPU PROFILING
 
 You: "Compare with working trace at C:\temp\good_filtered.txt"
-  → Same analyze_etl + good_filtered → adds ETL COMPARISON to report
+  → Same analyze_etl + good_filtered → adds ETL COMPARISON
 ```
 
 ### Other Tools
@@ -214,8 +355,10 @@ You: "What is API ID 33?"
   → decode_api_id: AddNavigationStarting (Navigation, EventRegistration)
 
 You: "What events should I see for navigation?"
-  → get_expected_trace_events: 9-stage lifecycle pipeline with expected events,
-    failure variants, and optionally checks your trace for found vs missing
+  → get_expected_trace_events: 9-stage lifecycle pipeline with expected events
+
+You: "What flags help with blank pages?"
+  → lookup_feature_flags: disable-gpu, RendererAppContainer, etc.
 
 You: "Share my learnings"
   → share_learnings: Preview diff → confirm → pushed to GitHub
@@ -227,15 +370,16 @@ You: "Share my learnings"
 
 Ships pre-loaded — no setup required:
 
-| File | Contents | Auto-grows? |
-|------|----------|-------------|
-| `api_ids.json` | 175 API IDs (Navigate, Initialize, GoBack, ...) | ✅ Auto-discover |
-| `events.json` | 189+ ETW events across 15 categories | ✅ Auto-discover |
-| `root_causes.json` | 7 root causes with evidence patterns | ✅ Via analysis |
-| `timing_baselines.json` | 16 timing baselines with p50/p95/p99 | ✅ Auto-extract |
-| `api_sequences.json` | 12 API happy-path sequences | ✅ Via analysis |
-| `nav_playbooks.json` | Navigation & init lifecycle playbooks | ✅ Via analysis |
-| `rca_taxonomy.json` | Root-cause taxonomy (5 categories, ~15 sub-causes) | ✅ Via analysis |
+| File | Contents | Used By | Auto-grows? |
+|------|----------|---------|-------------|
+| `api_ids.json` | 175 API IDs (Navigate, Initialize, GoBack, ...) | decode_api_id | ✅ Auto-discover |
+| `events.json` | 700+ ETW events across 15 categories | triage, auto-learn | ✅ Auto-discover |
+| `root_causes.json` | 7 root causes with evidence patterns | evidence_pack | ✅ Via analysis |
+| `timing_baselines.json` | 16 timing baselines with p50/p95/p99 | **structured report** — metrics table | ✅ Auto-extract |
+| `api_sequences.json` | 12 API happy-path sequences | **structured report** — sequence validation | ✅ Via analysis |
+| `nav_playbooks.json` | Navigation & init lifecycle playbooks | nav_playbook | ✅ Via analysis |
+| `rca_taxonomy.json` | Root-cause taxonomy (5 categories, ~15 sub-causes) | triage | ✅ Via analysis |
+| `known_flags.json` | Feature flags with categories and risk levels | lookup_feature_flags | Manual |
 
 The KB grows automatically every time you analyze a trace. Use `share_learnings` to push discoveries to GitHub.
 
@@ -245,68 +389,22 @@ The KB grows automatically every time you analyze a trace. Use `share_learnings`
 
 Sharing is **explicit** — the server never pushes without your review.
 
-### How It Works
-
 1. **Analyze traces** as usual — the server learns locally (events, timings, patterns)
-2. **Say `"share my learnings"`** — the server shows you a diff:
-
-   ```
-   ## 📤 Learnings Ready to Share
-   
-   **3 new** entries and **1 updated** across 2 knowledge files.
-   
-   ### 📋 Events (events.json)
-   New (2):
-     - `WebView2_FrameCreated` — Frame creation callback
-     - `WebView2_CustomSchemeHandler` — Custom scheme registration
-   
-   ### ⏱️ Timing Baselines (timing_baselines.json)
-   Updated (1):
-     - `about_blank_navigation` — samples: 5 → 8
-   
-   To push, run share_learnings with action: "confirm".
-   ```
-
+2. **Say `"share my learnings"`** — the server shows you a diff
 3. **Say `"looks good, confirm"`** — changes are pushed to GitHub
 4. **Every other user** pulls your discoveries on their next server startup
 
-### Setup
+### Auth
 
-**Most users need zero setup** — the server auto-detects your GitHub authentication:
+**Most users need zero setup** — the server auto-detects authentication:
 
-| Auth Source | How It Works | Setup Needed |
-|-------------|-------------|--------------|
-| **VS Code GitHub sign-in** | Auto-detected from OS credential store (Copilot, Settings Sync, GitHub PRs) | **None** — already signed in |
-| **`gh` CLI** | Auto-detected via `gh auth token` | **None** — already authenticated |
-| **`GITHUB_TOKEN` env var** | Explicit token with repo write access (direct push) | One-time PAT creation |
+| Auth Source | Setup Needed |
+|-------------|--------------|
+| **VS Code GitHub sign-in** | **None** — already signed in |
+| **`gh` CLI** | **None** — already authenticated |
+| **`GITHUB_TOKEN` env var** | One-time PAT creation |
 
-The server tries each source in order. If you're signed into GitHub in VS Code or have the `gh` CLI, sharing works immediately.
-
-**If no auth is detected**, the server tells you how to fix it:
-
-```
-🟡 Pull-only mode — receiving shared learnings but cannot share.
-
-To enable sharing, do ONE of:
-• Install gh CLI and run: gh auth login
-• Sign into GitHub in VS Code
-• Set GITHUB_TOKEN env var in your MCP config
-```
-
-#### How sharing works behind the scenes
-
-- **Users with `GITHUB_TOKEN` env var** (repo collaborators): Direct push to the repo
-- **Users with `gh` CLI or VS Code auth**: Creates a GitHub Issue with the knowledge diff → a GitHub Actions workflow automatically validates, merges, and commits
-
-**Without any auth**: Everything still works. Learnings stay local, and you still **receive** others' shared discoveries (public repo, read access is free).
-
-### What Gets Synced
-
-| On Startup | On Share |
-|------------|----------|
-| Server **pulls** latest knowledge JSONs from GitHub | Server **pushes** your new discoveries back |
-| Additive merge with local data (never loses entries) | Only pushes files with actual changes |
-| Automatic — no user action needed | Explicit — requires preview + confirm |
+Without any auth, everything still works — learnings stay local, and you still **receive** others' shared discoveries.
 
 ---
 
@@ -315,33 +413,42 @@ To enable sharing, do ONE of:
 ```
 webview2-etw-mcp-server/
 ├── src/
-│   ├── index.ts                 MCP server (4 tools registered)
+│   ├── index.ts                   MCP server (5 tools registered)
 │   ├── tools/
-│   │   ├── unified_analyze.ts   🔧 Tool 1: Unified ETL analysis orchestrator
-│   │   ├── expected_events.ts   🔧 Tool 3: Expected trace events lookup
-│   │   ├── decode.ts            🔧 Tool 2: API ID decoding
-│   │   ├── triage.ts            Internal: root-cause scoring
-│   │   ├── nav_playbook.ts      Internal: navigation lifecycle checks
-│   │   ├── evidence_pack.ts     Internal: RCA evidence pack
-│   │   ├── analyze.ts           Internal: ETL extraction commands
-│   │   ├── analyze_cpu.ts       Internal: CPU profiling (opt-in)
-│   │   ├── timeline_slice.ts    Internal: time-window analysis
-│   │   ├── compare_etls.ts      Internal: ETL comparison
-│   │   ├── validate_trace.ts    Internal: API sequence validation
-│   │   └── auto_learn.ts        Internal: passive auto-learning
+│   │   ├── unified_analyze.ts     🔧 Tool 1: Unified ETL analysis orchestrator
+│   │   ├── decode.ts              🔧 Tool 2: API ID decoding
+│   │   ├── expected_events.ts     🔧 Tool 3: Expected trace events lookup
+│   │   ├── feature_flags.ts       🔧 Tool 4: Feature flag lookup
+│   │   ├── structured_report.ts   14-section structured report + narrative formatter
+│   │   ├── trace_structure.ts     Process topology, incarnations, config extraction
+│   │   ├── triage.ts              Root-cause scoring engine
+│   │   ├── nav_playbook.ts        Navigation lifecycle validation
+│   │   ├── evidence_pack.ts       RCA evidence assembly
+│   │   ├── analyze.ts             ETL extraction command generation
+│   │   ├── analyze_cpu.ts         CPU profiling (opt-in)
+│   │   ├── timeline_slice.ts      Time-window analysis
+│   │   ├── compare_etls.ts        ETL comparison
+│   │   ├── validate_trace.ts      API sequence validation
+│   │   └── auto_learn.ts          Passive auto-learning
 │   ├── knowledge/
-│   │   ├── loader.ts            JSON I/O with path resolution
-│   │   ├── sync.ts              GitHub sync (pull/push)
-│   │   ├── api_ids.json         175 API ID mappings
-│   │   ├── api_sequences.json   12 API happy-path sequences
-│   │   ├── events.json          189+ ETW events
-│   │   ├── root_causes.json     7 root causes
-│   │   ├── timing_baselines.json  16 timing baselines
-│   │   ├── nav_playbooks.json   Navigation & init playbooks
-│   │   └── rca_taxonomy.json    Root-cause taxonomy
+│   │   ├── loader.ts              JSON I/O with path resolution
+│   │   ├── sync.ts                GitHub sync (pull/push)
+│   │   ├── api_ids.json           175 API ID mappings
+│   │   ├── api_sequences.json     12 API happy-path sequences
+│   │   ├── events.json            700+ ETW events
+│   │   ├── root_causes.json       7 root causes
+│   │   ├── timing_baselines.json  16 timing baselines (p50/p95/p99)
+│   │   ├── nav_playbooks.json     Navigation & init playbooks
+│   │   ├── known_flags.json       Feature flags database
+│   │   └── rca_taxonomy.json      Root-cause taxonomy
 │   └── test.ts
+├── tools/
+│   └── etl-extract/               TraceEvent-based C# ETL extractor
+│       └── EtlExtract/
+│           ├── Program.cs         Single-pass extraction (~23s for 1.5GB)
+│           └── EtlExtract.csproj  .NET project with TraceEvent NuGet
 ├── .github/workflows/
-│   └── process-learnings.yml    Auto-process learning submissions
+│   └── process-learnings.yml      Auto-process learning submissions
 └── README.md
 ```
 
@@ -349,10 +456,14 @@ webview2-etw-mcp-server/
 
 | Decision | Rationale |
 |----------|-----------|
-| **4 tools only** | Users don't need to learn sub-tools; `analyze_etl` orchestrates everything |
+| **5 tools only** | Users don't need to learn sub-tools; `analyze_etl` orchestrates everything |
+| **TraceEvent fast path** | C# extractor runs in ~23s vs 5-15min with xperf; auto-fallback if not built |
+| **14-section structured report** | Programmatic JSON consumption + human-readable narrative in one output |
+| **KB-powered metrics** | Observed values compared against p95 baselines from `timing_baselines.json` |
+| **Incarnation grouping** | Processes grouped by WebView2 creation lifecycle, not just by role |
+| **Sequence validation** | Happy-path events from `api_sequences.json` compared against actual trace |
 | **CPU profiling is opt-in** | Initial analysis is fast (event-level); CPU only when evidence suggests contention |
 | **Auto-learning on every analysis** | KB grows silently; no manual contribution tools needed |
-| **JSON knowledge base** | Version-controlled, diffable, works offline, syncs via GitHub API |
 | **Local-first** | Everything works without a token; sharing is opt-in |
 
 ---

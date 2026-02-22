@@ -24,6 +24,7 @@ import type { TraceStructure, Incarnation } from "./trace_structure.js";
 export interface ETLAnalysisReport {
   metadata: Metadata;
   processTopology: ProcessTopology;
+  incarnations: IncarnationEntry[];
   navigationTimeline: NavigationTimelineEntry[];
   renderingPipeline: RenderingPipeline;
   storageAndPartition: StorageAndPartition;
@@ -33,6 +34,7 @@ export interface ETLAnalysisReport {
   computedMetrics: ComputedMetrics;
   rootCauseAnalysis: RootCauseAnalysis;
   confidenceModel: ConfidenceModel;
+  sequenceValidation: SequenceValidation;
   recommendations: string[];
 }
 
@@ -164,6 +166,59 @@ export interface ConfidenceModel {
   finalConfidence: number;
 }
 
+export interface IncarnationEntry {
+  id: number;
+  creationTimestamp: string | null;
+  hostPid: number | null;
+  browserPid: number | null;
+  processes: { pid: number; name: string; role: string }[];
+  keyEvents: string[];
+  errors: string[];
+  hasIssue: boolean;
+  issueHint: string;
+  durationMs: number;
+}
+
+export interface SequenceValidation {
+  flow: string;
+  expectedSteps: string[];
+  foundSteps: string[];
+  missingSteps: string[];
+  completionPct: number;
+  breakpointStage: string | null;
+}
+
+interface TimingBaseline {
+  p50_ms: number | null;
+  p95_ms: number | null;
+  p99_ms: number | null;
+  notes: string;
+  sampleCount: number;
+}
+
+// ─── Knowledge Base Loader ──────────────────────────────────────────
+
+function loadTimingBaselines(): Record<string, TimingBaseline> {
+  try {
+    const kbPath = new URL("../knowledge/timing_baselines.json", import.meta.url);
+    return JSON.parse(readFileSync(kbPath, "utf-8"));
+  } catch { return {}; }
+}
+
+interface ApiSequenceStep {
+  event: string;
+  phase: string;
+  required: boolean;
+  notes?: string;
+}
+
+function loadApiSequences(): Record<string, { happyPath: ApiSequenceStep[] }> {
+  try {
+    const kbPath = new URL("../knowledge/api_sequences.json", import.meta.url);
+    return JSON.parse(readFileSync(kbPath, "utf-8"));
+  } catch { return {}; }
+}
+
 // ─── Known VDI / third-party DLLs ───────────────────────────────────
 
 const VDI_DLLS = [
@@ -207,9 +262,13 @@ export function buildStructuredReport(
     }
   } catch { /* ignore */ }
 
+  const baselines = loadTimingBaselines();
+  const apiSequences = loadApiSequences();
+
   return {
     metadata: buildMetadata(etlPath, etlSizeMB, traceStructure, lines.length),
     processTopology: buildProcessTopology(traceStructure),
+    incarnations: buildIncarnations(traceStructure),
     navigationTimeline: buildNavigationTimeline(lines),
     renderingPipeline: buildRenderingPipeline(lines, traceStructure),
     storageAndPartition: buildStorageAndPartition(lines, traceStructure),
@@ -219,6 +278,7 @@ export function buildStructuredReport(
     computedMetrics: buildComputedMetrics(lines, traceStructure),
     rootCauseAnalysis: buildRootCauseAnalysis(triageResult),
     confidenceModel: buildConfidenceModel(triageResult, evidenceResult),
+    sequenceValidation: buildSequenceValidation(lines, apiSequences),
     recommendations: buildRecommendations(triageResult, evidenceResult, lines, traceStructure),
   };
 }
@@ -281,6 +341,72 @@ function buildProcessTopology(ts: TraceStructure): ProcessTopology {
     utility: ts.processes.filter(p => p.role === "utility").map(toEntry),
     host: ts.processes.find(p => p.role === "host") ? toEntry(ts.processes.find(p => p.role === "host")!) : null,
     crashpad: ts.processes.filter(p => p.role === "crashpad").map(toEntry),
+  };
+}
+
+function buildIncarnations(ts: TraceStructure): IncarnationEntry[] {
+  return ts.incarnations.map(inc => ({
+    id: inc.id,
+    creationTimestamp: inc.creationTs > 0 ? `${(inc.creationTs / 1_000_000).toFixed(3)}s` : null,
+    hostPid: inc.hostPid,
+    browserPid: inc.browserPid,
+    processes: inc.processes.map(p => ({ pid: p.pid, name: p.name, role: p.role })),
+    keyEvents: inc.keyEvents.map(e => e.event).slice(0, 20),
+    errors: inc.errors,
+    hasIssue: inc.hasIssue,
+    issueHint: inc.issueHint,
+    durationMs: inc.durationMs,
+  }));
+}
+
+function buildSequenceValidation(
+  lines: string[],
+  apiSequences: Record<string, { happyPath: ApiSequenceStep[] }>,
+): SequenceValidation {
+  // Validate Navigate happy path (most common)
+  const navSeq = apiSequences["Navigate"];
+  if (!navSeq) {
+    return { flow: "Navigate", expectedSteps: [], foundSteps: [], missingSteps: [], completionPct: 0, breakpointStage: null };
+  }
+
+  const expected = navSeq.happyPath.filter(s => s.required).map(s => s.event);
+  const allExpected = navSeq.happyPath.map(s => s.event);
+  const found: string[] = [];
+  const lineContent = lines.join("\n").toLowerCase();
+
+  for (const step of allExpected) {
+    // Normalize event name for matching
+    const patterns = [
+      step.toLowerCase(),
+      step.replace(/::/g, "_").toLowerCase(),
+      step.replace(/\s+/g, "").toLowerCase(),
+    ];
+    if (patterns.some(p => lineContent.includes(p))) {
+      found.push(step);
+    }
+  }
+
+  const missingRequired = expected.filter(e => !found.includes(e));
+  const completionPct = expected.length > 0
+    ? Math.round((expected.filter(e => found.includes(e)).length / expected.length) * 100)
+    : 0;
+
+  // Find breakpoint: first missing required step
+  let breakpoint: string | null = null;
+  for (const step of navSeq.happyPath) {
+    if (step.required && !found.includes(step.event)) {
+      breakpoint = `${step.phase}: ${step.event}`;
+      break;
+    }
+  }
+
+  return {
+    flow: "Navigate",
+    expectedSteps: allExpected,
+    foundSteps: found,
+    missingSteps: missingRequired,
+    completionPct,
+    breakpointStage: breakpoint,
   };
 }
 
@@ -1024,6 +1150,50 @@ export function formatStructuredReportMarkdown(report: ETLAnalysisReport): strin
   out.push("");
 
   // ═══════════════════════════════════════════════════════════════════
+  // 2.5  INCARNATIONS (WebView2 Instance Groupings)
+  // ═══════════════════════════════════════════════════════════════════
+  if (r.incarnations.length > 0) {
+    out.push("## 📦 WebView2 Incarnations");
+    out.push("");
+    out.push(`**${r.incarnations.length} incarnation(s)** detected — each represents a WebView2 creation lifecycle.`);
+    out.push("");
+
+    for (const inc of r.incarnations) {
+      const statusIcon = inc.hasIssue ? "🔴" : "🟢";
+      out.push(`### ${statusIcon} Incarnation ${inc.id}`);
+      out.push("");
+      if (inc.creationTimestamp) out.push(`- Created at: **${inc.creationTimestamp}**`);
+      if (inc.hostPid) out.push(`- Host PID: **${inc.hostPid}**`);
+      if (inc.browserPid) out.push(`- Browser PID: **${inc.browserPid}**`);
+      out.push(`- Duration: **${fmtMs(inc.durationMs)}**`);
+      out.push(`- Processes: **${inc.processes.length}**`);
+      out.push("");
+
+      // Process table
+      if (inc.processes.length > 0) {
+        out.push("| PID | Name | Role |");
+        out.push("|-----|------|------|");
+        for (const p of inc.processes) {
+          out.push(`| ${p.pid} | ${p.name} | ${p.role} |`);
+        }
+        out.push("");
+      }
+
+      if (inc.hasIssue) {
+        out.push(`⚠️ **Issue:** ${inc.issueHint}`);
+        out.push("");
+      }
+      if (inc.errors.length > 0) {
+        out.push("**Errors:**");
+        for (const err of inc.errors.slice(0, 5)) {
+          out.push(`- ${err}`);
+        }
+        out.push("");
+      }
+    }
+  }
+
+  // ═══════════════════════════════════════════════════════════════════
   // 3️⃣  KEY OBSERVATIONS
   // ═══════════════════════════════════════════════════════════════════
   out.push("## 3️⃣ Key Observations");
@@ -1194,30 +1364,49 @@ export function formatStructuredReportMarkdown(report: ETLAnalysisReport): strin
   }
 
   // ═══════════════════════════════════════════════════════════════════
-  // 5️⃣  METRICS SUMMARY
+  // 5️⃣  METRICS SUMMARY (KB-powered expected values)
   // ═══════════════════════════════════════════════════════════════════
+  const baselines = loadTimingBaselines();
   out.push("## 5️⃣ Metrics Summary");
   out.push("");
-  out.push("| Metric | Observed | Expected | Status |");
-  out.push("|--------|----------|----------|--------|");
+  out.push("| Metric | Observed | Expected (KB p95) | Status |");
+  out.push("|--------|----------|-------------------|--------|");
 
   // Browser → Renderer
   if (cm.browserToRendererStartupMs !== null && cm.browserToRendererStartupMs > 0) {
-    out.push(`| Browser → Renderer Startup | ${fmtMs(cm.browserToRendererStartupMs)} | < 500 ms | ${cm.browserToRendererStartupMs > 500 ? "⚠️ Slow" : "✅ Normal"} |`);
+    const bl = baselines["creation_client_cold_start"];
+    const expected = bl?.p95_ms ? `< ${fmtMs(bl.p95_ms)}` : "< 500 ms";
+    const threshold = bl?.p95_ms || 500;
+    out.push(`| Browser → Renderer Startup | ${fmtMs(cm.browserToRendererStartupMs)} | ${expected} | ${cm.browserToRendererStartupMs > threshold ? "⚠️ Slow" : "✅ Normal"} |`);
   }
   // WebView2 Creation
   if (cm.creationTimeMs !== null) {
-    out.push(`| WebView2 Creation | ${fmtMs(cm.creationTimeMs)} | < 3000 ms | ${cm.creationTimeMs > 3000 ? "⚠️ Slow" : "✅ Normal"} |`);
+    const bl = baselines["creation_client_cold_start"];
+    const expected = bl?.p95_ms ? `< ${fmtMs(bl.p95_ms)}` : "< 3000 ms";
+    const threshold = bl?.p95_ms || 3000;
+    out.push(`| WebView2 Creation | ${fmtMs(cm.creationTimeMs)} | ${expected} | ${cm.creationTimeMs > threshold ? "⚠️ Slow" : "✅ Normal"} |`);
   }
   // Nav Start → Commit
   if (cm.navStartToCommitMs !== null) {
-    out.push(`| Navigation Start → Commit | ${fmtMs(cm.navStartToCommitMs)} | < 2000 ms | ${cm.navStartToCommitMs > 2000 ? "⚠️ Slow" : "✅ Normal"} |`);
+    const bl = baselines["begin_navigation_to_commit"];
+    const expected = bl?.p95_ms ? `< ${fmtMs(bl.p95_ms)}` : "< 2000 ms";
+    const threshold = bl?.p95_ms || 2000;
+    out.push(`| Navigation Start → Commit | ${fmtMs(cm.navStartToCommitMs)} | ${expected} | ${cm.navStartToCommitMs > threshold ? "⚠️ Slow" : "✅ Normal"} |`);
   }
   // Commit → Complete
   if (cm.commitToCompleteMs !== null) {
-    out.push(`| Commit → Complete | ${fmtMs(cm.commitToCompleteMs)} | < 2000 ms | ${cm.commitToCompleteMs > 2000 ? "⚠️ Slow" : "✅ Normal"} |`);
+    const bl = baselines["commit_to_did_commit"];
+    const expected = bl?.p95_ms ? `< ${fmtMs(bl.p95_ms)}` : "< 2000 ms";
+    const threshold = bl?.p95_ms || 2000;
+    out.push(`| Commit → Complete | ${fmtMs(cm.commitToCompleteMs)} | ${expected} | ${cm.commitToCompleteMs > threshold ? "⚠️ Slow" : "✅ Normal"} |`);
   } else if (fs.navigationCommitWithoutComplete) {
     out.push(`| Commit → Complete | Not observed | < 2000 ms | ❌ Failed |`);
+  }
+  // First Navigation
+  if (cm.firstNavigationTimeMs !== null) {
+    const bl = baselines["first_navigation_to_web"];
+    const expected = bl?.p95_ms ? `< ${fmtMs(bl.p95_ms)}` : "—";
+    out.push(`| First Navigation | ${fmtMs(cm.firstNavigationTimeMs)} | ${expected} | ℹ️ |`);
   }
   // Renderer lifetime
   if (cm.rendererLifetimeMs !== null) {
@@ -1230,6 +1419,29 @@ export function formatStructuredReportMarkdown(report: ETLAnalysisReport): strin
   // DLL loads
   out.push(`| DLL Loads | ${cm.dllLoadCount} | < 50 | ${cm.dllLoadCount > 100 ? "⚠️ High" : "✅ Normal"} |`);
   out.push("");
+
+  // ═══════════════════════════════════════════════════════════════════
+  // 5.5  EXPECTED vs OBSERVED EVENTS (from KB api_sequences.json)
+  // ═══════════════════════════════════════════════════════════════════
+  const sv = r.sequenceValidation;
+  if (sv.expectedSteps.length > 0) {
+    out.push("## 🔬 Expected vs Observed Events");
+    out.push("");
+    out.push(`**Flow:** ${sv.flow} | **Completion:** ${sv.completionPct}%`);
+    if (sv.breakpointStage) {
+      out.push(`**Pipeline breaks at:** ${sv.breakpointStage}`);
+    }
+    out.push("");
+    out.push("| Step | Expected Event | Status |");
+    out.push("|------|---------------|--------|");
+    for (const step of sv.expectedSteps) {
+      const found = sv.foundSteps.includes(step);
+      const required = sv.missingSteps.includes(step) || !found;
+      const icon = found ? "✅ Found" : (sv.missingSteps.includes(step) ? "❌ Missing (required)" : "⬜ Not found");
+      out.push(`| | ${step} | ${icon} |`);
+    }
+    out.push("");
+  }
 
   // ═══════════════════════════════════════════════════════════════════
   // 6️⃣  WHAT THIS MEANS
