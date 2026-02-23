@@ -6,10 +6,12 @@ Analyze WebView2 ETL traces with AI. **5 tools** — full structured analysis wi
 
 ## ✨ One-Click Install
 
-[![Install in VS Code](https://img.shields.io/badge/VS_Code-Install_WebView2_ETW_MCP-0098FF?style=flat-square&logo=visualstudiocode&logoColor=white)](https://insiders.vscode.dev/redirect/mcp/install?name=webview2-etw&config=%7B%22type%22%3A%22stdio%22%2C%22command%22%3A%22npx%22%2C%22args%22%3A%5B%22-y%22%2C%22github%3Akrbharadwaj%2Fwebview2-etw-mcp-server%22%5D%7D)
-[![Install in VS Code Insiders](https://img.shields.io/badge/VS_Code_Insiders-Install_WebView2_ETW_MCP-24bfa5?style=flat-square&logo=visualstudiocode&logoColor=white)](https://insiders.vscode.dev/redirect/mcp/install?name=webview2-etw&quality=insiders&config=%7B%22type%22%3A%22stdio%22%2C%22command%22%3A%22npx%22%2C%22args%22%3A%5B%22-y%22%2C%22github%3Akrbharadwaj%2Fwebview2-etw-mcp-server%22%5D%7D)
+[![Install in VS Code](https://img.shields.io/badge/VS_Code-Install_WebView2_ETW_MCP-0098FF?style=flat-square&logo=visualstudiocode&logoColor=white)](https://vscode.dev/redirect/mcp/install?name=webview2-etw&config=%7B%22command%22%3A%22npx%22%2C%22args%22%3A%5B%22-y%22%2C%22webview2-etw-mcp-server%22%5D%7D)
+[![Install in VS Code Insiders](https://img.shields.io/badge/VS_Code_Insiders-Install_WebView2_ETW_MCP-24bfa5?style=flat-square&logo=visualstudiocode&logoColor=white)](https://insiders.vscode.dev/redirect/mcp/install?name=webview2-etw&quality=insiders&config=%7B%22command%22%3A%22npx%22%2C%22args%22%3A%5B%22-y%22%2C%22webview2-etw-mcp-server%22%5D%7D)
 
 Click the button above → VS Code opens → MCP server is configured. **That's it.**
+
+> ⚠️ **Getting "spawn npx ENOENT"?** See [Troubleshooting](#-troubleshooting) below.
 
 ---
 
@@ -25,6 +27,7 @@ Click the button above → VS Code opens → MCP server is configured. **That's 
 8. [📤 Sharing Learnings](#-sharing-learnings)
 9. [🏗️ Architecture](#️-architecture)
 10. [📌 Contributing](#-contributing)
+11. [🔧 Troubleshooting](#-troubleshooting)
 
 ---
 
@@ -231,8 +234,8 @@ Renderer process crashed during navigation, leading to blank screen or content l
 
 ### ✨ One-Click Install (Recommended)
 
-[![Install in VS Code](https://img.shields.io/badge/VS_Code-Install_WebView2_ETW_MCP-0098FF?style=flat-square&logo=visualstudiocode&logoColor=white)](https://insiders.vscode.dev/redirect/mcp/install?name=webview2-etw&config=%7B%22type%22%3A%22stdio%22%2C%22command%22%3A%22npx%22%2C%22args%22%3A%5B%22-y%22%2C%22github%3Akrbharadwaj%2Fwebview2-etw-mcp-server%22%5D%7D)
-[![Install in VS Code Insiders](https://img.shields.io/badge/VS_Code_Insiders-Install_WebView2_ETW_MCP-24bfa5?style=flat-square&logo=visualstudiocode&logoColor=white)](https://insiders.vscode.dev/redirect/mcp/install?name=webview2-etw&quality=insiders&config=%7B%22type%22%3A%22stdio%22%2C%22command%22%3A%22npx%22%2C%22args%22%3A%5B%22-y%22%2C%22github%3Akrbharadwaj%2Fwebview2-etw-mcp-server%22%5D%7D)
+[![Install in VS Code](https://img.shields.io/badge/VS_Code-Install_WebView2_ETW_MCP-0098FF?style=flat-square&logo=visualstudiocode&logoColor=white)](https://vscode.dev/redirect/mcp/install?name=webview2-etw&config=%7B%22command%22%3A%22npx%22%2C%22args%22%3A%5B%22-y%22%2C%22webview2-etw-mcp-server%22%5D%7D)
+[![Install in VS Code Insiders](https://img.shields.io/badge/VS_Code_Insiders-Install_WebView2_ETW_MCP-24bfa5?style=flat-square&logo=visualstudiocode&logoColor=white)](https://insiders.vscode.dev/redirect/mcp/install?name=webview2-etw&quality=insiders&config=%7B%22command%22%3A%22npx%22%2C%22args%22%3A%5B%22-y%22%2C%22webview2-etw-mcp-server%22%5D%7D)
 
 ### 📋 Manual Install
 
@@ -242,9 +245,8 @@ Add to `.vscode/mcp.json` in your workspace:
 {
   "servers": {
     "webview2-etw": {
-      "type": "stdio",
       "command": "npx",
-      "args": ["-y", "github:krbharadwaj/webview2-etw-mcp-server"]
+      "args": ["-y", "webview2-etw-mcp-server"]
     }
   }
 }
@@ -257,9 +259,8 @@ Or add to your VS Code user `settings.json` (global — applies to all workspace
   "mcp": {
     "servers": {
       "webview2-etw": {
-        "type": "stdio",
         "command": "npx",
-        "args": ["-y", "github:krbharadwaj/webview2-etw-mcp-server"]
+        "args": ["-y", "webview2-etw-mcp-server"]
       }
     }
   }
@@ -478,6 +479,37 @@ The server learns from usage — the best contribution is **using it**.
 | **Check expected events** with `get_expected_trace_events` | Validates KB completeness |
 | **Share learnings** by saying `"share my learnings"` | Push discoveries to GitHub for all users |
 | **File issues / PRs** on GitHub | Direct improvements |
+
+## 🔧 Troubleshooting
+
+### "spawn npx ENOENT" or "'npx' is not recognized"
+
+This means VS Code cannot find `npx` in its PATH. Common causes:
+
+1. **Node.js was installed after VS Code was opened** — VS Code inherits PATH at startup. **Fix: Restart VS Code** (or restart your computer) so it picks up the updated PATH.
+
+2. **Node.js is not installed** — Install [Node.js 18+](https://nodejs.org/) and restart VS Code.
+
+3. **Fallback: use `node` directly** — If restarting doesn't help, install globally and point to `node`:
+
+   ```bash
+   npm install -g webview2-etw-mcp-server
+   ```
+
+   Then use this config in `.vscode/mcp.json`:
+
+   ```json
+   {
+     "servers": {
+       "webview2-etw": {
+         "command": "node",
+         "args": ["<path-to-global-node_modules>/webview2-etw-mcp-server/dist/index.js"]
+       }
+     }
+   }
+   ```
+
+   To find the path, run: `npm root -g`
 
 ## License
 
