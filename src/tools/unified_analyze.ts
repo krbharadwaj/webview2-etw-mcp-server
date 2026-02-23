@@ -658,9 +658,14 @@ function buildConfigSnapshot(structure: TraceStructure): string {
   const out: string[] = [
     "## 📋 Configuration Snapshot",
     "",
+    "### System & Runtime",
+    "",
     "| Property | Value |",
     "|----------|-------|",
     `| Runtime Version | ${c.runtimeVersion || "—"} |`,
+    `| SDK Version | ${c.sdkVersion || "—"} |`,
+    `| Browser Version | ${c.browserVersion || "—"} |`,
+    `| Channel | ${c.channelName || "—"} |`,
   ];
 
   // Extract chromium version from command line args
@@ -670,27 +675,85 @@ function buildConfigSnapshot(structure: TraceStructure): string {
     out.push(`| Chromium Version | ${ver} |`);
   }
 
+  // OS Build from environmentInfo
+  const osInfo = c.environmentInfo.find(e => /windows/i.test(e) || /osbuild/i.test(e) || /osversion/i.test(e));
+  out.push(`| OS Build | ${osInfo || "—"} |`);
+
+  // Architecture
+  const archInfo = c.environmentInfo.find(e => /architecture/i.test(e));
+  if (archInfo) {
+    out.push(`| ${archInfo} |`);
+  }
+
+  out.push(`| User Data Folder | ${c.userDataFolder || "—"} |`);
+
   out.push(`| Trace Duration | ${formatMs(structure.traceSpanMs)} (~${(structure.traceSpanMs / 60000).toFixed(1)} min) |`);
   out.push(`| Total Events | ${structure.totalEvents.toLocaleString()} (from ${structure.totalLines.toLocaleString()} lines) |`);
   out.push(`| Processes | ${structure.processes.length} |`);
+  out.push("");
 
+  // Feature flags section
   if (c.enabledFeatures.length > 0) {
-    out.push(`| Enabled Features | \`${c.enabledFeatures.join("`, `")}\` |`);
+    out.push("### Enabled Features");
+    out.push("```");
+    for (const f of c.enabledFeatures.slice(0, 30)) out.push(f);
+    if (c.enabledFeatures.length > 30) out.push(`... +${c.enabledFeatures.length - 30} more`);
+    out.push("```");
+    out.push("");
   }
   if (c.disabledFeatures.length > 0) {
-    out.push(`| Disabled Features | \`${c.disabledFeatures.join("`, `")}\` |`);
+    out.push("### Disabled Features");
+    out.push("```");
+    for (const f of c.disabledFeatures.slice(0, 20)) out.push(f);
+    if (c.disabledFeatures.length > 20) out.push(`... +${c.disabledFeatures.length - 20} more`);
+    out.push("```");
+    out.push("");
   }
 
-  // Notable args (filter to interesting ones)
+  // WebView2-specific flags
+  if (c.webview2Flags.length > 0) {
+    out.push("### WebView2-Specific Flags");
+    out.push("```");
+    for (const f of c.webview2Flags) out.push(f);
+    out.push("```");
+    out.push("");
+  }
+
+  // Field trials
+  if (c.fieldTrials.length > 0) {
+    out.push("### Field Trials");
+    out.push("```");
+    for (const f of c.fieldTrials.slice(0, 15)) out.push(f);
+    if (c.fieldTrials.length > 15) out.push(`... +${c.fieldTrials.length - 15} more`);
+    out.push("```");
+    out.push("");
+  }
+
+  // Notable command line args
   const notableArgs = c.commandLineArgs.filter(a =>
     a.includes("embedded-browser") || a.includes("device-scale") || a.includes("js-flags") ||
-    a.includes("disable-gpu") || a.includes("proxy") || a.includes("user-data-dir")
-  ).slice(0, 5);
+    a.includes("disable-gpu") || a.includes("proxy") || a.includes("user-data-dir") ||
+    a.includes("no-sandbox") || a.includes("single-process") || a.includes("remote-debugging")
+  ).slice(0, 10);
   if (notableArgs.length > 0) {
-    out.push(`| Notable Args | \`${notableArgs.join("`, `")}\` |`);
+    out.push("### Notable Command Line Args");
+    out.push("```");
+    for (const a of notableArgs) out.push(a);
+    out.push("```");
+    out.push("");
   }
 
-  out.push("");
+  // System / environment info
+  const sysInfo = c.environmentInfo.filter(e => !/architecture/i.test(e));
+  if (sysInfo.length > 0) {
+    out.push("### Environment Info");
+    out.push("```");
+    for (const e of sysInfo.slice(0, 10)) out.push(e);
+    if (sysInfo.length > 10) out.push(`... +${sysInfo.length - 10} more`);
+    out.push("```");
+    out.push("");
+  }
+
   return out.join("\n");
 }
 

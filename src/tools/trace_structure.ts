@@ -248,6 +248,7 @@ function extractConfiguration(lines: string[]): Configuration {
   const wv2FlagSet = new Set<string>();
   const trialSet = new Set<string>();
   const cmdArgSet = new Set<string>();
+  const envInfoSet = new Set<string>();
 
   for (const line of lines) {
     // Runtime version: from Creation events or version strings
@@ -330,6 +331,26 @@ function extractConfiguration(lines: string[]): Configuration {
         }
       }
     }
+
+    // OS / system environment info
+    const osMatch = line.match(/Windows\s+\d+[^\n,;]*/i)
+      || line.match(/OsBuild[=:]\s*["']?([^\s"',;]+)/i)
+      || line.match(/OSVersion[=:]\s*["']?([^\s"',;]+)/i);
+    if (osMatch) {
+      envInfoSet.add(osMatch[0].trim());
+    }
+
+    // System configuration events (processor, memory, etc.)
+    const sysConfigMatch = line.match(/SystemConfig[/\\](\w+)/i);
+    if (sysConfigMatch) {
+      envInfoSet.add(sysConfigMatch[0].trim());
+    }
+
+    // Architecture / platform info
+    const archMatch = line.match(/\b(x64|x86|arm64|aarch64)\b/i);
+    if (archMatch && (line.toLowerCase().includes("process/start") || line.toLowerCase().includes("commandline") || line.toLowerCase().includes("imageload"))) {
+      envInfoSet.add(`Architecture: ${archMatch[1]}`);
+    }
   }
 
   config.enabledFeatures = [...enabledSet].sort();
@@ -337,6 +358,7 @@ function extractConfiguration(lines: string[]): Configuration {
   config.webview2Flags = [...wv2FlagSet].sort();
   config.fieldTrials = [...trialSet].sort();
   config.commandLineArgs = [...cmdArgSet].sort();
+  config.environmentInfo = [...envInfoSet];
 
   return config;
 }

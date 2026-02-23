@@ -299,11 +299,19 @@ function buildMetadata(
     windowEnd = `${(ts.traceSpanMs / 1000).toFixed(3)}s`;
   }
 
-  // Detect OS build from command line args or environment info
+  // Detect OS build from environment info or command line args
   let osBuild: string | null = null;
   for (const arg of ts.config.environmentInfo) {
-    const osMatch = arg.match(/Windows\s+\d+.*?(\d{5})/i);
+    const osMatch = arg.match(/Windows\s+\d+[^\n,;]*/i)
+      || arg.match(/OsBuild[=:]\s*["']?([^\s"',;]+)/i)
+      || arg.match(/OSVersion[=:]\s*["']?([^\s"',;]+)/i);
     if (osMatch) { osBuild = arg.trim(); break; }
+  }
+  if (!osBuild) {
+    for (const arg of ts.config.commandLineArgs) {
+      const osMatch = arg.match(/Windows\s+\d+.*?(\d{5})/i);
+      if (osMatch) { osBuild = arg.trim(); break; }
+    }
   }
 
   return {
@@ -1459,6 +1467,31 @@ export function formatStructuredReportMarkdown(report: ETLAnalysisReport): strin
   const nextSteps = deriveNextSteps(r);
   for (let i = 0; i < nextSteps.length; i++) {
     out.push(`${i + 1}. ${nextSteps[i]}`);
+  }
+  out.push("");
+
+  // ═══════════════════════════════════════════════════════════════════
+  // 8️⃣  SYSTEM & CONFIGURATION METADATA
+  // ═══════════════════════════════════════════════════════════════════
+  out.push("## 8️⃣ System & Configuration Metadata");
+  out.push("");
+  out.push("| Property | Value |");
+  out.push("|----------|-------|");
+  out.push(`| Runtime Version | ${r.metadata.runtimeVersion || "—"} |`);
+  out.push(`| SDK Version | ${r.metadata.sdkVersion || "—"} |`);
+  out.push(`| Browser Version | ${r.metadata.browserVersion || "—"} |`);
+  out.push(`| OS Build | ${r.metadata.osBuild || "—"} |`);
+  out.push(`| ETL Size | ${r.metadata.etlSizeMB ? `${r.metadata.etlSizeMB} MB` : "—"} |`);
+  out.push(`| Analysis Window | ${r.metadata.analysisWindow ? `${r.metadata.analysisWindow.start} → ${r.metadata.analysisWindow.end}` : "—"} |`);
+  out.push(`| Trace Span | ${fmtMs(r.metadata.traceSpanMs)} |`);
+  out.push(`| Total Events | ${r.metadata.totalEvents.toLocaleString()} |`);
+  out.push(`| Filtered Events | ${r.metadata.filteredEvents.toLocaleString()} |`);
+  out.push(`| Analysis Mode | ${r.metadata.analysisMode} |`);
+  if (inj.suspectedVDIEnvironment) {
+    out.push(`| VDI Environment | ⚠️ Yes (${inj.vdiIndicators.join(", ")}) |`);
+  }
+  if (inj.thirdPartyDllsDetected.length > 0) {
+    out.push(`| Third-Party DLLs | ${inj.thirdPartyDllsDetected.join(", ")} |`);
   }
   out.push("");
 
