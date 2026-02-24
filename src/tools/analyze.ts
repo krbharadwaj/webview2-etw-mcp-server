@@ -8,10 +8,13 @@ const XPERF_PATH = "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performan
 
 // TraceEvent-based extractor (fast, single-pass, no xperf text dump)
 function getEtlExtractPath(): string {
-  // Resolve relative to this file: ../tools/etl-extract/bin/EtlExtract.exe
   const thisDir = dirname(fileURLToPath(import.meta.url));
-  const toolPath = join(thisDir, "..", "..", "tools", "etl-extract", "bin", "EtlExtract.exe");
-  return toolPath;
+  // Dev/source layout: src/tools/ → ../../tools/etl-extract/bin/
+  const devPath = join(thisDir, "..", "..", "tools", "etl-extract", "bin", "EtlExtract.exe");
+  if (existsSync(devPath)) return devPath;
+  // npm package layout: dist/ → ../tools/etl-extract/bin/
+  const npmPath = join(thisDir, "..", "tools", "etl-extract", "bin", "EtlExtract.exe");
+  return npmPath;
 }
 
 interface AnalyzeResult {

@@ -29,7 +29,27 @@ interface TimingBaseline {
 // Batch buffer — collect discoveries during a single tool call, flush at end
 let pendingEvents: Map<string, Partial<EventEntry>> = new Map();
 let pendingTimings: Map<string, number> = new Map();
-let learnStats = { eventsDiscovered: 0, timingsRecorded: 0 };
+let learnStats = { eventsDiscovered: 0, timingsRecorded: 0, sequencesUpdated: 0 };
+
+// Track per-PID event ordering for sequence mining
+let eventSequenceBuffer: Array<{ event: string; pid: number; lineIndex: number }> = [];
+
+interface SequenceStep {
+  event: string;
+  field?: string;
+  phase: string;
+  required: boolean;
+  notes?: string;
+  autoMined?: boolean;
+  terminal?: boolean;
+}
+
+interface ApiSequence {
+  apiId?: number;
+  description?: string;
+  happyPath: SequenceStep[];
+  [key: string]: any;
+}
 
 /**
  * Call this with lines from any filtered ETL file.
@@ -38,7 +58,8 @@ let learnStats = { eventsDiscovered: 0, timingsRecorded: 0 };
 export function learnFromLines(lines: string[]): void {
   const events = loadJson<Record<string, EventEntry>>("events.json");
 
-  for (const line of lines) {
+  for (let idx = 0; idx < lines.length; idx++) {
+    const line = lines[idx];
     // 1. Discover unknown events
     const eventName = extractEventName(line);
     if (eventName && !events[eventName] && !pendingEvents.has(eventName)) {
@@ -59,6 +80,12 @@ export function learnFromLines(lines: string[]): void {
 
     // 2. Extract timing from known timing events
     extractTimingFromLine(line);
+
+    // 3. Track event ordering for sequence mining
+    if (eventName) {
+      const pid = extractPid(line);
+      eventSequenceBuffer.push({ event: eventName, pid, lineIndex: idx });
+    }
   }
 }
 
@@ -124,14 +151,24 @@ export function flushLearnings(): string {
     pendingTimings.clear();
   }
 
+  // Mine sequences — find new events between known sequence steps
+  if (eventSequenceBuffer.length > 0) {
+    const seqUpdated = mineSequencesFromBuffer();
+    if (seqUpdated > 0) {
+      summaryParts.push(`🔗 Enriched ${seqUpdated} event sequence${seqUpdated > 1 ? "s" : ""}`);
+      learnStats.sequencesUpdated += seqUpdated;
+    }
+    eventSequenceBuffer = [];
+  }
+
   if (summaryParts.length === 0) return "";
-  return "\n\n---\n🧠 **Auto-learned**: " + summaryParts.join(" | ");
+  return "\n\n---\n🧠 **Auto-learned**: " + summaryParts.join(" | ") + '\n\n> 💡 Say **"share my learnings"** to push these discoveries to the team knowledge base.';
 }
 
 /**
  * Get cumulative stats for this session.
  */
-export function getLearnStats(): { eventsDiscovered: number; timingsRecorded: number } {
+export function getLearnStats(): { eventsDiscovered: number; timingsRecorded: number; sequencesUpdated: number } {
   return { ...learnStats };
 }
 
@@ -246,4 +283,104 @@ function inferDescription(eventName: string): string {
     .trim()
     .toLowerCase();
   return `Auto-discovered: ${parts}`;
+}
+
+function extractPid(line: string): number {
+  // Match PID from "ProcessName.exe (1234)" pattern
+  const m = line.match(/\((\d+)\)/);
+  return m ? parseInt(m[1], 10) : 0;
+}
+
+/**
+ * Mine sequences from the event buffer.
+ * For each known sequence, check if new events appear between adjacent steps.
+ * Insert them with required: false, autoMined: true.
+ */
+function mineSequencesFromBuffer(): number {
+  let sequences: Record<string, ApiSequence>;
+  try {
+    sequences = loadJson<Record<string, ApiSequence>>("api_sequences.json");
+  } catch {
+    return 0;
+  }
+
+  const traceEvents = eventSequenceBuffer.map(e => e.event);
+  let sequencesUpdated = 0;
+
+  for (const [seqName, seq] of Object.entries(sequences)) {
+    if (seqName === "_metadata" || !seq.happyPath || seq.happyPath.length < 2) continue;
+
+    const steps = seq.happyPath;
+    let modified = false;
+
+    // For each pair of adjacent steps in the happy path
+    for (let i = 0; i < steps.length - 1; i++) {
+      const stepA = steps[i].event;
+      const stepB = steps[i + 1].event;
+
+      // Find occurrences of stepA in the trace
+      for (let t = 0; t < traceEvents.length - 2; t++) {
+        if (traceEvents[t] !== stepA) continue;
+
+        // Look for stepB within the next 50 events
+        const searchEnd = Math.min(t + 50, traceEvents.length);
+        let stepBIdx = -1;
+        for (let s = t + 1; s < searchEnd; s++) {
+          if (traceEvents[s] === stepB) {
+            stepBIdx = s;
+            break;
+          }
+        }
+        if (stepBIdx === -1 || stepBIdx === t + 1) continue;
+
+        // Collect unique events between stepA and stepB
+        const between = new Set<string>();
+        for (let b = t + 1; b < stepBIdx; b++) {
+          const evt = traceEvents[b];
+          // Skip if already in the happy path
+          if (steps.some(s => s.event === evt)) continue;
+          // Skip noise events
+          if (evt.length < 5 || evt === "UnknownEvent") continue;
+          between.add(evt);
+        }
+
+        // Insert new events (max 3 per gap to avoid noise)
+        let inserted = 0;
+        for (const newEvent of between) {
+          if (inserted >= 3) break;
+          // Insert after position i (between stepA and stepB)
+          const newStep: SequenceStep = {
+            event: newEvent,
+            phase: inferPhaseFromEvent(newEvent),
+            required: false,
+            autoMined: true,
+            notes: `Auto-discovered between ${stepA} and ${stepB}`,
+          };
+          steps.splice(i + 1 + inserted, 0, newStep);
+          inserted++;
+          modified = true;
+        }
+
+        if (inserted > 0) break; // Only insert from first occurrence
+      }
+    }
+
+    if (modified) {
+      sequencesUpdated++;
+    }
+  }
+
+  if (sequencesUpdated > 0) {
+    saveJson("api_sequences.json", sequences);
+  }
+
+  return sequencesUpdated;
+}
+
+function inferPhaseFromEvent(eventName: string): string {
+  if (eventName.includes("WebView2_")) return "client";
+  if (eventName.includes("Navigation") || eventName.includes("Document")) return "browser";
+  if (eventName.includes("Renderer") || eventName.includes("v8.")) return "renderer";
+  if (eventName.includes("ServiceWorker")) return "service_worker";
+  return "browser";
 }

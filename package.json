@@ -10,14 +10,16 @@
   "files": [
     "dist/",
     "knowledge/",
+    "tools/etl-extract/bin/EtlExtract.exe",
     "README.md",
     "TOOLS_GUIDE.md"
   ],
   "scripts": {
     "build": "tsc && npm run copy-knowledge",
+    "build-etl-extract": "cd tools/etl-extract/EtlExtract && dotnet publish -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:PublishTrimmed=true -p:IncludeNativeLibrariesForSelfExtract=true -o ../bin",
     "copy-knowledge": "node -e \"const fs=require('fs');const p=require('path');fs.mkdirSync('knowledge',{recursive:true});['api_ids.json','events.json','root_causes.json','timing_baselines.json','api_sequences.json','nav_playbooks.json','rca_taxonomy.json','community_issues.json','anomaly_patterns.json','known_flags.json'].forEach(f=>{const src=p.join('src','knowledge',f);if(fs.existsSync(src))fs.copyFileSync(src,p.join('knowledge',f))})\"",
     "prepare": "npm run build",
-    "prepublishOnly": "npm run build",
+    "prepublishOnly": "npm run build && npm run build-etl-extract",
     "start": "node dist/index.js",
     "dev": "tsx src/index.ts",
     "test": "tsx src/test.ts"

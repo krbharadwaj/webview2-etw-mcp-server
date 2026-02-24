@@ -788,6 +788,11 @@ function buildUserFriendlyNextSteps(
     }
   }
 
+  out.push("### 🧠 Share what you learned:");
+  out.push("");
+  out.push('- **Share learnings** — New events and timings were auto-discovered from this trace. Help improve analysis for everyone:');
+  out.push('  > *"Share my learnings"*');
+  out.push("");
   out.push("### For deeper analysis:");
   out.push("");
 
@@ -799,9 +804,6 @@ function buildUserFriendlyNextSteps(
 
   out.push('- **Decode API IDs** to see which specific APIs were called:');
   out.push('  > *"Decode WebView2 API IDs 3, 5, 10"*');
-  out.push("");
-  out.push('- **Share learnings** — New events were auto-discovered from this trace:');
-  out.push('  > *"Preview learnings and share to team knowledge base"*');
   out.push("");
 
   return out.join("\n");
