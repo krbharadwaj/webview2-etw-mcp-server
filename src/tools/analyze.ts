@@ -2,19 +2,32 @@ import { execSync } from "child_process";
 import { existsSync, readFileSync } from "fs";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
+import { homedir } from "os";
 import { generatePreprocessStep } from "./etlx_cache.js";
 
 const XPERF_PATH = "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\xperf.exe";
 
 // TraceEvent-based extractor (fast, single-pass, no xperf text dump)
-function getEtlExtractPath(): string {
+function getEtlExtractPath(): string | null {
+  // Try multiple locations in priority order
   const thisDir = dirname(fileURLToPath(import.meta.url));
-  // Dev/source layout: src/tools/ → ../../tools/etl-extract/bin/
-  const devPath = join(thisDir, "..", "..", "tools", "etl-extract", "bin", "EtlExtract.exe");
-  if (existsSync(devPath)) return devPath;
-  // npm package layout: dist/ → ../tools/etl-extract/bin/
-  const npmPath = join(thisDir, "..", "tools", "etl-extract", "bin", "EtlExtract.exe");
-  return npmPath;
+  const candidates = [
+    // 1. Dev/source layout: src/tools/ or dist/tools/ → ../../tools/etl-extract/bin/
+    join(thisDir, "..", "..", "tools", "etl-extract", "bin", "EtlExtract.exe"),
+    // 2. npm package layout: dist/ → ../tools/etl-extract/bin/
+    join(thisDir, "..", "tools", "etl-extract", "bin", "EtlExtract.exe"),
+    // 3. User's source checkout
+    join(homedir(), "source", "webview2-etw-mcp-server", "tools", "etl-extract", "bin", "EtlExtract.exe"),
+    // 4. C:\temp checkout (common for linked installs)
+    "C:\\temp\\webview2-etw-mcp-server\\tools\\etl-extract\\bin\\EtlExtract.exe",
+    // 5. Published self-contained output
+    join(thisDir, "..", "..", "tools", "etl-extract", "EtlExtract", "bin", "Release", "net10.0", "win-x64", "EtlExtract.exe"),
+  ];
+
+  for (const candidate of candidates) {
+    if (existsSync(candidate)) return candidate;
+  }
+  return null;
 }
 
 interface AnalyzeResult {
@@ -45,17 +58,23 @@ export function analyzeEtl(etlPath: string, hostApp: string, outDir?: string): s
 
   const outputDir = outDir || "C:\\temp\\etl_analysis";
   const etlExtractPath = getEtlExtractPath();
-  const useTraceEvent = existsSync(etlExtractPath);
+  const useTraceEvent = etlExtractPath !== null;
 
   if (!useTraceEvent && !existsSync(XPERF_PATH)) {
     return [
       "❌ No ETL extraction tool found.",
       "",
-      "Option 1 (fast): Build the TraceEvent extractor:",
+      "Option 1 (recommended — handles all ETL formats including compressed/relogged):",
+      "  Build the TraceEvent extractor:",
       "  cd tools/etl-extract/EtlExtract && dotnet publish -c Release -r win-x64 --self-contained false -o ../bin",
       "",
-      "Option 2 (legacy): Install Windows Performance Toolkit from Windows SDK:",
+      "Option 2 (legacy — may fail on compressed/relogged ETL files):",
+      "  Install Windows Performance Toolkit from Windows SDK:",
       "  https://developer.microsoft.com/en-us/windows/downloads/windows-sdk/",
+      "",
+      "⚠️ Note: xperf cannot handle 'Sequential Relogged Compressed' ETL files",
+      "  (common with WPR captures, SearchHost, and Windows system traces).",
+      "  Use Option 1 for reliable extraction of all ETL formats.",
     ].join("\n");
   }
 
@@ -116,8 +135,13 @@ export function analyzeEtl(etlPath: string, hostApp: string, outDir?: string): s
   }
 
   // Legacy fallback: xperf-based extraction (slow, two passes)
+  // WARNING: xperf dumper fails on "Sequential Relogged Compressed" ETL files
+  // (common with WPR captures, SearchHost, Windows system traces)
   return [
     `## ETL Analysis Setup for ${hostApp} (xperf — legacy mode)`,
+    "",
+    "⚠️ **Important**: xperf may fail on compressed/relogged ETL files (e.g., WPR captures, SearchHost traces).",
+    "If Step 2 produces 0 lines, see the **Fallback** section below.",
     "",
     "### Step 1: Set Variables",
     "```powershell",
@@ -138,7 +162,16 @@ export function analyzeEtl(etlPath: string, hostApp: string, outDir?: string): s
     `  Select-String -Pattern "$hostApp|WebView2_|msedgewebview2|NavigationRequest|ServiceWorker|TokenBroker|WebTokenRequest|BrowserMain|DocumentLoader|RendererMain|v8\\." |`,
     `  Where-Object { $_.Line -notmatch "Process Name \\( PID\\)" } |`,
     `  Out-File $filtered -Encoding utf8`,
-    `Write-Host "Done: $((Get-Content $filtered | Measure-Object).Count) lines"`,
+    ``,
+    `# Verify extraction produced output`,
+    `$lineCount = (Get-Content $filtered -ErrorAction SilentlyContinue | Measure-Object).Count`,
+    `if ($lineCount -eq 0) {`,
+    `  Write-Host "❌ xperf produced 0 lines. This ETL may be in a format xperf cannot handle." -ForegroundColor Red`,
+    `  Write-Host "   Common cause: 'Sequential Relogged Compressed' format (WPR captures, SearchHost traces)." -ForegroundColor Yellow`,
+    `  Write-Host "   → Use the TraceEvent-based extractor instead (see Fallback section below)." -ForegroundColor Yellow`,
+    `} else {`,
+    `  Write-Host "Done: $lineCount lines"`,
+    `}`,
     "```",
     "",
     "### Step 3: Extract Feature Flags & Experiments",
@@ -173,6 +206,28 @@ export function analyzeEtl(etlPath: string, hostApp: string, outDir?: string): s
     `  Select-Object -First 100`,
     "```",
     "",
+    "### 🔄 Fallback: Build TraceEvent Extractor (if xperf fails)",
+    "",
+    "If xperf produced 0 lines, the ETL is likely in a compressed/relogged format.",
+    "Build the TraceEvent-based extractor which handles **all** ETL formats:",
+    "",
+    "```powershell",
+    `# Option A: Build from source (requires .NET SDK)`,
+    `$mcpDir = (npm root -g) + "\\webview2-etw-mcp-server"`,
+    `if (Test-Path "$mcpDir\\tools\\etl-extract\\EtlExtract\\EtlExtract.csproj") {`,
+    `  Push-Location "$mcpDir\\tools\\etl-extract\\EtlExtract"`,
+    `  dotnet publish -c Release -r win-x64 --self-contained false -o ../bin`,
+    `  Pop-Location`,
+    `  # Now re-run extraction with the fast extractor:`,
+    `  & "$mcpDir\\tools\\etl-extract\\bin\\EtlExtract.exe" "${etlPath}" "${hostApp}" "$outDir\\filtered.txt" --feature-flags "$outDir\\feature_flags.txt"`,
+    `} else {`,
+    `  Write-Host "Source not found. Clone and build manually:" -ForegroundColor Yellow`,
+    `  Write-Host "  git clone https://github.com/krbharadwaj/webview2-etw-mcp-server.git C:\\temp\\webview2-etw-mcp-server"`,
+    `  Write-Host "  cd C:\\temp\\webview2-etw-mcp-server\\tools\\etl-extract\\EtlExtract"`,
+    `  Write-Host "  dotnet publish -c Release -r win-x64 --self-contained false -o ../bin"`,
+    `}`,
+    "```",
+    "",
     "### Next Steps",
     "After running the above, use these tools:",
     "- `validate_trace` — validate API calls against expected happy-path sequences",
@@ -185,7 +240,7 @@ export function analyzeEtl(etlPath: string, hostApp: string, outDir?: string): s
 
 export function generateFilterCommand(etlPath: string, hostApp: string, additionalPatterns?: string[]): string {
   const etlExtractPath = getEtlExtractPath();
-  if (existsSync(etlExtractPath)) {
+  if (etlExtractPath) {
     return [
       "```powershell",
       `& "${etlExtractPath}" "${etlPath}" "${hostApp}" "C:\\temp\\etl_analysis\\filtered.txt" --feature-flags "C:\\temp\\etl_analysis\\feature_flags.txt"`,
@@ -193,7 +248,7 @@ export function generateFilterCommand(etlPath: string, hostApp: string, addition
     ].join("\n");
   }
 
-  // Legacy xperf fallback
+  // Legacy xperf fallback — warn about potential format issues
   const patterns = [
     hostApp,
     "WebView2_",
@@ -210,11 +265,20 @@ export function generateFilterCommand(etlPath: string, hostApp: string, addition
   ];
 
   return [
+    "⚠️ Using xperf fallback — may fail on compressed/relogged ETL files.",
+    "If extraction produces 0 lines, build the TraceEvent extractor:",
+    "  `cd tools/etl-extract/EtlExtract && dotnet publish -c Release -r win-x64 --self-contained false -o ../bin`",
+    "",
     "```powershell",
     `& "${XPERF_PATH}" -i "${etlPath}" -quiet -a dumper 2>$null |`,
     `  Select-String -Pattern "${patterns.join("|")}" |`,
     `  Where-Object { $_.Line -notmatch "Process Name \\( PID\\)" } |`,
     `  Out-File "C:\\temp\\etl_analysis\\filtered.txt" -Encoding utf8`,
+    ``,
+    `# Verify extraction succeeded`,
+    `$count = (Get-Content "C:\\temp\\etl_analysis\\filtered.txt" -ErrorAction SilentlyContinue | Measure-Object).Count`,
+    `if ($count -eq 0) { Write-Host "❌ xperf produced 0 lines — ETL may be compressed/relogged. Build TraceEvent extractor instead." -ForegroundColor Red }`,
+    `else { Write-Host "✅ Extracted $count lines" }`,
     "```",
   ].join("\n");
 }

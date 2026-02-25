@@ -10,7 +10,9 @@
   "files": [
     "dist/",
     "knowledge/",
-    "tools/etl-extract/bin/EtlExtract.exe",
+    "tools/etl-extract/bin/",
+    "tools/etl-extract/EtlExtract/EtlExtract.csproj",
+    "tools/etl-extract/EtlExtract/Program.cs",
     "README.md",
     "TOOLS_GUIDE.md"
   ],
