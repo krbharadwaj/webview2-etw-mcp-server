@@ -4,15 +4,23 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using Microsoft.Diagnostics.Tracing;
 using Microsoft.Diagnostics.Tracing.Etlx;
 using Microsoft.Diagnostics.Tracing.Parsers;
+using Microsoft.Windows.EventTracing;
+using Microsoft.Windows.EventTracing.Cpu;
+using Microsoft.Windows.EventTracing.Processes;
+using Microsoft.Windows.EventTracing.Symbols;
 
 /// <summary>
 /// Fast ETL → filtered text extraction using TraceEvent.
 /// Replaces: xperf -a dumper | Select-String -Pattern "..."
 /// Subscribes only to relevant providers, skips kernel noise entirely.
 /// Output format matches xperf dumper so existing MCP analysis code works unchanged.
+///
+/// --cpu mode: Uses TraceProcessor for native CPU sample extraction with symbol resolution.
+/// Replaces the slow xperf -symbols -a dumper | Select-String pipeline.
 /// </summary>
 class Program
 {
@@ -21,16 +29,31 @@ class Program
         if (args.Length < 2)
         {
             Console.Error.WriteLine("Usage: EtlExtract <etl-path> <host-app> [output-path] [--feature-flags <ff-output>] [--pid <host-pid>]");
+            Console.Error.WriteLine("       EtlExtract <etl-path> <host-app> --cpu --pid <pid> [--range-start <us>] [--range-end <us>] [--keywords kw1,kw2] [--output <path>] [--sympath <path>]");
             Console.Error.WriteLine();
             Console.Error.WriteLine("  Extracts WebView2-relevant events from ETL using TraceEvent.");
             Console.Error.WriteLine("  Output is xperf-dumper compatible text for MCP server analysis.");
             Console.Error.WriteLine();
-            Console.Error.WriteLine("Options:");
+            Console.Error.WriteLine("Modes:");
+            Console.Error.WriteLine("  (default)             Event extraction — filtered events as text.");
+            Console.Error.WriteLine("  --cpu                 CPU sample extraction — symbol-resolved call stacks via TraceProcessor.");
+            Console.Error.WriteLine();
+            Console.Error.WriteLine("Options (both modes):");
             Console.Error.WriteLine("  --pid <pid>           Filter to this host PID and its child processes only.");
-            Console.Error.WriteLine("                        Without --pid, all processes matching the host app name are included.");
             Console.Error.WriteLine("  --feature-flags <path> Write feature flag lines to a separate file.");
+            Console.Error.WriteLine();
+            Console.Error.WriteLine("Options (--cpu mode):");
+            Console.Error.WriteLine("  --range-start <us>    Start of time range in microseconds (relative to trace start).");
+            Console.Error.WriteLine("  --range-end <us>      End of time range in microseconds.");
+            Console.Error.WriteLine("  --keywords <kw1,kw2>  Comma-separated keywords to match against function/module names.");
+            Console.Error.WriteLine("  --output <path>       Output file path (default: C:\\temp\\cpu_analysis\\cpu_pid_<pid>.json).");
+            Console.Error.WriteLine("  --sympath <path>      Symbol path override (default: Chromium + Microsoft + Edge symbol servers).");
             return 1;
         }
+
+        // Check for --cpu mode
+        if (args.Contains("--cpu"))
+            return CpuAnalyzer.Run(args);
 
         string etlPath = args[0];
         string hostApp = args[1];
@@ -99,7 +122,7 @@ class Program
 
             // Subscribe to ALL dynamic events — callback does fast in-memory filtering
             // (no text serialization of skipped events, unlike xperf dumper)
-            source.Dynamic.All += (TraceEvent data) =>
+            source.Dynamic.All += (Microsoft.Diagnostics.Tracing.TraceEvent data) =>
             {
                 totalEvents++;
 
@@ -311,7 +334,7 @@ class Program
         return 0;
     }
 
-    static void WriteEventLine(StreamWriter writer, string eventName, long tsUs, string processName, int pid, int tid, string opcode, TraceEvent data, ref int matchCount, List<string>? featureFlagLines, string[] ffPatterns, ref int featureFlagCount)
+    static void WriteEventLine(StreamWriter writer, string eventName, long tsUs, string processName, int pid, int tid, string opcode, Microsoft.Diagnostics.Tracing.TraceEvent data, ref int matchCount, List<string>? featureFlagLines, string[] ffPatterns, ref int featureFlagCount)
     {
         var sb = new StringBuilder(256);
         sb.Append(eventName.PadLeft(24));
@@ -355,6 +378,286 @@ class Program
                     break;
                 }
             }
+        }
+    }
+}
+
+/// <summary>
+/// Native CPU sample extraction using TraceProcessor (Microsoft.Windows.EventTracing).
+/// Replaces: xperf -symbols -a dumper | Select-String "SampledProfile.*\(PID\)"
+///
+/// Uses:
+///   - trace.UseCpuSamplingData() for structured CPU sample events
+///   - trace.UseSymbols() for symbol resolution from symbol servers
+///   - Stack walking via ICpuSample.Stack for resolved call stacks
+///   - Native PID and time-range filtering (no regex post-processing)
+///
+/// Output: JSON with aggregated CPU data + raw sample lines for backward compat.
+/// </summary>
+static class CpuAnalyzer
+{
+    // Default symbol servers: Chromium + Windows OS + Edge (corpnet)
+    static readonly string DefaultSymbolPath = string.Join(";",
+        "srv*C:\\Symbols*https://chromium-browser-symsrv.commondatastorage.googleapis.com",
+        "srv*C:\\Symbols*http://msdl.microsoft.com/download/symbols",
+        "srv*C:\\Symbols*https://symweb.azurefd.net"
+    );
+
+    public static int Run(string[] args)
+    {
+        string etlPath = args[0];
+        string hostApp = args[1];
+        int? pid = null;
+        long? rangeStartUs = null;
+        long? rangeEndUs = null;
+        string[] keywords = ["msedge.dll", "msedgewebview2.dll"];
+        string? outputPath = null;
+        string? symPath = null;
+
+        // Parse args
+        for (int i = 0; i < args.Length - 1; i++)
+        {
+            switch (args[i])
+            {
+                case "--pid":
+                    if (int.TryParse(args[i + 1], out int p)) pid = p;
+                    break;
+                case "--range-start":
+                    if (long.TryParse(args[i + 1], out long rs)) rangeStartUs = rs;
+                    break;
+                case "--range-end":
+                    if (long.TryParse(args[i + 1], out long re)) rangeEndUs = re;
+                    break;
+                case "--keywords":
+                    keywords = args[i + 1].Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                    break;
+                case "--output":
+                    outputPath = args[i + 1];
+                    break;
+                case "--sympath":
+                    symPath = args[i + 1];
+                    break;
+            }
+        }
+
+        if (!File.Exists(etlPath))
+        {
+            Console.Error.WriteLine($"ETL file not found: {etlPath}");
+            return 1;
+        }
+
+        // Default output path
+        outputPath ??= Path.Combine("C:\\temp\\cpu_analysis", $"cpu_pid_{pid ?? 0}.json");
+        Directory.CreateDirectory(Path.GetDirectoryName(outputPath)!);
+
+        // Also write raw sample lines for backward compat with parseCpuData()
+        string rawSamplesPath = Path.ChangeExtension(outputPath, ".txt");
+
+        // Resolve symbol path: CLI arg > env var > default
+        string effectiveSymPath = symPath
+            ?? Environment.GetEnvironmentVariable("_NT_SYMBOL_PATH")
+            ?? DefaultSymbolPath;
+
+        var sw = Stopwatch.StartNew();
+
+        Console.Error.WriteLine($"CPU Analysis: {Path.GetFileName(etlPath)}");
+        Console.Error.WriteLine($"  Host app:   {hostApp}");
+        Console.Error.WriteLine($"  PID:        {pid?.ToString() ?? "all"}");
+        if (rangeStartUs.HasValue && rangeEndUs.HasValue)
+            Console.Error.WriteLine($"  Time range: {rangeStartUs}–{rangeEndUs} µs");
+        Console.Error.WriteLine($"  Keywords:   {string.Join(", ", keywords)}");
+        Console.Error.WriteLine($"  Symbols:    {effectiveSymPath}");
+        Console.Error.WriteLine($"  Output:     {outputPath}");
+        Console.Error.WriteLine();
+
+        try
+        {
+            using var trace = TraceProcessor.Create(etlPath, new TraceProcessorSettings
+            {
+                AllowLostEvents = true
+            });
+
+            var cpuSamplingData = trace.UseCpuSamplingData();
+            var processData = trace.UseProcesses();
+            var symbolData = trace.UseSymbols();
+
+            Console.Error.WriteLine("Processing trace (single pass)...");
+            trace.Process();
+
+            // Load symbols from configured symbol servers
+            Console.Error.WriteLine("Loading symbols (resolving from symbol servers)...");
+            var symPaths = effectiveSymPath.Split(';', StringSplitOptions.RemoveEmptyEntries);
+            symbolData.Result.LoadSymbolsAsync(
+                SymCachePath.Automatic,
+                new SymbolPath(symPaths)
+            ).GetAwaiter().GetResult();
+
+            Console.Error.WriteLine("Extracting CPU samples...");
+
+            var samples = cpuSamplingData.Result.Samples;
+            int totalSamples = 0;
+            int matchedSamples = 0;
+            int skippedByPid = 0;
+            int skippedByRange = 0;
+
+            // Aggregation maps
+            var functionCounts = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+            var moduleCounts = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+            var keywordCounts = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+            foreach (var kw in keywords)
+                keywordCounts[kw] = 0;
+
+            using var rawWriter = new StreamWriter(rawSamplesPath, false, Encoding.UTF8, bufferSize: 1 << 16);
+
+            foreach (var sample in samples)
+            {
+                totalSamples++;
+
+                // PID filter
+                int samplePid = sample.Process?.Id ?? -1;
+                if (pid.HasValue && samplePid != pid.Value)
+                {
+                    skippedByPid++;
+                    continue;
+                }
+
+                // Time range filter
+                decimal sampleTsUs = sample.Timestamp.HasValue
+                    ? sample.Timestamp.TotalMicroseconds
+                    : 0;
+                if (rangeStartUs.HasValue && sampleTsUs < rangeStartUs.Value)
+                {
+                    skippedByRange++;
+                    continue;
+                }
+                if (rangeEndUs.HasValue && sampleTsUs > rangeEndUs.Value)
+                {
+                    skippedByRange++;
+                    continue;
+                }
+
+                matchedSamples++;
+
+                // Walk the call stack via IStackSnapshot.Frames
+                string processName = sample.Process?.ImageName ?? "Unknown";
+                if (!processName.Contains('.') && processName != "Unknown")
+                    processName += ".exe";
+                int tid = sample.Thread?.Id ?? 0;
+
+                var stackFrames = new List<string>();
+                var stack = sample.Stack;
+                if (stack != null)
+                {
+                    foreach (var frame in stack.Frames)
+                    {
+                        if (!frame.HasValue) continue;
+
+                        string frameName;
+                        var symbol = frame.Symbol;
+                        if (symbol != null)
+                        {
+                            string modName = symbol.Image?.FileName ?? "???";
+                            string funcName = symbol.FunctionName ?? $"+0x{frame.RelativeVirtualAddress.Value:x}";
+                            frameName = $"{modName}!{funcName}";
+                        }
+                        else if (frame.Image != null)
+                        {
+                            string modName = frame.Image.FileName ?? "???";
+                            frameName = $"{modName}!+0x{frame.RelativeVirtualAddress.Value:x}";
+                        }
+                        else
+                        {
+                            frameName = $"0x{frame.Address.Value:x}";
+                        }
+
+                        stackFrames.Add(frameName);
+
+                        // Aggregate function counts
+                        functionCounts[frameName] = functionCounts.GetValueOrDefault(frameName) + 1;
+
+                        // Aggregate module counts
+                        string moduleName = frame.Symbol?.Image?.FileName ?? frame.Image?.FileName ?? "unknown";
+                        moduleCounts[moduleName] = moduleCounts.GetValueOrDefault(moduleName) + 1;
+
+                        // Keyword matching against frame
+                        string frameLower = frameName.ToLowerInvariant();
+                        foreach (var kw in keywords)
+                        {
+                            if (frameLower.Contains(kw.ToLowerInvariant()))
+                                keywordCounts[kw] = keywordCounts.GetValueOrDefault(kw) + 1;
+                        }
+                    }
+                }
+
+                // Write raw sample line (xperf-compatible format for backward compat)
+                long tsUsLong = (long)sampleTsUs;
+                string stackStr = stackFrames.Count > 0 ? string.Join(" <- ", stackFrames) : "no_stack";
+                rawWriter.WriteLine($"SampledProfile, {tsUsLong,10}, {processName} ({samplePid}), {tid,10}, Info, Stack={stackStr}");
+
+                if (matchedSamples % 5000 == 0)
+                    Console.Error.Write($"\r  {matchedSamples:N0} samples extracted ({totalSamples:N0} processed)...");
+            }
+
+            Console.Error.WriteLine($"\r  {matchedSamples:N0} samples extracted ({totalSamples:N0} processed)     ");
+
+            sw.Stop();
+
+            // Build JSON summary
+            var topFunctions = functionCounts
+                .OrderByDescending(kv => kv.Value)
+                .Take(25)
+                .Select(kv => new { name = kv.Key, samples = kv.Value })
+                .ToList();
+
+            var topModules = moduleCounts
+                .OrderByDescending(kv => kv.Value)
+                .Take(15)
+                .Select(kv => new { name = kv.Key, samples = kv.Value, pct = matchedSamples > 0 ? Math.Round(kv.Value * 100.0 / matchedSamples, 1) : 0 })
+                .ToList();
+
+            var keywordHits = keywords
+                .Select(kw => new { keyword = kw, samples = keywordCounts.GetValueOrDefault(kw), pct = matchedSamples > 0 ? Math.Round(keywordCounts.GetValueOrDefault(kw) * 100.0 / matchedSamples, 1) : 0 })
+                .ToList();
+
+            var summary = new
+            {
+                totalSamples = matchedSamples,
+                totalProcessed = totalSamples,
+                pid = pid ?? 0,
+                rangeUs = new[] { rangeStartUs ?? 0, rangeEndUs ?? 0 },
+                elapsedSec = Math.Round(sw.Elapsed.TotalSeconds, 1),
+                symbolPath = effectiveSymPath,
+                rawSamplesFile = rawSamplesPath,
+                topFunctions,
+                topModules,
+                keywordHits,
+                skippedByPid,
+                skippedByRange
+            };
+
+            string json = JsonSerializer.Serialize(summary, new JsonSerializerOptions { WriteIndented = true });
+            File.WriteAllText(outputPath, json, Encoding.UTF8);
+
+            // Console summary
+            Console.Error.WriteLine();
+            Console.Error.WriteLine($"Done in {sw.Elapsed.TotalSeconds:F1}s");
+            Console.Error.WriteLine($"  Total samples:  {totalSamples:N0}");
+            Console.Error.WriteLine($"  Matched:        {matchedSamples:N0}");
+            if (skippedByPid > 0) Console.Error.WriteLine($"  Skipped (PID):  {skippedByPid:N0}");
+            if (skippedByRange > 0) Console.Error.WriteLine($"  Skipped (range):{skippedByRange:N0}");
+            Console.Error.WriteLine($"  Top module:     {(topModules.Count > 0 ? $"{topModules[0].name} ({topModules[0].pct}%)" : "n/a")}");
+            Console.Error.WriteLine($"  JSON output:    {outputPath}");
+            Console.Error.WriteLine($"  Raw samples:    {rawSamplesPath}");
+
+            // Machine-readable summary on stdout
+            Console.WriteLine($"CPU_OK|{matchedSamples}|{totalSamples}|{sw.Elapsed.TotalSeconds:F1}|{outputPath}");
+            return 0;
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error in CPU analysis: {ex.Message}");
+            Console.Error.WriteLine(ex.StackTrace);
+            return 2;
         }
     }
 }

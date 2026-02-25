@@ -150,7 +150,7 @@ export function deepDive(params: DeepDiveParams): string {
   sections.push(`- **${windows.length}** suspicious window(s) analyzed`);
   sections.push(`- **${criticalCount}** critical issue(s)`);
   if (cpuCount > 0) {
-    sections.push(`- **${cpuCount}** window(s) with CPU profiling ${autoCpu ? "generated" : "recommended"}`);
+    sections.push(`- **${cpuCount}** window(s) with CPU profiling ${autoCpu ? "results" : "recommended"}`);
   }
   sections.push("");
 
@@ -164,7 +164,7 @@ export function deepDive(params: DeepDiveParams): string {
   sections.push("");
   sections.push("1. **Review the timeline slices above** — look for unexpected gaps, error bursts, or missing events");
   if (cpuCount > 0 && autoCpu) {
-    sections.push("2. **Run the CPU profiling commands** generated above to see where CPU time is spent");
+    sections.push("2. **Review the CPU profiling results** above to see where CPU time is spent");
   }
   sections.push(`${cpuCount > 0 && autoCpu ? "3" : "2"}. **Compare with a working trace** to confirm these windows diverge from normal behavior`);
 
