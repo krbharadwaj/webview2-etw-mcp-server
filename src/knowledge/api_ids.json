@@ -1,254 +1,2326 @@
 {
-  "0": { "name": "Unknown", "category": "Unknown" },
-  "1": { "name": "(Obsolete) InternalCdp", "category": "DevTools" },
-  "2": { "name": "GenericCdp", "category": "DevTools" },
-  "3": { "name": "Navigate", "category": "Navigation", "critical": true },
-  "4": { "name": "NavigateToString", "category": "Navigation", "critical": true },
-  "5": { "name": "ExecuteScript", "category": "Script" },
-  "6": { "name": "PutIsVisible", "category": "View" },
-  "7": { "name": "Initialize", "category": "Lifecycle", "critical": true },
-  "8": { "name": "PostWebMessage", "category": "Communication" },
-  "9": { "name": "Reload", "category": "Navigation", "critical": true },
-  "10": { "name": "CapturePreview", "category": "View" },
-  "11": { "name": "AddScriptToExecuteOnDocumentCreated", "category": "Script" },
-  "12": { "name": "RemoveScriptToExecuteOnDocumentCreated", "category": "Script" },
-  "15": { "name": "MoveFocusProgrammatic", "category": "Focus" },
-  "16": { "name": "MoveFocusTraversal", "category": "Focus" },
-  "19": { "name": "GetCanGoBack", "category": "Navigation" },
-  "20": { "name": "GetCanGoForward", "category": "Navigation" },
-  "21": { "name": "GoBack", "category": "Navigation", "critical": true },
-  "22": { "name": "GoForward", "category": "Navigation", "critical": true },
-  "23": { "name": "Stop", "category": "Navigation", "critical": true },
-  "24": { "name": "GetDocumentTitle", "category": "Document" },
-  "25": { "name": "OpenDevToolsWindow", "category": "DevTools" },
-  "26": { "name": "GetSource", "category": "Navigation" },
-  "27": { "name": "GetBounds", "category": "View" },
-  "28": { "name": "PutBounds", "category": "View" },
-  "29": { "name": "GetSetting", "category": "Settings" },
-  "30": { "name": "GetZoomFactor", "category": "View" },
-  "31": { "name": "PutZoomFactor", "category": "View" },
-  "32": { "name": "GetBrowserProcessId", "category": "Lifecycle", "critical": true },
-  "33": { "name": "AddNavigationStarting", "category": "EventRegistration", "critical": true },
-  "34": { "name": "RemoveNavigationStarting", "category": "EventRegistration" },
-  "37": { "name": "AddNavigationCompleted", "category": "EventRegistration", "critical": true },
-  "38": { "name": "RemoveNavigationCompleted", "category": "EventRegistration" },
-  "39": { "name": "AddFrameNavigationStarting", "category": "EventRegistration" },
-  "40": { "name": "RemoveFrameNavigationStarting", "category": "EventRegistration" },
-  "41": { "name": "AddMoveFocusRequested", "category": "EventRegistration" },
-  "42": { "name": "RemoveMoveFocusRequested", "category": "EventRegistration" },
-  "43": { "name": "AddGotFocus", "category": "EventRegistration" },
-  "44": { "name": "RemoveGotFocus", "category": "EventRegistration" },
-  "45": { "name": "AddLostFocus", "category": "EventRegistration" },
-  "46": { "name": "RemoveLostFocus", "category": "EventRegistration" },
-  "47": { "name": "AddWebResourceRequested", "category": "EventRegistration" },
-  "48": { "name": "RemoveWebResourceRequested", "category": "EventRegistration" },
-  "49": { "name": "AddScriptDialogOpening", "category": "EventRegistration" },
-  "50": { "name": "RemoveScriptDialogOpening", "category": "EventRegistration" },
-  "51": { "name": "AddZoomFactorChanged", "category": "EventRegistration" },
-  "52": { "name": "RemoveZoomFactorChanged", "category": "EventRegistration" },
-  "53": { "name": "AddPermissionRequested", "category": "EventRegistration" },
-  "54": { "name": "RemovePermissionRequested", "category": "EventRegistration" },
-  "55": { "name": "AddProcessFailed", "category": "EventRegistration" },
-  "56": { "name": "RemoveProcessFailed", "category": "EventRegistration" },
-  "57": { "name": "AddWebMessageReceived", "category": "EventRegistration" },
-  "58": { "name": "RemoveWebMessageReceived", "category": "EventRegistration" },
-  "59": { "name": "AddDevToolsProtocolEventReceived", "category": "EventRegistration" },
-  "60": { "name": "RemoveDevToolsProtocolEventReceived", "category": "EventRegistration" },
-  "61": { "name": "AddNewWindowRequested", "category": "EventRegistration" },
-  "62": { "name": "RemoveNewWindowRequested", "category": "EventRegistration" },
-  "63": { "name": "AddDocumentTitleChanged", "category": "EventRegistration" },
-  "64": { "name": "RemoveDocumentTitleChanged", "category": "EventRegistration" },
-  "65": { "name": "GetIsVisible", "category": "View" },
-  "66": { "name": "CallDevToolsProtocolMethod", "category": "DevTools" },
-  "67": { "name": "AddRemoteObject", "category": "Communication" },
-  "68": { "name": "RemoveRemoteObject", "category": "Communication" },
-  "69": { "name": "AddContainsFullscreenElementChanged", "category": "EventRegistration" },
-  "70": { "name": "RemoveContainsFullscreenElementChanged", "category": "EventRegistration" },
-  "71": { "name": "GetContainsFullscreenElement", "category": "View" },
-  "72": { "name": "AddWebResourceRequestedFilter", "category": "Network" },
-  "73": { "name": "RemoveWebResourceRequestedFilter", "category": "Network" },
-  "74": { "name": "NotifyParentWindowPositionChanged", "category": "View" },
-  "75": { "name": "AddCursorChanged", "category": "EventRegistration" },
-  "76": { "name": "RemoveCursorChanged", "category": "EventRegistration" },
-  "77": { "name": "AddContentLoading", "category": "EventRegistration", "critical": true },
-  "78": { "name": "RemoveContentLoading", "category": "EventRegistration" },
-  "79": { "name": "AddSourceChanged", "category": "EventRegistration", "critical": true },
-  "80": { "name": "RemoveSourceChanged", "category": "EventRegistration" },
-  "81": { "name": "AddHistoryChanged", "category": "EventRegistration", "critical": true },
-  "82": { "name": "RemoveHistoryChanged", "category": "EventRegistration" },
-  "83": { "name": "AddAcceleratorKeyPressed", "category": "EventRegistration" },
-  "84": { "name": "RemoveAcceleratorKeyPressed", "category": "EventRegistration" },
-  "85": { "name": "AddWindowCloseRequested", "category": "EventRegistration" },
-  "86": { "name": "RemoveWindowCloseRequested", "category": "EventRegistration" },
-  "87": { "name": "SetBoundsAndZoomFactor", "category": "View" },
-  "88": { "name": "AddFrameNavigationCompleted", "category": "EventRegistration" },
-  "89": { "name": "RemoveFrameNavigationCompleted", "category": "EventRegistration" },
-  "90": { "name": "AddHostObjectHelper", "category": "Communication" },
-  "91": { "name": "AddWebResourceResponseReceived", "category": "EventRegistration" },
-  "92": { "name": "RemoveWebResourceResponseReceived", "category": "EventRegistration" },
-  "93": { "name": "AddDOMContentLoaded", "category": "EventRegistration", "critical": true },
-  "94": { "name": "RemoveDOMContentLoaded", "category": "EventRegistration" },
-  "95": { "name": "NavigateWithWebResourceRequest", "category": "Navigation", "critical": true },
-  "96": { "name": "GetEnvironment", "category": "Lifecycle" },
-  "97": { "name": "GetCookieManager", "category": "Settings" },
-  "98": { "name": "SetVirtualHostNameToFolderMapping", "category": "Network" },
-  "99": { "name": "ClearVirtualHostNameToFolderMapping", "category": "Network" },
-  "100": { "name": "GetShouldDetectMonitorScaleChanges", "category": "View" },
-  "101": { "name": "PutShouldDetectMonitorScaleChanges", "category": "View" },
-  "102": { "name": "AddRasterizationScaleChanged", "category": "EventRegistration" },
-  "103": { "name": "RemoveRasterizationScaleChanged", "category": "EventRegistration" },
-  "104": { "name": "DragEnter", "category": "Input" },
-  "105": { "name": "TrySuspend", "category": "Lifecycle" },
-  "106": { "name": "Resume", "category": "Lifecycle" },
-  "107": { "name": "GetBoundsMode", "category": "View" },
-  "108": { "name": "PutBoundsMode", "category": "View" },
-  "109": { "name": "Close", "category": "Lifecycle" },
-  "110": { "name": "GetParentWindow", "category": "View" },
-  "111": { "name": "PutParentWindow", "category": "View" },
-  "112": { "name": "GetRootVisualTarget", "category": "View" },
-  "113": { "name": "PutRootVisualTarget", "category": "View" },
-  "114": { "name": "SendMouseInput", "category": "Input" },
-  "115": { "name": "SendPointerInput", "category": "Input" },
-  "116": { "name": "CreateCoreWebView2PointerInfoFromPointerId", "category": "Input" },
-  "117": { "name": "GetCursor", "category": "View" },
-  "118": { "name": "GetSystemCursorId", "category": "View" },
-  "119": { "name": "GetUIAProvider", "category": "Accessibility" },
-  "120": { "name": "GetRasterizationScale", "category": "View" },
-  "121": { "name": "PutRasterizationScale", "category": "View" },
-  "122": { "name": "DragLeave", "category": "Input" },
-  "123": { "name": "DragOver", "category": "Input" },
-  "124": { "name": "Drop", "category": "Input" },
-  "125": { "name": "GetIsSuspended", "category": "Lifecycle" },
-  "126": { "name": "GetBackgroundColor", "category": "View" },
-  "127": { "name": "PutBackgroundColor", "category": "View" },
-  "128": { "name": "AddDownloadStarting", "category": "EventRegistration" },
-  "129": { "name": "RemoveDownloadStarting", "category": "EventRegistration" },
-  "130": { "name": "AddClientCertificateRequested", "category": "EventRegistration" },
-  "131": { "name": "RemoveClientCertificateRequested", "category": "EventRegistration" },
-  "132": { "name": "AddContextMenuRequested", "category": "EventRegistration" },
-  "133": { "name": "RemoveContextMenuRequested", "category": "EventRegistration" },
-  "134": { "name": "GetAllowExternalDrop", "category": "Settings" },
-  "135": { "name": "PutAllowExternalDrop", "category": "Settings" },
-  "136": { "name": "GetMemoryUsageTargetLevel", "category": "Memory" },
-  "137": { "name": "PutMemoryUsageTargetLevel", "category": "Memory" },
-  "138": { "name": "AddStatusBarTextChanged", "category": "EventRegistration" },
-  "139": { "name": "RemoveStatusBarTextChanged", "category": "EventRegistration" },
-  "140": { "name": "GetStatusBarText", "category": "View" },
-  "141": { "name": "Mute", "category": "Audio" },
-  "142": { "name": "Unmute", "category": "Audio" },
-  "143": { "name": "GetIsMuted", "category": "Audio" },
-  "144": { "name": "GetIsCurrentlyAudible", "category": "Audio" },
-  "145": { "name": "AddMuteStateChanged", "category": "EventRegistration" },
-  "146": { "name": "RemoveMuteStateChanged", "category": "EventRegistration" },
-  "147": { "name": "AddAudibleStateChanged", "category": "EventRegistration" },
-  "148": { "name": "RemoveAudibleStateChanged", "category": "EventRegistration" },
-  "149": { "name": "AddFaviconChanged", "category": "EventRegistration" },
-  "150": { "name": "RemoveFaviconChanged", "category": "EventRegistration" },
-  "151": { "name": "GetFaviconUri", "category": "View" },
-  "152": { "name": "GetFavicon", "category": "View" },
-  "153": { "name": "GetProfile", "category": "Lifecycle" },
-  "154": { "name": "PrintToPdf", "category": "View" },
-  "155": { "name": "AddBasicAuthenticationRequested", "category": "EventRegistration" },
-  "156": { "name": "RemoveBasicAuthenticationRequested", "category": "EventRegistration" },
-  "157": { "name": "FrameAddWebMessageReceived", "category": "Communication" },
-  "158": { "name": "GetIsDefaultDownloadDialogOpen", "category": "Download" },
-  "159": { "name": "OpenDefaultDownloadDialog", "category": "Download" },
-  "160": { "name": "CloseDefaultDownloadDialog", "category": "Download" },
-  "161": { "name": "GetDefaultDownloadDialogCornerAlignment", "category": "Download" },
-  "162": { "name": "PutDefaultDownloadDialogCornerAlignment", "category": "Download" },
-  "163": { "name": "GetDefaultDownloadDialogMargin", "category": "Download" },
-  "164": { "name": "PutDefaultDownloadDialogMargin", "category": "Download" },
-  "165": { "name": "AddIsDefaultDownloadDialogOpenChanged", "category": "EventRegistration" },
-  "166": { "name": "RemoveIsDefaultDownloadDialogOpenChanged", "category": "EventRegistration" },
-  "167": { "name": "CallDevToolsProtocolMethodForSession", "category": "DevTools" },
-  "168": { "name": "AddServerCertificateError", "category": "EventRegistration" },
-  "169": { "name": "RemoveServerCertificateError", "category": "EventRegistration" },
-  "170": { "name": "ClearServerCertificateErrorActions", "category": "Security" },
-  "171": { "name": "SetWebView2Delegate", "category": "Lifecycle" },
-  "172": { "name": "RemoveWebView2Delegate", "category": "Lifecycle" },
-  "173": { "name": "ExecuteScriptWithResult", "category": "Script" },
-  "174": { "name": "FrameRemoveWebMessageReceived", "category": "Communication" },
-  "175": { "name": "ShowPrintUIBrowser", "category": "Print", "critical": true },
-  "176": { "name": "ShowPrintUISystem", "category": "Print", "critical": true },
-  "177": { "name": "Print", "category": "Print", "critical": true },
-  "178": { "name": "PrintToPdfStream", "category": "Print", "critical": true },
-  "179": { "name": "PostSharedBufferToScript", "category": "Communication" },
-  "180": { "name": "FramePostSharedBufferToScript", "category": "Communication" },
-  "181": { "name": "FrameAddPermissionRequested", "category": "EventRegistration" },
-  "182": { "name": "FrameRemovePermissionRequested", "category": "EventRegistration" },
-  "183": { "name": "FrameAddNavigationStarted", "category": "EventRegistration" },
-  "184": { "name": "FrameRemoveNavigationStarted", "category": "EventRegistration" },
-  "185": { "name": "FrameAddNavigationCompleted", "category": "EventRegistration" },
-  "186": { "name": "FrameRemoveNavigationCompleted", "category": "EventRegistration" },
-  "187": { "name": "AddLaunchingExternalUriScheme", "category": "EventRegistration" },
-  "188": { "name": "RemoveLaunchingExternalUriScheme", "category": "EventRegistration" },
-  "189": { "name": "BrowserHitTransparent", "category": "Input" },
-  "190": { "name": "AddProfileDeleted", "category": "EventRegistration" },
-  "191": { "name": "RemoveProfileDeleted", "category": "EventRegistration" },
-  "192": { "name": "GetCustomDataPartitionId", "category": "Settings" },
-  "193": { "name": "PutCustomDataPartitionId", "category": "Settings" },
-  "194": { "name": "ClearCustomDataPartition", "category": "Settings" },
-  "195": { "name": "GetProcessInfosWithDetails", "category": "Lifecycle", "critical": true },
-  "196": { "name": "GetFrameId", "category": "Frame" },
-  "197": { "name": "FrameGetFrameId", "category": "Frame" },
-  "198": { "name": "AddNotificationReceived", "category": "EventRegistration" },
-  "199": { "name": "RemoveNotificationReceived", "category": "EventRegistration" },
-  "200": { "name": "AddProfileNotificationReceived", "category": "EventRegistration" },
-  "201": { "name": "RemoveProfileNotificationReceived", "category": "EventRegistration" },
-  "202": { "name": "AddNonClientRegionChanged", "category": "EventRegistration" },
-  "203": { "name": "RemoveNonClientRegionChanged", "category": "EventRegistration" },
-  "204": { "name": "GetNonClientRegionAtPoint", "category": "View" },
-  "205": { "name": "QueryNonClientRegion", "category": "View" },
-  "206": { "name": "GetProcessExtendedInfos", "category": "Lifecycle", "critical": true },
-  "207": { "name": "ShowSaveAsUI", "category": "SaveAs", "critical": true },
-  "208": { "name": "AddSaveAsUIShowing", "category": "EventRegistration" },
-  "209": { "name": "RemoveSaveAsUIShowing", "category": "EventRegistration" },
-  "210": { "name": "AddScreenCaptureStarting", "category": "EventRegistration" },
-  "211": { "name": "RemoveScreenCaptureStarting", "category": "EventRegistration" },
-  "212": { "name": "FrameAddScreenCaptureStarting", "category": "EventRegistration" },
-  "213": { "name": "FrameRemoveScreenCaptureStarting", "category": "EventRegistration" },
-  "214": { "name": "AddSaveFileSecurityCheckStarting", "category": "EventRegistration" },
-  "215": { "name": "RemoveSaveFileSecurityCheckStarting", "category": "EventRegistration" },
-  "216": { "name": "AddDedicatedWorkerCreated", "category": "EventRegistration" },
-  "217": { "name": "RemoveDedicatedWorkerCreated", "category": "EventRegistration" },
-  "218": { "name": "AddServiceWorkerRegistered", "category": "EventRegistration" },
-  "219": { "name": "RemoveServiceWorkerRegistered", "category": "EventRegistration" },
-  "220": { "name": "AddSharedWorkerCreated", "category": "EventRegistration" },
-  "221": { "name": "RemoveSharedWorkerCreated", "category": "EventRegistration" },
-  "222": { "name": "AddWebResourceRequestedFilterWithRequestSourceKinds", "category": "Network" },
-  "223": { "name": "GetWindowControlsOverlay", "category": "View" },
-  "224": { "name": "AddFrameFrameCreated", "category": "EventRegistration" },
-  "225": { "name": "RemoveFrameFrameCreated", "category": "EventRegistration" },
-  "226": { "name": "AddDragStarting", "category": "EventRegistration" },
-  "227": { "name": "RemoveDragStarting", "category": "EventRegistration" },
-  "228": { "name": "FrameAddDedicatedWorkerCreated", "category": "EventRegistration" },
-  "229": { "name": "FrameRemoveDedicatedWorkerCreated", "category": "EventRegistration" },
-  "230": { "name": "DedicatedWorkerAddDedicatedWorkerCreated", "category": "Worker" },
-  "231": { "name": "DedicatedWorkerRemoveDedicatedWorkerCreated", "category": "Worker" },
-  "232": { "name": "DedicatedWorkerAddWebMessageReceived", "category": "Worker" },
-  "233": { "name": "DedicatedWorkerRemoveWebMessageReceived", "category": "Worker" },
-  "234": { "name": "DedicatedWorkerPostWebMessageAsString", "category": "Worker" },
-  "235": { "name": "DedicatedWorkerPostWebMessageAsJson", "category": "Worker" },
-  "236": { "name": "DedicatedWorkerAddDestroying", "category": "Worker" },
-  "237": { "name": "DedicatedWorkerRemoveDestroying", "category": "Worker" },
-  "238": { "name": "ServiceWorkerManagerGetServiceWorkerRegistrations", "category": "Worker" },
-  "239": { "name": "ServiceWorkerManagerGetServiceWorkerRegistrationsForScope", "category": "Worker" },
-  "240": { "name": "ServiceWorkerRegistrationGetActiveServiceWorker", "category": "Worker" },
-  "241": { "name": "ServiceWorkerRegistrationAddServiceWorkerActivated", "category": "Worker" },
-  "242": { "name": "ServiceWorkerRegistrationRemoveServiceWorkerActivated", "category": "Worker" },
-  "243": { "name": "ServiceWorkerRegistrationAddUnregistering", "category": "Worker" },
-  "244": { "name": "ServiceWorkerRegistrationRemoveUnregistering", "category": "Worker" },
-  "245": { "name": "ServiceWorkerAddWebMessageReceived", "category": "Worker" },
-  "246": { "name": "ServiceWorkerRemoveWebMessageReceived", "category": "Worker" },
-  "247": { "name": "ServiceWorkerPostWebMessageAsString", "category": "Worker" },
-  "248": { "name": "ServiceWorkerPostWebMessageAsJson", "category": "Worker" },
-  "249": { "name": "ServiceWorkerAddDestroying", "category": "Worker" },
-  "250": { "name": "ServiceWorkerRemoveDestroying", "category": "Worker" },
-  "251": { "name": "ProfileGetServiceWorkerManager", "category": "Worker" },
-  "252": { "name": "ProfileGetSharedWorkerManager", "category": "Worker" },
-  "253": { "name": "SharedWorkerManagerGetSharedWorkers", "category": "Worker" },
-  "254": { "name": "AddSensitivityLabelChanged", "category": "EventRegistration" },
-  "255": { "name": "RemoveSensitivityLabelChanged", "category": "EventRegistration" },
-  "256": { "name": "SetPirmAllowlist", "category": "Security" },
-  "257": { "name": "SetAllowedPortRange", "category": "Network" }
+  "0": {
+    "name": "Unknown",
+    "category": "Unknown",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "1": {
+    "name": "(Obsolete) InternalCdp",
+    "category": "DevTools",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "2": {
+    "name": "GenericCdp",
+    "category": "DevTools",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "3": {
+    "name": "Navigate",
+    "category": "Navigation",
+    "critical": true,
+    "etwEvents": [
+      "WebView2_APICalled",
+      "WebView2_Event",
+      "NavigationRequest::Create",
+      "NavigationRequest::BeginNavigation",
+      "NavigationRequest::CommitNavigation"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": true
+  },
+  "4": {
+    "name": "NavigateToString",
+    "category": "Navigation",
+    "critical": true,
+    "etwEvents": [
+      "WebView2_APICalled",
+      "WebView2_Event",
+      "NavigationRequest::Create",
+      "NavigationRequest::BeginNavigation",
+      "NavigationRequest::CommitNavigation"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": true
+  },
+  "5": {
+    "name": "ExecuteScript",
+    "category": "Script",
+    "etwEvents": [
+      "WebView2_APICalled",
+      "WebView2_ObjectCalled",
+      "WebView2_InvokeFinished"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": true
+  },
+  "6": {
+    "name": "PutIsVisible",
+    "category": "View",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": true
+  },
+  "7": {
+    "name": "Initialize",
+    "category": "Lifecycle",
+    "critical": true,
+    "etwEvents": [
+      "WebView2_APICalled",
+      "WebView2_Creation_Client",
+      "WebView2_CreationTime"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": true
+  },
+  "8": {
+    "name": "PostWebMessage",
+    "category": "Communication",
+    "etwEvents": [
+      "WebView2_APICalled",
+      "WebView2_ObjectCalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": true
+  },
+  "9": {
+    "name": "Reload",
+    "category": "Navigation",
+    "critical": true,
+    "etwEvents": [
+      "WebView2_APICalled",
+      "WebView2_Event",
+      "NavigationRequest::Create",
+      "NavigationRequest::BeginNavigation"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": true
+  },
+  "10": {
+    "name": "CapturePreview",
+    "category": "View",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": true
+  },
+  "11": {
+    "name": "AddScriptToExecuteOnDocumentCreated",
+    "category": "Script",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": true
+  },
+  "12": {
+    "name": "RemoveScriptToExecuteOnDocumentCreated",
+    "category": "Script",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "15": {
+    "name": "MoveFocusProgrammatic",
+    "category": "Focus",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": true
+  },
+  "16": {
+    "name": "MoveFocusTraversal",
+    "category": "Focus",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "19": {
+    "name": "GetCanGoBack",
+    "category": "Navigation",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "20": {
+    "name": "GetCanGoForward",
+    "category": "Navigation",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "21": {
+    "name": "GoBack",
+    "category": "Navigation",
+    "critical": true,
+    "etwEvents": [
+      "WebView2_APICalled",
+      "WebView2_Event",
+      "NavigationRequest::Create",
+      "NavigationRequest::BeginNavigation"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": true
+  },
+  "22": {
+    "name": "GoForward",
+    "category": "Navigation",
+    "critical": true,
+    "etwEvents": [
+      "WebView2_APICalled",
+      "WebView2_Event",
+      "NavigationRequest::Create",
+      "NavigationRequest::BeginNavigation"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": true
+  },
+  "23": {
+    "name": "Stop",
+    "category": "Navigation",
+    "critical": true,
+    "etwEvents": [
+      "WebView2_APICalled",
+      "WebView2_Event",
+      "NavigationRequest::Create",
+      "NavigationRequest::BeginNavigation"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": true
+  },
+  "24": {
+    "name": "GetDocumentTitle",
+    "category": "Document",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "25": {
+    "name": "OpenDevToolsWindow",
+    "category": "DevTools",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "26": {
+    "name": "GetSource",
+    "category": "Navigation",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "27": {
+    "name": "GetBounds",
+    "category": "View",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "28": {
+    "name": "PutBounds",
+    "category": "View",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": true
+  },
+  "29": {
+    "name": "GetSetting",
+    "category": "Settings",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "30": {
+    "name": "GetZoomFactor",
+    "category": "View",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "31": {
+    "name": "PutZoomFactor",
+    "category": "View",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "32": {
+    "name": "GetBrowserProcessId",
+    "category": "Lifecycle",
+    "critical": true,
+    "etwEvents": [
+      "WebView2_APICalled",
+      "WebView2_ObjectCallResponse"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": true
+  },
+  "33": {
+    "name": "AddNavigationStarting",
+    "category": "EventRegistration",
+    "critical": true,
+    "etwEvents": [
+      "WebView2_APICalled",
+      "WebView2_Event"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": true
+  },
+  "34": {
+    "name": "RemoveNavigationStarting",
+    "category": "EventRegistration",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "37": {
+    "name": "AddNavigationCompleted",
+    "category": "EventRegistration",
+    "critical": true,
+    "etwEvents": [
+      "WebView2_APICalled",
+      "WebView2_Event"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": true
+  },
+  "38": {
+    "name": "RemoveNavigationCompleted",
+    "category": "EventRegistration",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "39": {
+    "name": "AddFrameNavigationStarting",
+    "category": "EventRegistration",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "40": {
+    "name": "RemoveFrameNavigationStarting",
+    "category": "EventRegistration",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "41": {
+    "name": "AddMoveFocusRequested",
+    "category": "EventRegistration",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "42": {
+    "name": "RemoveMoveFocusRequested",
+    "category": "EventRegistration",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "43": {
+    "name": "AddGotFocus",
+    "category": "EventRegistration",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "44": {
+    "name": "RemoveGotFocus",
+    "category": "EventRegistration",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "45": {
+    "name": "AddLostFocus",
+    "category": "EventRegistration",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "46": {
+    "name": "RemoveLostFocus",
+    "category": "EventRegistration",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "47": {
+    "name": "AddWebResourceRequested",
+    "category": "EventRegistration",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": true
+  },
+  "48": {
+    "name": "RemoveWebResourceRequested",
+    "category": "EventRegistration",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "49": {
+    "name": "AddScriptDialogOpening",
+    "category": "EventRegistration",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "50": {
+    "name": "RemoveScriptDialogOpening",
+    "category": "EventRegistration",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "51": {
+    "name": "AddZoomFactorChanged",
+    "category": "EventRegistration",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "52": {
+    "name": "RemoveZoomFactorChanged",
+    "category": "EventRegistration",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "53": {
+    "name": "AddPermissionRequested",
+    "category": "EventRegistration",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "54": {
+    "name": "RemovePermissionRequested",
+    "category": "EventRegistration",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "55": {
+    "name": "AddProcessFailed",
+    "category": "EventRegistration",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": true
+  },
+  "56": {
+    "name": "RemoveProcessFailed",
+    "category": "EventRegistration",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "57": {
+    "name": "AddWebMessageReceived",
+    "category": "EventRegistration",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": true
+  },
+  "58": {
+    "name": "RemoveWebMessageReceived",
+    "category": "EventRegistration",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "59": {
+    "name": "AddDevToolsProtocolEventReceived",
+    "category": "EventRegistration",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "60": {
+    "name": "RemoveDevToolsProtocolEventReceived",
+    "category": "EventRegistration",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "61": {
+    "name": "AddNewWindowRequested",
+    "category": "EventRegistration",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": true
+  },
+  "62": {
+    "name": "RemoveNewWindowRequested",
+    "category": "EventRegistration",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "63": {
+    "name": "AddDocumentTitleChanged",
+    "category": "EventRegistration",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "64": {
+    "name": "RemoveDocumentTitleChanged",
+    "category": "EventRegistration",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "65": {
+    "name": "GetIsVisible",
+    "category": "View",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "66": {
+    "name": "CallDevToolsProtocolMethod",
+    "category": "DevTools",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": true
+  },
+  "67": {
+    "name": "AddRemoteObject",
+    "category": "Communication",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": true
+  },
+  "68": {
+    "name": "RemoveRemoteObject",
+    "category": "Communication",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "69": {
+    "name": "AddContainsFullscreenElementChanged",
+    "category": "EventRegistration",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "70": {
+    "name": "RemoveContainsFullscreenElementChanged",
+    "category": "EventRegistration",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "71": {
+    "name": "GetContainsFullscreenElement",
+    "category": "View",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "72": {
+    "name": "AddWebResourceRequestedFilter",
+    "category": "Network",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "73": {
+    "name": "RemoveWebResourceRequestedFilter",
+    "category": "Network",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "74": {
+    "name": "NotifyParentWindowPositionChanged",
+    "category": "View",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "75": {
+    "name": "AddCursorChanged",
+    "category": "EventRegistration",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "76": {
+    "name": "RemoveCursorChanged",
+    "category": "EventRegistration",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "77": {
+    "name": "AddContentLoading",
+    "category": "EventRegistration",
+    "critical": true,
+    "etwEvents": [
+      "WebView2_APICalled",
+      "WebView2_Event"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": true
+  },
+  "78": {
+    "name": "RemoveContentLoading",
+    "category": "EventRegistration",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "79": {
+    "name": "AddSourceChanged",
+    "category": "EventRegistration",
+    "critical": true,
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "80": {
+    "name": "RemoveSourceChanged",
+    "category": "EventRegistration",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "81": {
+    "name": "AddHistoryChanged",
+    "category": "EventRegistration",
+    "critical": true,
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "82": {
+    "name": "RemoveHistoryChanged",
+    "category": "EventRegistration",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "83": {
+    "name": "AddAcceleratorKeyPressed",
+    "category": "EventRegistration",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "84": {
+    "name": "RemoveAcceleratorKeyPressed",
+    "category": "EventRegistration",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "85": {
+    "name": "AddWindowCloseRequested",
+    "category": "EventRegistration",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "86": {
+    "name": "RemoveWindowCloseRequested",
+    "category": "EventRegistration",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "87": {
+    "name": "SetBoundsAndZoomFactor",
+    "category": "View",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "88": {
+    "name": "AddFrameNavigationCompleted",
+    "category": "EventRegistration",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "89": {
+    "name": "RemoveFrameNavigationCompleted",
+    "category": "EventRegistration",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "90": {
+    "name": "AddHostObjectHelper",
+    "category": "Communication",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "91": {
+    "name": "AddWebResourceResponseReceived",
+    "category": "EventRegistration",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "92": {
+    "name": "RemoveWebResourceResponseReceived",
+    "category": "EventRegistration",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "93": {
+    "name": "AddDOMContentLoaded",
+    "category": "EventRegistration",
+    "critical": true,
+    "etwEvents": [
+      "WebView2_APICalled",
+      "WebView2_Event"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": true
+  },
+  "94": {
+    "name": "RemoveDOMContentLoaded",
+    "category": "EventRegistration",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "95": {
+    "name": "NavigateWithWebResourceRequest",
+    "category": "Navigation",
+    "critical": true,
+    "etwEvents": [
+      "WebView2_APICalled",
+      "WebView2_Event",
+      "NavigationRequest::Create",
+      "NavigationRequest::BeginNavigation",
+      "NavigationRequest::CommitNavigation"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": true
+  },
+  "96": {
+    "name": "GetEnvironment",
+    "category": "Lifecycle",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "97": {
+    "name": "GetCookieManager",
+    "category": "Settings",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "98": {
+    "name": "SetVirtualHostNameToFolderMapping",
+    "category": "Network",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "99": {
+    "name": "ClearVirtualHostNameToFolderMapping",
+    "category": "Network",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "100": {
+    "name": "GetShouldDetectMonitorScaleChanges",
+    "category": "View",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "101": {
+    "name": "PutShouldDetectMonitorScaleChanges",
+    "category": "View",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "102": {
+    "name": "AddRasterizationScaleChanged",
+    "category": "EventRegistration",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "103": {
+    "name": "RemoveRasterizationScaleChanged",
+    "category": "EventRegistration",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "104": {
+    "name": "DragEnter",
+    "category": "Input",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "105": {
+    "name": "TrySuspend",
+    "category": "Lifecycle",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": true
+  },
+  "106": {
+    "name": "Resume",
+    "category": "Lifecycle",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": true
+  },
+  "107": {
+    "name": "GetBoundsMode",
+    "category": "View",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "108": {
+    "name": "PutBoundsMode",
+    "category": "View",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "109": {
+    "name": "Close",
+    "category": "Lifecycle",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": true
+  },
+  "110": {
+    "name": "GetParentWindow",
+    "category": "View",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "111": {
+    "name": "PutParentWindow",
+    "category": "View",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "112": {
+    "name": "GetRootVisualTarget",
+    "category": "View",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "113": {
+    "name": "PutRootVisualTarget",
+    "category": "View",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "114": {
+    "name": "SendMouseInput",
+    "category": "Input",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "115": {
+    "name": "SendPointerInput",
+    "category": "Input",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "116": {
+    "name": "CreateCoreWebView2PointerInfoFromPointerId",
+    "category": "Input",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "117": {
+    "name": "GetCursor",
+    "category": "View",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "118": {
+    "name": "GetSystemCursorId",
+    "category": "View",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "119": {
+    "name": "GetUIAProvider",
+    "category": "Accessibility",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "120": {
+    "name": "GetRasterizationScale",
+    "category": "View",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "121": {
+    "name": "PutRasterizationScale",
+    "category": "View",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "122": {
+    "name": "DragLeave",
+    "category": "Input",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "123": {
+    "name": "DragOver",
+    "category": "Input",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "124": {
+    "name": "Drop",
+    "category": "Input",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "125": {
+    "name": "GetIsSuspended",
+    "category": "Lifecycle",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "126": {
+    "name": "GetBackgroundColor",
+    "category": "View",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "127": {
+    "name": "PutBackgroundColor",
+    "category": "View",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "128": {
+    "name": "AddDownloadStarting",
+    "category": "EventRegistration",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": true
+  },
+  "129": {
+    "name": "RemoveDownloadStarting",
+    "category": "EventRegistration",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "130": {
+    "name": "AddClientCertificateRequested",
+    "category": "EventRegistration",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "131": {
+    "name": "RemoveClientCertificateRequested",
+    "category": "EventRegistration",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "132": {
+    "name": "AddContextMenuRequested",
+    "category": "EventRegistration",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "133": {
+    "name": "RemoveContextMenuRequested",
+    "category": "EventRegistration",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "134": {
+    "name": "GetAllowExternalDrop",
+    "category": "Settings",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "135": {
+    "name": "PutAllowExternalDrop",
+    "category": "Settings",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "136": {
+    "name": "GetMemoryUsageTargetLevel",
+    "category": "Memory",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "137": {
+    "name": "PutMemoryUsageTargetLevel",
+    "category": "Memory",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": true
+  },
+  "138": {
+    "name": "AddStatusBarTextChanged",
+    "category": "EventRegistration",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "139": {
+    "name": "RemoveStatusBarTextChanged",
+    "category": "EventRegistration",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "140": {
+    "name": "GetStatusBarText",
+    "category": "View",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "141": {
+    "name": "Mute",
+    "category": "Audio",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": true
+  },
+  "142": {
+    "name": "Unmute",
+    "category": "Audio",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "143": {
+    "name": "GetIsMuted",
+    "category": "Audio",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "144": {
+    "name": "GetIsCurrentlyAudible",
+    "category": "Audio",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "145": {
+    "name": "AddMuteStateChanged",
+    "category": "EventRegistration",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "146": {
+    "name": "RemoveMuteStateChanged",
+    "category": "EventRegistration",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "147": {
+    "name": "AddAudibleStateChanged",
+    "category": "EventRegistration",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "148": {
+    "name": "RemoveAudibleStateChanged",
+    "category": "EventRegistration",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "149": {
+    "name": "AddFaviconChanged",
+    "category": "EventRegistration",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "150": {
+    "name": "RemoveFaviconChanged",
+    "category": "EventRegistration",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "151": {
+    "name": "GetFaviconUri",
+    "category": "View",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "152": {
+    "name": "GetFavicon",
+    "category": "View",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "153": {
+    "name": "GetProfile",
+    "category": "Lifecycle",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "154": {
+    "name": "PrintToPdf",
+    "category": "View",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": true
+  },
+  "155": {
+    "name": "AddBasicAuthenticationRequested",
+    "category": "EventRegistration",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": true
+  },
+  "156": {
+    "name": "RemoveBasicAuthenticationRequested",
+    "category": "EventRegistration",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "157": {
+    "name": "FrameAddWebMessageReceived",
+    "category": "Communication",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "158": {
+    "name": "GetIsDefaultDownloadDialogOpen",
+    "category": "Download",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "159": {
+    "name": "OpenDefaultDownloadDialog",
+    "category": "Download",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "160": {
+    "name": "CloseDefaultDownloadDialog",
+    "category": "Download",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "161": {
+    "name": "GetDefaultDownloadDialogCornerAlignment",
+    "category": "Download",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "162": {
+    "name": "PutDefaultDownloadDialogCornerAlignment",
+    "category": "Download",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "163": {
+    "name": "GetDefaultDownloadDialogMargin",
+    "category": "Download",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "164": {
+    "name": "PutDefaultDownloadDialogMargin",
+    "category": "Download",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "165": {
+    "name": "AddIsDefaultDownloadDialogOpenChanged",
+    "category": "EventRegistration",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "166": {
+    "name": "RemoveIsDefaultDownloadDialogOpenChanged",
+    "category": "EventRegistration",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "167": {
+    "name": "CallDevToolsProtocolMethodForSession",
+    "category": "DevTools",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "168": {
+    "name": "AddServerCertificateError",
+    "category": "EventRegistration",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "169": {
+    "name": "RemoveServerCertificateError",
+    "category": "EventRegistration",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "170": {
+    "name": "ClearServerCertificateErrorActions",
+    "category": "Security",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "171": {
+    "name": "SetWebView2Delegate",
+    "category": "Lifecycle",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "172": {
+    "name": "RemoveWebView2Delegate",
+    "category": "Lifecycle",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "173": {
+    "name": "ExecuteScriptWithResult",
+    "category": "Script",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": true
+  },
+  "174": {
+    "name": "FrameRemoveWebMessageReceived",
+    "category": "Communication",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "175": {
+    "name": "ShowPrintUIBrowser",
+    "category": "Print",
+    "critical": true,
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": true
+  },
+  "176": {
+    "name": "ShowPrintUISystem",
+    "category": "Print",
+    "critical": true,
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": true
+  },
+  "177": {
+    "name": "Print",
+    "category": "Print",
+    "critical": true,
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": true
+  },
+  "178": {
+    "name": "PrintToPdfStream",
+    "category": "Print",
+    "critical": true,
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": true
+  },
+  "179": {
+    "name": "PostSharedBufferToScript",
+    "category": "Communication",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "180": {
+    "name": "FramePostSharedBufferToScript",
+    "category": "Communication",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "181": {
+    "name": "FrameAddPermissionRequested",
+    "category": "EventRegistration",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "182": {
+    "name": "FrameRemovePermissionRequested",
+    "category": "EventRegistration",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "183": {
+    "name": "FrameAddNavigationStarted",
+    "category": "EventRegistration",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "184": {
+    "name": "FrameRemoveNavigationStarted",
+    "category": "EventRegistration",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "185": {
+    "name": "FrameAddNavigationCompleted",
+    "category": "EventRegistration",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "186": {
+    "name": "FrameRemoveNavigationCompleted",
+    "category": "EventRegistration",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "187": {
+    "name": "AddLaunchingExternalUriScheme",
+    "category": "EventRegistration",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "188": {
+    "name": "RemoveLaunchingExternalUriScheme",
+    "category": "EventRegistration",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "189": {
+    "name": "BrowserHitTransparent",
+    "category": "Input",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "190": {
+    "name": "AddProfileDeleted",
+    "category": "EventRegistration",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "191": {
+    "name": "RemoveProfileDeleted",
+    "category": "EventRegistration",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "192": {
+    "name": "GetCustomDataPartitionId",
+    "category": "Settings",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "193": {
+    "name": "PutCustomDataPartitionId",
+    "category": "Settings",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "194": {
+    "name": "ClearCustomDataPartition",
+    "category": "Settings",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "195": {
+    "name": "GetProcessInfosWithDetails",
+    "category": "Lifecycle",
+    "critical": true,
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "196": {
+    "name": "GetFrameId",
+    "category": "Frame",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "197": {
+    "name": "FrameGetFrameId",
+    "category": "Frame",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "198": {
+    "name": "AddNotificationReceived",
+    "category": "EventRegistration",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "199": {
+    "name": "RemoveNotificationReceived",
+    "category": "EventRegistration",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "200": {
+    "name": "AddProfileNotificationReceived",
+    "category": "EventRegistration",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "201": {
+    "name": "RemoveProfileNotificationReceived",
+    "category": "EventRegistration",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "202": {
+    "name": "AddNonClientRegionChanged",
+    "category": "EventRegistration",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "203": {
+    "name": "RemoveNonClientRegionChanged",
+    "category": "EventRegistration",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "204": {
+    "name": "GetNonClientRegionAtPoint",
+    "category": "View",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "205": {
+    "name": "QueryNonClientRegion",
+    "category": "View",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "206": {
+    "name": "GetProcessExtendedInfos",
+    "category": "Lifecycle",
+    "critical": true,
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "207": {
+    "name": "ShowSaveAsUI",
+    "category": "SaveAs",
+    "critical": true,
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": true
+  },
+  "208": {
+    "name": "AddSaveAsUIShowing",
+    "category": "EventRegistration",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "209": {
+    "name": "RemoveSaveAsUIShowing",
+    "category": "EventRegistration",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "210": {
+    "name": "AddScreenCaptureStarting",
+    "category": "EventRegistration",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": true
+  },
+  "211": {
+    "name": "RemoveScreenCaptureStarting",
+    "category": "EventRegistration",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "212": {
+    "name": "FrameAddScreenCaptureStarting",
+    "category": "EventRegistration",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "213": {
+    "name": "FrameRemoveScreenCaptureStarting",
+    "category": "EventRegistration",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "214": {
+    "name": "AddSaveFileSecurityCheckStarting",
+    "category": "EventRegistration",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "215": {
+    "name": "RemoveSaveFileSecurityCheckStarting",
+    "category": "EventRegistration",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "216": {
+    "name": "AddDedicatedWorkerCreated",
+    "category": "EventRegistration",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "217": {
+    "name": "RemoveDedicatedWorkerCreated",
+    "category": "EventRegistration",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "218": {
+    "name": "AddServiceWorkerRegistered",
+    "category": "EventRegistration",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "219": {
+    "name": "RemoveServiceWorkerRegistered",
+    "category": "EventRegistration",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "220": {
+    "name": "AddSharedWorkerCreated",
+    "category": "EventRegistration",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "221": {
+    "name": "RemoveSharedWorkerCreated",
+    "category": "EventRegistration",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "222": {
+    "name": "AddWebResourceRequestedFilterWithRequestSourceKinds",
+    "category": "Network",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "223": {
+    "name": "GetWindowControlsOverlay",
+    "category": "View",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "224": {
+    "name": "AddFrameFrameCreated",
+    "category": "EventRegistration",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "225": {
+    "name": "RemoveFrameFrameCreated",
+    "category": "EventRegistration",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "226": {
+    "name": "AddDragStarting",
+    "category": "EventRegistration",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "227": {
+    "name": "RemoveDragStarting",
+    "category": "EventRegistration",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "228": {
+    "name": "FrameAddDedicatedWorkerCreated",
+    "category": "EventRegistration",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "229": {
+    "name": "FrameRemoveDedicatedWorkerCreated",
+    "category": "EventRegistration",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "230": {
+    "name": "DedicatedWorkerAddDedicatedWorkerCreated",
+    "category": "Worker",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "231": {
+    "name": "DedicatedWorkerRemoveDedicatedWorkerCreated",
+    "category": "Worker",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "232": {
+    "name": "DedicatedWorkerAddWebMessageReceived",
+    "category": "Worker",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "233": {
+    "name": "DedicatedWorkerRemoveWebMessageReceived",
+    "category": "Worker",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "234": {
+    "name": "DedicatedWorkerPostWebMessageAsString",
+    "category": "Worker",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "235": {
+    "name": "DedicatedWorkerPostWebMessageAsJson",
+    "category": "Worker",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "236": {
+    "name": "DedicatedWorkerAddDestroying",
+    "category": "Worker",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "237": {
+    "name": "DedicatedWorkerRemoveDestroying",
+    "category": "Worker",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "238": {
+    "name": "ServiceWorkerManagerGetServiceWorkerRegistrations",
+    "category": "Worker",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "239": {
+    "name": "ServiceWorkerManagerGetServiceWorkerRegistrationsForScope",
+    "category": "Worker",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "240": {
+    "name": "ServiceWorkerRegistrationGetActiveServiceWorker",
+    "category": "Worker",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "241": {
+    "name": "ServiceWorkerRegistrationAddServiceWorkerActivated",
+    "category": "Worker",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "242": {
+    "name": "ServiceWorkerRegistrationRemoveServiceWorkerActivated",
+    "category": "Worker",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "243": {
+    "name": "ServiceWorkerRegistrationAddUnregistering",
+    "category": "Worker",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "244": {
+    "name": "ServiceWorkerRegistrationRemoveUnregistering",
+    "category": "Worker",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "245": {
+    "name": "ServiceWorkerAddWebMessageReceived",
+    "category": "Worker",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "246": {
+    "name": "ServiceWorkerRemoveWebMessageReceived",
+    "category": "Worker",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "247": {
+    "name": "ServiceWorkerPostWebMessageAsString",
+    "category": "Worker",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "248": {
+    "name": "ServiceWorkerPostWebMessageAsJson",
+    "category": "Worker",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "249": {
+    "name": "ServiceWorkerAddDestroying",
+    "category": "Worker",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "250": {
+    "name": "ServiceWorkerRemoveDestroying",
+    "category": "Worker",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "251": {
+    "name": "ProfileGetServiceWorkerManager",
+    "category": "Worker",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "252": {
+    "name": "ProfileGetSharedWorkerManager",
+    "category": "Worker",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "253": {
+    "name": "SharedWorkerManagerGetSharedWorkers",
+    "category": "Worker",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "254": {
+    "name": "AddSensitivityLabelChanged",
+    "category": "EventRegistration",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "255": {
+    "name": "RemoveSensitivityLabelChanged",
+    "category": "EventRegistration",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "256": {
+    "name": "SetPirmAllowlist",
+    "category": "Security",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  },
+  "257": {
+    "name": "SetAllowedPortRange",
+    "category": "Network",
+    "etwEvents": [
+      "WebView2_APICalled"
+    ],
+    "capturedByWprp": true,
+    "hasDetailedSequence": false
+  }
 }

@@ -123,57 +123,54 @@ function runFullAnalysis(params: UnifiedParams): string {
   sections.push([
     "# 🔍 WebView2 ETL Analysis Report",
     "",
-    `**ETL**: \`${etlName}\`${sizeStr} | **Host App**: ${hostApp} | **Symptom**: ${symptom || "Not specified"}`,
+    `**ETL**: \`${etlName}\`${sizeStr} | **Host App**: ${hostApp}`,
     "",
   ].join("\n"));
 
-  // ── 2. VERDICT (most important — first thing users read) ──
-  sections.push(buildVerdict(topSuspect, rootCauses, structuredReport, traceStructure));
-
-  // ── 3. ANNOTATED TIMELINE ──
-  if (traceStructure) {
-    const timeline = buildAnnotatedTimeline(traceStructure, topSuspect);
-    if (timeline) {
-      sections.push("---\n");
-      sections.push(timeline);
-    }
-  }
-
-  // ── 4. NAVIGATION SEQUENCE VALIDATION ──
-  if (isNavRelated && traceStructure) {
-    sections.push("---\n");
-    sections.push(buildSequenceVisualization(filteredFile, structuredReport));
-  }
-
-  // ── 5. ROOT CAUSE ANALYSIS ──
-  sections.push("---\n");
-  sections.push(buildRCASection(rootCauses, structuredReport));
-
-  // ── 6. KEY METRICS ──
-  if (structuredReport) {
-    sections.push("---\n");
-    sections.push(buildMetricsTable(structuredReport));
-  }
-
-  // ── 7. PROCESS SUMMARY (collapsed) ──
-  if (traceStructure) {
-    sections.push("---\n");
-    sections.push(buildCollapsedProcessSummary(traceStructure));
-  }
-
-  // ── 8. INITIAL WARNINGS ──
-  if (traceStructure && traceStructure.issues.length > 0) {
-    sections.push("---\n");
-    sections.push(buildWarningsSection(traceStructure));
-  }
-
-  // ── 9. CONFIGURATION SNAPSHOT ──
+  // ── 2. METADATA & CONFIGURATION ──
   if (traceStructure) {
     sections.push("---\n");
     sections.push(buildConfigSnapshot(traceStructure));
   }
 
-  // ── 10. OPTIONAL: Timeline slice, comparison, CPU ──
+  // ── 3. SYMPTOM ──
+  sections.push("---\n");
+  sections.push(buildSymptomSection(symptom, traceStructure, structuredReport));
+
+  // ── 4. IMPACT ──
+  sections.push("---\n");
+  sections.push(buildImpactSection(topSuspect, structuredReport, traceStructure));
+
+  // ── 5. ROOT CAUSE HYPOTHESIS ──
+  // Includes: incarnation PID groups, trace path vs expected path, annotated timeline
+  sections.push("---\n");
+  sections.push(buildRootCauseHypothesisSection(
+    rootCauses, structuredReport, traceStructure, filteredFile, topSuspect, isNavRelated
+  ));
+
+  // ── 6. EVIDENCE ──
+  sections.push("---\n");
+  sections.push(buildEvidenceSection(structuredReport, traceStructure));
+
+  // ── 7. CONFIDENCE LEVEL ──
+  sections.push("---\n");
+  sections.push(buildConfidenceLevelSection(rootCauses, structuredReport));
+
+  // ── 8. DEEP DIVE WITH CPU TRACES ──
+  sections.push("---\n");
+  sections.push(buildCpuDeepDiveSection(
+    includeCpu, etlPath, pid, cpuKeywords, startTime, endTime, traceStructure
+  ));
+
+  // ── 9. NEXT ACTION ──
+  sections.push("---\n");
+  sections.push(buildNextActionSection(topSuspect, isNavRelated, includeCpu, !!startTime, traceStructure));
+
+  // ── 10. OPEN QUESTIONS ──
+  sections.push("---\n");
+  sections.push(buildOpenQuestionsSection(rootCauses, structuredReport, traceStructure, includeCpu, goodEtl));
+
+  // ── OPTIONAL: Timeline slice, comparison ──
   if (startTime && endTime) {
     sections.push("---\n");
     const slice = timelineSlice(filteredFile, startTime, endTime, pid);
@@ -188,21 +185,7 @@ function runFullAnalysis(params: UnifiedParams): string {
     sections.push(comparison);
   }
 
-  if (includeCpu) {
-    sections.push("---\n");
-    if (!pid) {
-      sections.push("## ⏳ CPU Analysis\n\nCPU analysis requested but no `pid` provided. Check the process summary above and re-run with the PID.\n");
-    } else {
-      const keywords = cpuKeywords || ["msedge.dll", "msedgewebview2.dll", "webview2", "ntdll"];
-      sections.push(analyzeCpu(etlPath, pid, keywords, startTime, endTime, undefined));
-    }
-  }
-
-  // ── 11. NEXT STEPS (user-friendly) ──
-  sections.push("---\n");
-  sections.push(buildUserFriendlyNextSteps(topSuspect, isNavRelated, includeCpu, !!startTime, traceStructure));
-
-  // ── 12. APPENDIX (link to JSON, not inline) ──
+  // ── APPENDIX ──
   sections.push("---\n");
   sections.push(buildAppendixSection(outputDir));
 
@@ -283,49 +266,593 @@ function parseRootCauses(triageOutput: string): ParsedRootCause[] {
   return causes;
 }
 
-function buildVerdict(
+// ─── New Report Section Builders ────────────────────────────────────
+
+function buildSymptomSection(
+  symptom: string,
+  structure: TraceStructure | null,
+  report: ETLAnalysisReport | null,
+): string {
+  const out: string[] = [
+    "## 🎯 Symptom",
+    "",
+  ];
+
+  if (symptom) {
+    out.push(`**Reported**: ${symptom}`);
+  } else {
+    out.push("**Reported**: Not specified by user");
+  }
+  out.push("");
+
+  // Add observed symptoms from trace analysis
+  const observed: string[] = [];
+  if (report?.failureSignals?.rendererCrashDuringNavigation) observed.push("Renderer crashed during navigation");
+  if (report?.failureSignals?.navigationCommitWithoutComplete) observed.push("Navigation committed but never completed");
+  if (report?.failureSignals?.browserProcessFailure) observed.push("Browser process terminated unexpectedly");
+  if (report?.failureSignals?.rendererStartupSlow) observed.push("Renderer startup was abnormally slow");
+  if (report?.failureSignals?.creationFailure) observed.push("WebView2 creation failed");
+  if (report?.failureSignals?.serviceWorkerTimeout) observed.push("Service worker timed out");
+  if (report?.failureSignals?.authenticationFailure) observed.push("Authentication failure detected");
+  if (report?.failureSignals?.gpuCrash) observed.push("GPU process crashed");
+  if (report?.failureSignals?.networkStallDetected) observed.push("Network stall detected");
+
+  if (structure) {
+    const issueIncs = structure.incarnations.filter(i => i.hasIssue);
+    for (const inc of issueIncs) {
+      if (inc.issueHint && !observed.some(o => o.includes(inc.issueHint.substring(0, 20)))) {
+        observed.push(inc.issueHint);
+      }
+    }
+  }
+
+  if (observed.length > 0) {
+    out.push("**Observed from trace**:");
+    for (const o of observed) {
+      out.push(`- ${o}`);
+    }
+    out.push("");
+  }
+
+  return out.join("\n");
+}
+
+function buildImpactSection(
   topSuspect: string,
-  rootCauses: ParsedRootCause[],
   report: ETLAnalysisReport | null,
   structure: TraceStructure | null,
 ): string {
-  const primary = rootCauses[0];
-  const confidence = primary ? `${primary.confidence}%` : "Unknown";
-  const confLabel = primary && primary.confidence >= 70 ? "High" : primary && primary.confidence >= 50 ? "Moderate" : "Low";
-
-  // Build impact statement
-  let impact = "The host application may be in an unexpected state.";
-  if (topSuspect.toLowerCase().includes("navigation")) {
-    impact = "The host app was never notified that navigation finished. If it waits on this event before showing content, the result is a **blank but responsive UI**.";
-  } else if (topSuspect.toLowerCase().includes("auth") || topSuspect.toLowerCase().includes("token")) {
-    impact = "Authentication failures may prevent content from loading, resulting in blank or error pages.";
-  } else if (topSuspect.toLowerCase().includes("renderer") || topSuspect.toLowerCase().includes("crash")) {
-    impact = "Renderer instability means the page cannot render reliably — content may flash or go blank.";
-  } else if (topSuspect.toLowerCase().includes("service worker")) {
-    impact = "Service worker delays may cause prolonged blank pages before content appears.";
-  }
-
-  // Build key action
-  let keyAction = "Compare with a working trace to confirm this is the divergence point.";
-  if (topSuspect.toLowerCase().includes("navigation") && topSuspect.toLowerCase().includes("completed")) {
-    keyAction = "Compare with a working trace to confirm divergence. Check if event handlers (`add_NavigationCompleted`) were registered before navigation began.";
-  }
-
-  const missingNote = primary?.missing?.length
-    ? `, but missing \`${primary.missing[0]?.replace(/^⚠️\s*Expected\s*/i, "").replace(/\s*not found$/i, "")}\` weakens temporal correlation`
-    : "";
-
   const out: string[] = [
-    "## 🎯 Verdict",
-    "",
-    "| | |",
-    "|---|---|",
-    `| **Finding** | \`${topSuspect || "Unknown"}\` — ${primary?.stage ? `at the ${primary.stage} stage` : "root cause could not be determined"}. |`,
-    `| **Confidence** | **${confidence}** (${confLabel})${missingNote ? ` — strong event evidence${missingNote}` : ""} |`,
-    `| **Impact** | ${impact} |`,
-    `| **Key Action** | ${keyAction} |`,
+    "## 💥 Impact",
     "",
   ];
+
+  const suspect = topSuspect.toLowerCase();
+
+  if (suspect.includes("navigation") && suspect.includes("completed")) {
+    out.push("The host app was never notified that navigation finished. If it waits on this event before showing content, the result is a **blank but responsive UI**.");
+    out.push("");
+    out.push("**User-facing**: The end user sees a blank page or loading indicator that never resolves, even though the underlying browser process is running normally.");
+  } else if (suspect.includes("navigation")) {
+    out.push("Navigation did not complete as expected. The page content may not have loaded properly.");
+    out.push("");
+    out.push("**User-facing**: The end user may see a blank page, partial content, or an error page.");
+  } else if (suspect.includes("auth") || suspect.includes("token")) {
+    out.push("Authentication failures prevent secure content from loading.");
+    out.push("");
+    out.push("**User-facing**: Login prompts may fail, pages requiring auth may show errors, or SSO may be broken.");
+  } else if (suspect.includes("renderer") || suspect.includes("crash")) {
+    out.push("Renderer instability means the page cannot render reliably.");
+    out.push("");
+    out.push("**User-facing**: Content may flash, go blank, or show an error page unexpectedly.");
+  } else if (suspect.includes("service worker")) {
+    out.push("Service worker delays prevent content from appearing promptly.");
+    out.push("");
+    out.push("**User-facing**: Prolonged blank page before content finally appears, or stale cached content displayed.");
+  } else if (suspect.includes("creation") || suspect.includes("initialization")) {
+    out.push("WebView2 environment failed to initialize.");
+    out.push("");
+    out.push("**User-facing**: The application window shows no web content at all — the WebView2 control never appeared.");
+  } else {
+    out.push("The host application may be in an unexpected state due to the detected issue.");
+    out.push("");
+    out.push("**User-facing**: Application behavior is degraded or functionality is broken.");
+  }
+
+  // Add scope info
+  if (structure) {
+    const issueCount = structure.incarnations.filter(i => i.hasIssue).length;
+    const totalCount = structure.incarnations.length;
+    if (totalCount > 0) {
+      out.push("");
+      out.push(`**Scope**: ${issueCount} of ${totalCount} WebView2 incarnation(s) affected.`);
+    }
+  }
+
+  out.push("");
+  return out.join("\n");
+}
+
+function buildRootCauseHypothesisSection(
+  rootCauses: ParsedRootCause[],
+  report: ETLAnalysisReport | null,
+  structure: TraceStructure | null,
+  filteredFile: string,
+  topSuspect: string,
+  isNavRelated: boolean,
+): string {
+  const out: string[] = [
+    "## 🧠 Root Cause Hypothesis",
+    "",
+  ];
+
+  // Primary hypothesis
+  if (rootCauses.length > 0) {
+    const primary = rootCauses[0];
+    out.push(`### Primary: ${primary.label}`);
+    out.push("");
+    out.push(`**Stage**: ${primary.stage} | **Category**: ${primary.category}`);
+    out.push("");
+  } else {
+    out.push("### Primary: Undetermined");
+    out.push("");
+    out.push("Insufficient evidence to form a root cause hypothesis.");
+    out.push("");
+  }
+
+  // ── Process Incarnation Map (PID groups) ──
+  if (structure && structure.incarnations.length > 0) {
+    out.push("### 🔄 Process Incarnation Map");
+    out.push("");
+    for (const inc of structure.incarnations) {
+      const status = inc.hasIssue ? `🔴 **${inc.issueHint}**` : "✅ OK";
+      out.push(`#### Incarnation #${inc.id} — ${status} (${formatMs(inc.durationMs)})`);
+      out.push("");
+      out.push("| Role | PID | Events | Errors |");
+      out.push("|------|-----|--------|--------|");
+
+      // Group processes by role
+      const hostProc = inc.processes.find(p => p.role === "host");
+      const browserProc = inc.processes.find(p => p.role === "browser" || p.role === "webview2");
+      const renderers = inc.processes.filter(p => p.role === "renderer");
+      const gpuProc = inc.processes.find(p => p.role === "gpu");
+      const utilities = inc.processes.filter(p => p.role === "utility");
+      const others = inc.processes.filter(p =>
+        !["host", "browser", "webview2", "renderer", "gpu", "utility"].includes(p.role)
+      );
+
+      if (hostProc) {
+        out.push(`| 📦 Host | ${hostProc.pid} | ${hostProc.eventCount} | ${hostProc.errors.length > 0 ? hostProc.errors.slice(0, 2).join(", ") : "—"} |`);
+      }
+      if (browserProc) {
+        out.push(`| 🌐 Browser | ${browserProc.pid} | ${browserProc.eventCount} | ${browserProc.errors.length > 0 ? browserProc.errors.slice(0, 2).join(", ") : "—"} |`);
+      }
+      for (const r of renderers.slice(0, 5)) {
+        out.push(`| 📄 Renderer | ${r.pid} | ${r.eventCount} | ${r.errors.length > 0 ? r.errors.slice(0, 2).join(", ") : "—"} |`);
+      }
+      if (renderers.length > 5) {
+        out.push(`| 📄 Renderer | +${renderers.length - 5} more | — | — |`);
+      }
+      if (gpuProc) {
+        out.push(`| 🎮 GPU | ${gpuProc.pid} | ${gpuProc.eventCount} | ${gpuProc.errors.length > 0 ? gpuProc.errors.slice(0, 2).join(", ") : "—"} |`);
+      }
+      for (const u of utilities.slice(0, 3)) {
+        out.push(`| ⚙️ Utility | ${u.pid} | ${u.eventCount} | — |`);
+      }
+      out.push("");
+    }
+  }
+
+  // ── Trace Path vs Expected Path ──
+  if (isNavRelated) {
+    out.push("### 🧭 Trace Path vs Expected Path");
+    out.push("");
+    out.push(buildSequenceVisualization(filteredFile, report));
+    out.push("");
+  }
+
+  // ── Annotated Timeline ──
+  if (structure) {
+    const timeline = buildAnnotatedTimeline(structure, topSuspect);
+    if (timeline) {
+      out.push("### ⏱️ Annotated Timeline");
+      out.push("");
+      out.push(timeline);
+    }
+  }
+
+  // ── Contributing Factors ──
+  if (rootCauses.length > 1) {
+    out.push("### 🟡 Contributing Factors");
+    out.push("");
+    for (let i = 1; i < rootCauses.length; i++) {
+      const rc = rootCauses[i];
+      out.push(`**${i}. ${rc.label}** (${rc.confidence}% — ${rc.stage})`);
+      if (rc.evidence.length > 0) {
+        for (const e of rc.evidence.slice(0, 3)) {
+          out.push(`   - ${e.replace(/^[✅🔍🚫]\s*/, "")}`);
+        }
+      }
+      out.push("");
+    }
+  }
+
+  // ── Additional analysis signals ──
+  if (structure && structure.issues.length > 0) {
+    out.push("### ⚡ Additional Signals");
+    out.push("");
+    out.push("| Severity | Signal |");
+    out.push("|----------|--------|");
+    for (const issue of structure.issues.slice(0, 10)) {
+      out.push(`| ${issue.severity} | ${issue.message}: \`${issue.evidence.slice(0, 80)}\` |`);
+    }
+    out.push("");
+  }
+
+  return out.join("\n");
+}
+
+function buildEvidenceSection(
+  report: ETLAnalysisReport | null,
+  structure: TraceStructure | null,
+): string {
+  const out: string[] = [
+    "## 📊 Evidence",
+    "",
+  ];
+
+  // Key metrics
+  if (report) {
+    const m = report.computedMetrics;
+    out.push("### Key Metrics");
+    out.push("");
+    out.push("| Metric | Observed | Baseline (p95) | Assessment |");
+    out.push("|--------|----------|----------------|------------|");
+
+    if (m.creationTimeMs != null) {
+      const assess = m.creationTimeMs > 3000 ? "🔴 **Slow**" : m.creationTimeMs > 1500 ? "⚠️ **Above baseline**" : "✅ Normal";
+      out.push(`| WebView2 Creation | ${formatMs(m.creationTimeMs)} | < 3,000ms | ${assess} |`);
+    }
+    if (m.browserToRendererStartupMs != null) {
+      const assess = m.browserToRendererStartupMs > 1000 ? "🔴 **Slow**" : m.browserToRendererStartupMs > 500 ? "⚠️ **Slow**" : "✅ Normal";
+      out.push(`| Browser → Renderer Startup | ${formatMs(m.browserToRendererStartupMs)} | < 500ms | ${assess} |`);
+    }
+    if (m.rendererLifetimeMs != null) {
+      out.push(`| Renderer Lifetime | ${formatMs(m.rendererLifetimeMs)} | — | ℹ️ |`);
+    }
+
+    const rendererCount = report.processTopology.renderers.length;
+    if (rendererCount > 0) {
+      const assess = rendererCount > 5 ? "⚠️ **Abnormal**" : "✅ Normal";
+      out.push(`| Renderer Processes | ${rendererCount} | 1-3 | ${assess} |`);
+    }
+
+    out.push(`| GPU Restarts | ${m.gpuRestartCount} | 0 | ${m.gpuRestartCount > 0 ? "⚠️ **Unstable**" : "✅ Healthy"} |`);
+
+    if (m.dllLoadCount > 0) {
+      const assess = m.dllLoadCount > 200 ? "⚠️ **High**" : "✅ Normal";
+      out.push(`| DLLs Loaded | ${m.dllLoadCount} | < 50 | ${assess} |`);
+    }
+
+    if (report.networkActivity.longPendingRequests > 0) {
+      out.push(`| Pending Network Requests | ${report.networkActivity.longPendingRequests} | — | ℹ️ Many requests never got responses |`);
+    }
+    out.push("");
+
+    // Root cause evidence details
+    if (report.rootCauseAnalysis?.primary) {
+      const rcaPrimary = report.rootCauseAnalysis.primary;
+      out.push("### Root Cause Evidence");
+      out.push("");
+      out.push("| Signal | Detail |");
+      out.push("|--------|--------|");
+      out.push(`| Type | ${rcaPrimary.type} |`);
+      out.push(`| Stage | ${rcaPrimary.stage} |`);
+      out.push(`| Confidence | ${rcaPrimary.confidence}% |`);
+      out.push("");
+    }
+
+    // DLL injection evidence
+    if (report.injectionAndEnvironment.thirdPartyDllsDetected.length > 0 || report.injectionAndEnvironment.suspectedVDIEnvironment) {
+      out.push("### Environment Evidence");
+      out.push("");
+      if (report.injectionAndEnvironment.suspectedVDIEnvironment) {
+        out.push("⚠️ **VDI environment detected** — indicators: " +
+          report.injectionAndEnvironment.vdiIndicators.slice(0, 3).join(", "));
+        out.push("");
+      }
+      if (report.injectionAndEnvironment.thirdPartyDllsDetected.length > 0) {
+        out.push(`**Third-party DLLs injected** (${report.injectionAndEnvironment.thirdPartyDllsDetected.length}):`);
+        for (const dll of report.injectionAndEnvironment.thirdPartyDllsDetected.slice(0, 5)) {
+          out.push(`- \`${dll}\``);
+        }
+        out.push("");
+      }
+    }
+  }
+
+  return out.join("\n");
+}
+
+function buildConfidenceLevelSection(
+  rootCauses: ParsedRootCause[],
+  report: ETLAnalysisReport | null,
+): string {
+  const out: string[] = [
+    "## 🎲 Confidence Level",
+    "",
+  ];
+
+  if (rootCauses.length === 0) {
+    out.push("**Level**: ❓ **Low** — Insufficient data to form a hypothesis.");
+    out.push("");
+    out.push("**Reasoning**: No clear root cause pattern was identified in the trace data.");
+    out.push("");
+    return out.join("\n");
+  }
+
+  const primary = rootCauses[0];
+  const confPct = primary.confidence;
+  let confLabel = "Low";
+  let confIcon = "🟡";
+  if (confPct >= 80) { confLabel = "High"; confIcon = "🟢"; }
+  else if (confPct >= 60) { confLabel = "Moderate-High"; confIcon = "🟢"; }
+  else if (confPct >= 40) { confLabel = "Moderate"; confIcon = "🟡"; }
+  else { confLabel = "Low"; confIcon = "🔴"; }
+
+  out.push(`**Level**: ${confIcon} **${confLabel}** (${confPct}%)`);
+  out.push("");
+
+  // Evidence strength breakdown
+  out.push("**Supporting signals**:");
+  if (primary.evidence.length > 0) {
+    for (const e of primary.evidence) {
+      const cleaned = e.replace(/^[✅🔍🚫]\s*/, "").replace(/^[^\w]*/, "");
+      const icon = e.startsWith("✅") ? "✅" : e.startsWith("🚫") ? "🚫" : "🔍";
+      out.push(`- ${icon} ${cleaned}`);
+    }
+  }
+  out.push("");
+
+  // Weakening signals
+  if (primary.missing.length > 0) {
+    out.push("**Weakening signals**:");
+    for (const m of primary.missing) {
+      out.push(`- ⚠️ ${m.replace(/^⚠️\s*/, "")}`);
+    }
+    out.push("");
+  }
+
+  // Confidence model from structured report
+  if (report?.confidenceModel) {
+    const cm = report.confidenceModel;
+    out.push("**Scoring breakdown**:");
+    out.push(`- Signal agreement: ${cm.signalAgreementScore ?? "—"}`);
+    out.push(`- Temporal correlation: ${cm.temporalCorrelationScore ?? "—"}`);
+    out.push(`- Noise level: ${cm.noiseLevelScore ?? "—"}`);
+    out.push(`- Final confidence: ${cm.finalConfidence ?? "—"}%`);
+    out.push("");
+  }
+
+  return out.join("\n");
+}
+
+function buildCpuDeepDiveSection(
+  includeCpu: boolean,
+  etlPath: string,
+  pid: string | undefined,
+  cpuKeywords: string[] | undefined,
+  startTime: string | undefined,
+  endTime: string | undefined,
+  structure: TraceStructure | null,
+): string {
+  const out: string[] = [
+    "## ⚡ Deep Dive: CPU Traces for Suspicious Timing",
+    "",
+  ];
+
+  if (includeCpu && pid) {
+    const keywords = cpuKeywords || ["msedge.dll", "msedgewebview2.dll", "webview2", "ntdll"];
+    const cpuResult = analyzeCpu(etlPath, pid, keywords, startTime, endTime, undefined);
+    out.push(cpuResult);
+  } else if (includeCpu && !pid) {
+    out.push("CPU analysis requested but no `pid` provided.");
+    out.push("");
+    if (structure) {
+      const browserPid = structure.processes.find(p => p.role === "browser" || p.role === "webview2")?.pid;
+      if (browserPid) {
+        out.push(`Recommended PID: **${browserPid}** (browser process). Re-run with \`pid=${browserPid}\`.`);
+      }
+    }
+  } else {
+    // CPU not requested — show guidance for suspicious timing
+    out.push("CPU profiling was not requested for this analysis.");
+    out.push("");
+
+    // Identify suspicious gaps that would benefit from CPU analysis
+    if (structure) {
+      const suspiciousGaps: { incarnation: number; fromEvent: string; toEvent: string; gapMs: number; pid: number }[] = [];
+      for (const inc of structure.incarnations) {
+        const events = inc.keyEvents.sort((a, b) => a.ts - b.ts);
+        for (let i = 1; i < events.length; i++) {
+          const gapMs = (events[i].ts - events[i - 1].ts) / 1000;
+          if (gapMs > 500) {
+            suspiciousGaps.push({
+              incarnation: inc.id,
+              fromEvent: events[i - 1].event,
+              toEvent: events[i].event,
+              gapMs,
+              pid: events[i].pid,
+            });
+          }
+        }
+      }
+
+      if (suspiciousGaps.length > 0) {
+        out.push("### Suspicious Timing Gaps (candidates for CPU deep dive)");
+        out.push("");
+        out.push("| Gap | Between | PID | Recommended Action |");
+        out.push("|-----|---------|-----|--------------------|");
+        for (const g of suspiciousGaps.slice(0, 5)) {
+          const action = `Re-run with \`pid=${g.pid}, include_cpu=true\``;
+          out.push(`| ${formatMs(g.gapMs)} | \`${g.fromEvent.slice(0, 30)}\` → \`${g.toEvent.slice(0, 30)}\` | ${g.pid} | ${action} |`);
+        }
+        out.push("");
+      } else {
+        out.push("No suspicious timing gaps detected. CPU profiling may not be needed for this trace.");
+      }
+    }
+  }
+
+  out.push("");
+  return out.join("\n");
+}
+
+function buildNextActionSection(
+  topSuspect: string,
+  isNav: boolean,
+  hasCpu: boolean,
+  hasTimeline: boolean,
+  structure: TraceStructure | null,
+): string {
+  const out: string[] = [
+    "## ▶️ Next Action",
+    "",
+    "### Immediate Steps",
+    "",
+  ];
+
+  let step = 1;
+
+  out.push(`${step}. **Compare with a working trace** — Capture an ETL when the app works normally:`);
+  out.push(`   > *"Analyze bad trace with good trace good.etl for ${structure ? structure.processes.find(p => p.role === "host")?.name || "the host app" : "the host app"}"*`);
+  out.push("");
+  step++;
+
+  if (isNav) {
+    out.push(`${step}. **Check event handler timing** — Verify that \`add_NavigationCompleted\` is called *before* \`Navigate()\` in the host app code.`);
+    out.push("");
+    step++;
+  }
+
+  if (topSuspect.toLowerCase().includes("auth")) {
+    out.push(`${step}. **Verify auth configuration** — Check WAM/TokenBroker setup and network connectivity to identity providers.`);
+    out.push("");
+    step++;
+  }
+
+  if (topSuspect.toLowerCase().includes("crash") || topSuspect.toLowerCase().includes("renderer")) {
+    out.push(`${step}. **Check crash dumps** — Look in the WebView2 user data folder for crash dump files.`);
+    out.push("");
+    step++;
+  }
+
+  if (!hasCpu && structure) {
+    const browserPid = structure.processes.find(p => p.role === "browser" || p.role === "webview2")?.pid;
+    if (browserPid) {
+      out.push(`${step}. **Run CPU profiling** for deeper analysis:`);
+      out.push(`   > *"Re-analyze with CPU profiling for PID ${browserPid}"*`);
+      out.push("");
+      step++;
+    }
+  }
+
+  out.push("### For Deeper Analysis");
+  out.push("");
+
+  if (!hasTimeline) {
+    out.push('- **Timeline slice** around the issue window:');
+    out.push('  > *"Analyze with start_time and end_time around the issue"*');
+    out.push("");
+  }
+
+  out.push('- **Decode API IDs** to see which specific APIs were called:');
+  out.push('  > *"Decode WebView2 API IDs 3, 5, 10"*');
+  out.push("");
+
+  out.push("### Share Your Findings");
+  out.push("");
+  out.push('- **Share learnings** — Help improve analysis for everyone:');
+  out.push('  > *"Share my learnings"*');
+  out.push("");
+
+  return out.join("\n");
+}
+
+function buildOpenQuestionsSection(
+  rootCauses: ParsedRootCause[],
+  report: ETLAnalysisReport | null,
+  structure: TraceStructure | null,
+  hasCpu: boolean,
+  goodEtl: string | undefined,
+): string {
+  const out: string[] = [
+    "## ❓ Open Questions",
+    "",
+  ];
+
+  const questions: string[] = [];
+
+  // Missing confidence
+  if (rootCauses.length > 0 && rootCauses[0].confidence < 70) {
+    questions.push("Root cause confidence is below 70% — additional traces or logs may be needed to confirm the hypothesis.");
+  }
+
+  // Missing signals
+  if (rootCauses.length > 0 && rootCauses[0].missing.length > 0) {
+    for (const m of rootCauses[0].missing) {
+      const cleaned = m.replace(/^⚠️\s*/, "");
+      questions.push(`Expected signal not found: ${cleaned} — Was the trace started early enough to capture this event?`);
+    }
+  }
+
+  // No comparison trace
+  if (!goodEtl) {
+    questions.push("No working trace was provided for comparison. Is this behavior consistently reproducible, or intermittent?");
+  }
+
+  // No CPU data
+  if (!hasCpu) {
+    questions.push("CPU profiling was not included. Are there performance or timeout symptoms that would benefit from CPU analysis?");
+  }
+
+  // Multiple incarnations
+  if (structure && structure.incarnations.length > 1) {
+    const issueCount = structure.incarnations.filter(i => i.hasIssue).length;
+    if (issueCount < structure.incarnations.length) {
+      questions.push(`Only ${issueCount} of ${structure.incarnations.length} incarnations showed issues. What differs between the working and failing incarnations?`);
+    }
+  }
+
+  // VDI/injection
+  if (report?.injectionAndEnvironment?.suspectedVDIEnvironment) {
+    questions.push("VDI environment detected. Does the same issue reproduce on a non-VDI machine?");
+  }
+
+  // DLL injection
+  if (report?.injectionAndEnvironment?.thirdPartyDllsDetected && report.injectionAndEnvironment.thirdPartyDllsDetected.length > 0) {
+    questions.push("Third-party DLLs were injected into WebView2 processes. Can these be temporarily disabled to test if they are contributing to the issue?");
+  }
+
+  // Auth failures
+  if (report?.failureSignals?.authenticationFailure) {
+    questions.push("Authentication failure detected. Is the user account properly configured and are identity provider endpoints reachable?");
+  }
+
+  // Short trace
+  if (structure && structure.traceSpanMs < 1000) {
+    questions.push("The trace is very short (<1s). Was the capture stopped too early, before the issue fully manifested?");
+  }
+
+  if (questions.length === 0) {
+    questions.push("No major open questions identified. The analysis appears comprehensive for the available data.");
+  }
+
+  for (let i = 0; i < questions.length; i++) {
+    out.push(`${i + 1}. ${questions[i]}`);
+  }
+  out.push("");
+
   return out.join("\n");
 }
 
@@ -343,7 +870,7 @@ function buildAnnotatedTimeline(
   const events = targetInc.keyEvents.sort((a, b) => a.ts - b.ts);
 
   const out: string[] = [
-    `## ⏱️ Annotated Timeline (Incarnation #${targetInc.id} — ${targetInc.issueHint || "where it broke"})`,
+    `**Incarnation #${targetInc.id}** — ${targetInc.issueHint || "key events"}`,
     "",
     "```",
     "Time          Event                              PID     What happened",
@@ -478,185 +1005,10 @@ function buildSequenceVisualization(
   return out.join("\n");
 }
 
-function buildRCASection(rootCauses: ParsedRootCause[], report: ETLAnalysisReport | null): string {
-  const out: string[] = [
-    "## 🔍 Root Cause Analysis",
-    "",
-  ];
-
-  if (rootCauses.length === 0) {
-    out.push("No root causes identified with sufficient confidence.");
-    return out.join("\n");
-  }
-
-  // Primary
-  const primary = rootCauses[0];
-  out.push(`### 🟥 Primary: ${primary.label} (${primary.confidence}%)`);
-  out.push("");
-  out.push(`**Stage**: ${primary.stage}`);
-  out.push("");
-
-  if (primary.evidence.length > 0 || primary.missing.length > 0) {
-    out.push("| Evidence | Detail |");
-    out.push("|----------|--------|");
-    for (const e of primary.evidence) {
-      // Strip leading emoji markers and clean up for display
-      const cleaned = e.replace(/^[✅🔍🚫]\s*/, "").replace(/^[^\w]*/, "");
-      const icon = e.startsWith("✅") ? "✅ Present" : e.startsWith("🚫") ? "🚫 Confirmed absent" : "🔍 Detected";
-      out.push(`| ${icon} | ${cleaned} |`);
-    }
-    for (const m of primary.missing) {
-      out.push(`| ⚠️ Unexpectedly absent | ${m.replace(/^⚠️\s*/, "")} |`);
-    }
-    out.push("");
-  }
-
-  // Alternative explanations from structured report
-  if (report?.rootCauseAnalysis?.primary) {
-    const rca = report.rootCauseAnalysis;
-    if (rca.secondary && rca.secondary.length > 0) {
-      // Will be covered by contributing factors below
-    }
-  }
-
-  // Contributing factors
-  for (let i = 1; i < rootCauses.length; i++) {
-    const rc = rootCauses[i];
-    out.push(`### 🟡 Contributing: ${rc.label} (${rc.confidence}%)`);
-    out.push("");
-    if (rc.evidence.length > 0) {
-      out.push("| Evidence | Detail |");
-      out.push("|----------|--------|");
-      for (const e of rc.evidence) {
-        const cleaned = e.replace(/^[✅🔍🚫]\s*/, "").replace(/^[^\w]*/, "");
-        out.push(`| 🔍 Detected | ${cleaned} |`);
-      }
-      out.push("");
-    }
-  }
-
-  return out.join("\n");
-}
-
-function buildMetricsTable(report: ETLAnalysisReport): string {
-  const m = report.computedMetrics;
-  const out: string[] = [
-    "## 📊 Key Metrics",
-    "",
-    "| Metric | Observed | Baseline (p95) | Assessment |",
-    "|--------|----------|----------------|------------|",
-  ];
-
-  if (m.creationTimeMs != null) {
-    const assess = m.creationTimeMs > 3000 ? "🔴 **Slow**" : m.creationTimeMs > 1500 ? "⚠️ **Above baseline**" : "✅ Normal";
-    out.push(`| WebView2 Creation | ${formatMs(m.creationTimeMs)} | < 3,000ms | ${assess} |`);
-  }
-  if (m.browserToRendererStartupMs != null) {
-    const assess = m.browserToRendererStartupMs > 1000 ? "🔴 **Slow**" : m.browserToRendererStartupMs > 500 ? "⚠️ **Slow**" : "✅ Normal";
-    out.push(`| Browser → Renderer Startup | ${formatMs(m.browserToRendererStartupMs)} | < 500ms | ${assess} |`);
-  }
-  if (m.rendererLifetimeMs != null) {
-    out.push(`| Renderer Lifetime | ${formatMs(m.rendererLifetimeMs)} | — | ℹ️ |`);
-  }
-
-  const rendererCount = report.processTopology.renderers.length;
-  if (rendererCount > 0) {
-    const assess = rendererCount > 5 ? "⚠️ **Abnormal**" : "✅ Normal";
-    out.push(`| Renderer Processes | ${rendererCount} | 1-3 | ${assess} |`);
-  }
-
-  out.push(`| GPU Restarts | ${m.gpuRestartCount} | 0 | ${m.gpuRestartCount > 0 ? "⚠️ **Unstable**" : "✅ Healthy"} |`);
-
-  if (m.dllLoadCount > 0) {
-    const assess = m.dllLoadCount > 200 ? "⚠️ **High**" : "✅ Normal";
-    out.push(`| DLLs Loaded | ${m.dllLoadCount} | < 50 | ${assess} |`);
-  }
-
-  if (report.networkActivity.longPendingRequests > 0) {
-    out.push(`| Pending Network Requests | ${report.networkActivity.longPendingRequests} | — | ℹ️ Many requests never got responses |`);
-  }
-
-  out.push("");
-  return out.join("\n");
-}
-
-function buildCollapsedProcessSummary(structure: TraceStructure): string {
-  const out: string[] = [
-    "## 🌲 Process Summary",
-    "",
-    "```",
-  ];
-
-  // Group: show host and browser prominently, collapse renderers
-  const hosts = structure.processes.filter(p => p.role === "host").sort((a, b) => b.eventCount - a.eventCount);
-  const browsers = structure.processes.filter(p => p.role === "browser" || p.role === "webview2");
-  const renderers = structure.processes.filter(p => p.role === "renderer").sort((a, b) => b.eventCount - a.eventCount);
-  const errorStr = (p: { errors: string[] }) => p.errors.length > 0 ? `, ⚠️ ${p.errors.length} errors` : "";
-
-  for (const h of hosts) {
-    out.push(`📦 ${h.name} (PID ${h.pid}) [HOST] — ${h.eventCount.toLocaleString()} events${errorStr(h)}`);
-    for (const b of browsers) {
-      out.push(`  └── 🌐 ${b.name} (PID ${b.pid}) [BROWSER] — ${b.eventCount.toLocaleString()} events`);
-      // Show top 3 renderers, collapse rest
-      const topRenderers = renderers.slice(0, 3);
-      const restCount = renderers.length - 3;
-      for (const r of topRenderers) {
-        const note = r === topRenderers[0] ? "  (most active)" : "";
-        out.push(`      ├── 📄 PID ${r.pid} [RENDERER] — ${r.eventCount.toLocaleString()} events${note}`);
-      }
-      if (restCount > 0) {
-        const avgEvents = Math.round(renderers.slice(3).reduce((s, r) => s + r.eventCount, 0) / restCount);
-        out.push(`      └── ... +${restCount} more renderers (avg ~${avgEvents} events each)`);
-      }
-    }
-  }
-
-  out.push("```");
-  out.push("");
-
-  // Incarnation summary
-  if (structure.incarnations.length > 0) {
-    out.push(`**${structure.incarnations.length} WebView2 incarnation(s)** detected:`);
-    for (const inc of structure.incarnations) {
-      const ts = (inc.creationTs / 1_000_000).toFixed(3);
-      const status = inc.hasIssue ? `🔴 **${inc.issueHint}**` : "✅ OK";
-      out.push(`- **#${inc.id}** (ts ${ts}s): ${inc.durationMs.toFixed(0)}ms duration — ${status}`);
-    }
-    out.push("");
-  }
-
-  // Host errors
-  const hostsWithErrors = hosts.filter(h => h.errors.length > 0);
-  if (hostsWithErrors.length > 0) {
-    for (const h of hostsWithErrors) {
-      out.push(`**Host errors** (PID ${h.pid}): \`${h.errors.slice(0, 5).join("`, `")}\``);
-    }
-    out.push("");
-  }
-
-  return out.join("\n");
-}
-
-function buildWarningsSection(structure: TraceStructure): string {
-  const out: string[] = [
-    "## ⚡ Initial Warnings",
-    "",
-    "| Severity | Signal |",
-    "|----------|--------|",
-  ];
-
-  for (const issue of structure.issues.slice(0, 10)) {
-    out.push(`| ${issue.severity} | ${issue.message}: \`${issue.evidence.slice(0, 80)}\` |`);
-  }
-
-  out.push("");
-  return out.join("\n");
-}
-
 function buildConfigSnapshot(structure: TraceStructure): string {
   const c = structure.config;
   const out: string[] = [
-    "## 📋 Configuration Snapshot",
+    "## 📋 Metadata & Configuration",
     "",
     "### System & Runtime",
     "",
@@ -753,58 +1105,6 @@ function buildConfigSnapshot(structure: TraceStructure): string {
     out.push("```");
     out.push("");
   }
-
-  return out.join("\n");
-}
-
-function buildUserFriendlyNextSteps(
-  topSuspect: string,
-  isNav: boolean,
-  hasCpu: boolean,
-  hasTimeline: boolean,
-  structure: TraceStructure | null,
-): string {
-  const out: string[] = [
-    "## ▶️ Recommended Next Steps",
-    "",
-    "### For this specific issue:",
-    "",
-    '1. **Compare with a working trace** — Capture an ETL when the app works normally. Ask Copilot:',
-    '   > *"Analyze bad trace with good trace good.etl for ' + (structure ? structure.processes.find(p => p.role === "host")?.name || "the host app" : "the host app") + '"*',
-    "",
-  ];
-
-  if (isNav) {
-    out.push("2. **Check event handler timing** — Verify that `add_NavigationCompleted` is called *before* `Navigate()` in the host app code.");
-    out.push("");
-  }
-
-  if (!hasCpu && structure) {
-    const browserPid = structure.processes.find(p => p.role === "browser" || p.role === "webview2")?.pid;
-    if (browserPid) {
-      out.push(`${isNav ? "3" : "2"}. **Investigate with CPU profiling** — Ask Copilot:`);
-      out.push(`   > *"Re-analyze with CPU profiling for PID ${browserPid}"*`);
-      out.push("");
-    }
-  }
-
-  out.push("### 🧠 Share what you learned:");
-  out.push("");
-  out.push('- **Share learnings** — New events and timings were auto-discovered from this trace. Help improve analysis for everyone:');
-  out.push('  > *"Share my learnings"*');
-  out.push("");
-  out.push("### For deeper analysis:");
-  out.push("");
-
-  if (!hasTimeline) {
-    out.push('- **Timeline slice** around the issue window:');
-    out.push('  > *"Analyze with start_time and end_time around the issue"*');
-    out.push("");
-  }
-
-  out.push('- **Decode API IDs** to see which specific APIs were called:');
-  out.push('  > *"Decode WebView2 API IDs 3, 5, 10"*');
-  out.push("");
 
   return out.join("\n");
 }

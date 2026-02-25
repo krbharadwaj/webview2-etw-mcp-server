@@ -7,19 +7,22 @@
         "event": "WebView2_APICalled",
         "field": "API=3",
         "phase": "trigger",
-        "required": true
+        "required": true,
+        "etwSource": "Edge_WebView"
       },
       {
         "event": "WebView2_NewNavigationContext",
         "phase": "client",
         "required": false,
-        "notes": "Client creates new navigation context"
+        "notes": "Client creates new navigation context",
+        "etwSource": "Edge_WebView"
       },
       {
         "event": "WebView2_SetPendingNavigation",
         "phase": "client",
         "required": false,
-        "notes": "Marks navigation as pending"
+        "notes": "Marks navigation as pending",
+        "etwSource": "Edge_WebView"
       },
       {
         "event": "WebView2_NavigationStarting",
@@ -29,22 +32,55 @@
         "traceMapping": {
           "etw_event": "WebView2_Event",
           "handlerInterface": "ICoreWebView2NavigationStartingEventHandler"
-        }
+        },
+        "etwSource": "Edge_WebView"
       },
       {
         "event": "NavigationRequest::Create",
         "phase": "browser",
-        "required": false
+        "required": false,
+        "etwSource": "Edge_Stable"
       },
       {
         "event": "NavigationRequest::BeginNavigation",
         "phase": "browser",
-        "required": true
+        "required": true,
+        "etwSource": "Edge_Stable"
+      },
+      {
+        "event": "Initializing",
+        "phase": "browser",
+        "required": false,
+        "autoMined": true,
+        "notes": "Auto-discovered between NavigationRequest::BeginNavigation and NavigationRequest::StartNavigation"
+      },
+      {
+        "event": "BeginNavigation",
+        "phase": "browser",
+        "required": false,
+        "autoMined": true,
+        "notes": "Auto-discovered between NavigationRequest::BeginNavigation and NavigationRequest::StartNavigation"
+      },
+      {
+        "event": "PrerenderHostRegistry::FindPotentialHostToActivate",
+        "phase": "browser",
+        "required": false,
+        "autoMined": true,
+        "notes": "Auto-discovered between NavigationRequest::BeginNavigation and NavigationRequest::StartNavigation"
+      },
+      {
+        "event": "NavigationRequest::BeginNavigationImpl",
+        "phase": "browser",
+        "required": false,
+        "autoMined": true,
+        "notes": "Auto-discovered between PrerenderHostRegistry::FindPotentialHostToActivate and NavigationRequest::StartNavigation",
+        "etwSource": "Edge_Stable"
       },
       {
         "event": "NavigationRequest::StartNavigation",
         "phase": "browser",
-        "required": true
+        "required": true,
+        "etwSource": "Edge_Stable"
       },
       {
         "event": "WebView2_SourceChanged",
@@ -54,7 +90,8 @@
         "traceMapping": {
           "etw_event": "WebView2_Event",
           "handlerInterface": "ICoreWebView2SourceChangedEventHandler"
-        }
+        },
+        "etwSource": "Edge_WebView"
       },
       {
         "event": "WebView2_ContentLoading",
@@ -64,17 +101,20 @@
         "traceMapping": {
           "etw_event": "WebView2_Event",
           "handlerInterface": "ICoreWebView2ContentLoadingEventHandler"
-        }
+        },
+        "etwSource": "Edge_WebView"
       },
       {
         "event": "NavigationRequest::CommitNavigation",
         "phase": "browser",
-        "required": true
+        "required": true,
+        "etwSource": "Edge_Stable"
       },
       {
         "event": "NavigationRequest::DidCommitNavigation",
         "phase": "browser",
-        "required": true
+        "required": true,
+        "etwSource": "Edge_Stable"
       },
       {
         "event": "WebView2_HistoryChanged",
@@ -84,7 +124,8 @@
         "traceMapping": {
           "etw_event": "WebView2_Event",
           "handlerInterface": "ICoreWebView2HistoryChangedEventHandler"
-        }
+        },
+        "etwSource": "Edge_WebView"
       },
       {
         "event": "WebView2_DOMContentLoaded",
@@ -94,7 +135,8 @@
         "traceMapping": {
           "etw_event": "WebView2_Event",
           "handlerInterface": "ICoreWebView2DOMContentLoadedEventHandler"
-        }
+        },
+        "etwSource": "Edge_WebView"
       },
       {
         "event": "WebView2_NavigationCompleted",
@@ -104,7 +146,8 @@
         "traceMapping": {
           "etw_event": "WebView2_Event",
           "handlerInterface": "ICoreWebView2NavigationCompletedEventHandler"
-        }
+        },
+        "etwSource": "Edge_WebView"
       },
       {
         "event": "WebView2_Event",
@@ -116,7 +159,8 @@
           "etw_event": "WebView2_Event",
           "handlerInterface": "ICoreWebView2NavigationCompletedEventHandler"
         },
-        "field": "event=ICoreWebView2NavigationCompletedEventHandler"
+        "field": "event=ICoreWebView2NavigationCompletedEventHandler",
+        "etwSource": "Edge_WebView"
       }
     ],
     "timingEvents": [
@@ -147,12 +191,14 @@
         "event": "WebView2_APICalled",
         "field": "API=4",
         "phase": "trigger",
-        "required": true
+        "required": true,
+        "etwSource": "Edge_WebView"
       },
       {
         "event": "WebView2_NewNavigationContext",
         "phase": "client",
-        "required": false
+        "required": false,
+        "etwSource": "Edge_WebView"
       },
       {
         "event": "WebView2_NavigationStarting",
@@ -162,17 +208,20 @@
         "traceMapping": {
           "etw_event": "WebView2_Event",
           "handlerInterface": "ICoreWebView2NavigationStartingEventHandler"
-        }
+        },
+        "etwSource": "Edge_WebView"
       },
       {
         "event": "NavigationRequest::Create",
         "phase": "browser",
-        "required": false
+        "required": false,
+        "etwSource": "Edge_Stable"
       },
       {
         "event": "NavigationRequest::BeginNavigation",
         "phase": "browser",
-        "required": true
+        "required": true,
+        "etwSource": "Edge_Stable"
       },
       {
         "event": "WebView2_SourceChanged",
@@ -182,7 +231,8 @@
           "etw_event": "WebView2_Event",
           "handlerInterface": "ICoreWebView2SourceChangedEventHandler"
         },
-        "notes": " [In ETL: look for WebView2_Event with handler param]"
+        "notes": " [In ETL: look for WebView2_Event with handler param]",
+        "etwSource": "Edge_WebView"
       },
       {
         "event": "WebView2_ContentLoading",
@@ -192,17 +242,20 @@
           "etw_event": "WebView2_Event",
           "handlerInterface": "ICoreWebView2ContentLoadingEventHandler"
         },
-        "notes": " [In ETL: look for WebView2_Event with handler param]"
+        "notes": " [In ETL: look for WebView2_Event with handler param]",
+        "etwSource": "Edge_WebView"
       },
       {
         "event": "NavigationRequest::CommitNavigation",
         "phase": "browser",
-        "required": true
+        "required": true,
+        "etwSource": "Edge_Stable"
       },
       {
         "event": "NavigationRequest::DidCommitNavigation",
         "phase": "browser",
-        "required": true
+        "required": true,
+        "etwSource": "Edge_Stable"
       },
       {
         "event": "WebView2_DOMContentLoaded",
@@ -212,7 +265,8 @@
           "etw_event": "WebView2_Event",
           "handlerInterface": "ICoreWebView2DOMContentLoadedEventHandler"
         },
-        "notes": " [In ETL: look for WebView2_Event with handler param]"
+        "notes": " [In ETL: look for WebView2_Event with handler param]",
+        "etwSource": "Edge_WebView"
       },
       {
         "event": "WebView2_NavigationCompleted",
@@ -222,7 +276,8 @@
           "etw_event": "WebView2_Event",
           "handlerInterface": "ICoreWebView2NavigationCompletedEventHandler"
         },
-        "notes": " [In ETL: look for WebView2_Event with handler param]"
+        "notes": " [In ETL: look for WebView2_Event with handler param]",
+        "etwSource": "Edge_WebView"
       },
       {
         "event": "WebView2_Event",
@@ -234,7 +289,8 @@
           "handlerInterface": "ICoreWebView2NavigationCompletedEventHandler"
         },
         "notes": "Handler dispatch for NavigationCompleted — same WebView2_Event trace with specific handler param [In ETL: same WebView2_Event trace as the callback above]",
-        "field": "event=ICoreWebView2NavigationCompletedEventHandler"
+        "field": "event=ICoreWebView2NavigationCompletedEventHandler",
+        "etwSource": "Edge_WebView"
       }
     ],
     "timingEvents": [
@@ -255,12 +311,14 @@
         "event": "WebView2_APICalled",
         "field": "API=95",
         "phase": "trigger",
-        "required": true
+        "required": true,
+        "etwSource": "Edge_WebView"
       },
       {
         "event": "WebView2_NewNavigationContext",
         "phase": "client",
-        "required": false
+        "required": false,
+        "etwSource": "Edge_WebView"
       },
       {
         "event": "WebView2_NavigationStarting",
@@ -270,17 +328,20 @@
         "traceMapping": {
           "etw_event": "WebView2_Event",
           "handlerInterface": "ICoreWebView2NavigationStartingEventHandler"
-        }
+        },
+        "etwSource": "Edge_WebView"
       },
       {
         "event": "NavigationRequest::Create",
         "phase": "browser",
-        "required": false
+        "required": false,
+        "etwSource": "Edge_Stable"
       },
       {
         "event": "NavigationRequest::BeginNavigation",
         "phase": "browser",
-        "required": true
+        "required": true,
+        "etwSource": "Edge_Stable"
       },
       {
         "event": "WebView2_SourceChanged",
@@ -290,7 +351,8 @@
           "etw_event": "WebView2_Event",
           "handlerInterface": "ICoreWebView2SourceChangedEventHandler"
         },
-        "notes": " [In ETL: look for WebView2_Event with handler param]"
+        "notes": " [In ETL: look for WebView2_Event with handler param]",
+        "etwSource": "Edge_WebView"
       },
       {
         "event": "WebView2_ContentLoading",
@@ -300,17 +362,20 @@
           "etw_event": "WebView2_Event",
           "handlerInterface": "ICoreWebView2ContentLoadingEventHandler"
         },
-        "notes": " [In ETL: look for WebView2_Event with handler param]"
+        "notes": " [In ETL: look for WebView2_Event with handler param]",
+        "etwSource": "Edge_WebView"
       },
       {
         "event": "NavigationRequest::CommitNavigation",
         "phase": "browser",
-        "required": true
+        "required": true,
+        "etwSource": "Edge_Stable"
       },
       {
         "event": "NavigationRequest::DidCommitNavigation",
         "phase": "browser",
-        "required": true
+        "required": true,
+        "etwSource": "Edge_Stable"
       },
       {
         "event": "WebView2_DOMContentLoaded",
@@ -320,7 +385,8 @@
           "etw_event": "WebView2_Event",
           "handlerInterface": "ICoreWebView2DOMContentLoadedEventHandler"
         },
-        "notes": " [In ETL: look for WebView2_Event with handler param]"
+        "notes": " [In ETL: look for WebView2_Event with handler param]",
+        "etwSource": "Edge_WebView"
       },
       {
         "event": "WebView2_NavigationCompleted",
@@ -330,7 +396,8 @@
           "etw_event": "WebView2_Event",
           "handlerInterface": "ICoreWebView2NavigationCompletedEventHandler"
         },
-        "notes": " [In ETL: look for WebView2_Event with handler param]"
+        "notes": " [In ETL: look for WebView2_Event with handler param]",
+        "etwSource": "Edge_WebView"
       },
       {
         "event": "WebView2_Event",
@@ -342,7 +409,8 @@
           "handlerInterface": "ICoreWebView2NavigationCompletedEventHandler"
         },
         "notes": "Handler dispatch for NavigationCompleted — same WebView2_Event trace with specific handler param [In ETL: same WebView2_Event trace as the callback above]",
-        "field": "event=ICoreWebView2NavigationCompletedEventHandler"
+        "field": "event=ICoreWebView2NavigationCompletedEventHandler",
+        "etwSource": "Edge_WebView"
       }
     ],
     "timingEvents": [
@@ -365,50 +433,59 @@
       {
         "event": "WebView2_FactoryCreate",
         "phase": "factory",
-        "required": true
+        "required": true,
+        "etwSource": "Edge_WebView"
       },
       {
         "event": "WebView2_FactoryAcquired",
         "phase": "factory",
-        "required": true
+        "required": true,
+        "etwSource": "Edge_WebView"
       },
       {
         "event": "WebView2_WebViewProcessLaunchType",
         "phase": "factory",
         "required": false,
-        "notes": "type=0 cold, type=1 warm"
+        "notes": "type=0 cold, type=1 warm",
+        "etwSource": "Edge_WebView"
       },
       {
         "event": "WebView2_LaunchProcess_Attempt",
         "phase": "factory",
-        "required": false
+        "required": false,
+        "etwSource": "Edge_WebView"
       },
       {
         "event": "WebView2_Creation_Client",
         "phase": "client",
         "required": true,
-        "notes": "Async BEGIN/END pair — duration = creation time"
+        "notes": "Async BEGIN/END pair — duration = creation time",
+        "etwSource": "Edge_WebView"
       },
       {
         "event": "WebView2_CreationTime",
         "phase": "client",
-        "required": false
+        "required": false,
+        "etwSource": "Edge_WebView"
       },
       {
         "event": "WebView2_ClientWindowInit",
         "phase": "controller",
-        "required": false
+        "required": false,
+        "etwSource": "Edge_WebView"
       },
       {
         "event": "WebView2_RegisterUIAEndpoints",
         "phase": "controller",
-        "required": false
+        "required": false,
+        "etwSource": "Edge_WebView"
       },
       {
         "event": "WebView2_FirstNavigationTime",
         "phase": "client",
         "required": false,
-        "terminal": true
+        "terminal": true,
+        "etwSource": "Edge_WebView"
       }
     ],
     "timingEvents": [
@@ -439,12 +516,14 @@
         "event": "WebView2_APICalled",
         "field": "API=9",
         "phase": "trigger",
-        "required": true
+        "required": true,
+        "etwSource": "Edge_WebView"
       },
       {
         "event": "WebView2_NewNavigationContext",
         "phase": "client",
-        "required": false
+        "required": false,
+        "etwSource": "Edge_WebView"
       },
       {
         "event": "WebView2_NavigationStarting",
@@ -454,17 +533,20 @@
           "etw_event": "WebView2_Event",
           "handlerInterface": "ICoreWebView2NavigationStartingEventHandler"
         },
-        "notes": " [In ETL: look for WebView2_Event with handler param]"
+        "notes": " [In ETL: look for WebView2_Event with handler param]",
+        "etwSource": "Edge_WebView"
       },
       {
         "event": "NavigationRequest::Create",
         "phase": "browser",
-        "required": false
+        "required": false,
+        "etwSource": "Edge_Stable"
       },
       {
         "event": "NavigationRequest::BeginNavigation",
         "phase": "browser",
-        "required": true
+        "required": true,
+        "etwSource": "Edge_Stable"
       },
       {
         "event": "WebView2_ContentLoading",
@@ -474,17 +556,20 @@
           "etw_event": "WebView2_Event",
           "handlerInterface": "ICoreWebView2ContentLoadingEventHandler"
         },
-        "notes": " [In ETL: look for WebView2_Event with handler param]"
+        "notes": " [In ETL: look for WebView2_Event with handler param]",
+        "etwSource": "Edge_WebView"
       },
       {
         "event": "NavigationRequest::CommitNavigation",
         "phase": "browser",
-        "required": true
+        "required": true,
+        "etwSource": "Edge_Stable"
       },
       {
         "event": "NavigationRequest::DidCommitNavigation",
         "phase": "browser",
-        "required": true
+        "required": true,
+        "etwSource": "Edge_Stable"
       },
       {
         "event": "WebView2_DOMContentLoaded",
@@ -494,7 +579,8 @@
           "etw_event": "WebView2_Event",
           "handlerInterface": "ICoreWebView2DOMContentLoadedEventHandler"
         },
-        "notes": " [In ETL: look for WebView2_Event with handler param]"
+        "notes": " [In ETL: look for WebView2_Event with handler param]",
+        "etwSource": "Edge_WebView"
       },
       {
         "event": "WebView2_NavigationCompleted",
@@ -504,7 +590,8 @@
           "etw_event": "WebView2_Event",
           "handlerInterface": "ICoreWebView2NavigationCompletedEventHandler"
         },
-        "notes": " [In ETL: look for WebView2_Event with handler param]"
+        "notes": " [In ETL: look for WebView2_Event with handler param]",
+        "etwSource": "Edge_WebView"
       },
       {
         "event": "WebView2_Event",
@@ -516,7 +603,8 @@
           "handlerInterface": "ICoreWebView2NavigationCompletedEventHandler"
         },
         "notes": "Handler dispatch for NavigationCompleted — same WebView2_Event trace with specific handler param [In ETL: same WebView2_Event trace as the callback above]",
-        "field": "event=ICoreWebView2NavigationCompletedEventHandler"
+        "field": "event=ICoreWebView2NavigationCompletedEventHandler",
+        "etwSource": "Edge_WebView"
       }
     ],
     "timingEvents": [
@@ -537,7 +625,8 @@
         "event": "WebView2_APICalled",
         "field": "API=21",
         "phase": "trigger",
-        "required": true
+        "required": true,
+        "etwSource": "Edge_WebView"
       },
       {
         "event": "WebView2_NavigationStarting",
@@ -547,17 +636,20 @@
           "etw_event": "WebView2_Event",
           "handlerInterface": "ICoreWebView2NavigationStartingEventHandler"
         },
-        "notes": " [In ETL: look for WebView2_Event with handler param]"
+        "notes": " [In ETL: look for WebView2_Event with handler param]",
+        "etwSource": "Edge_WebView"
       },
       {
         "event": "NavigationRequest::Create",
         "phase": "browser",
-        "required": false
+        "required": false,
+        "etwSource": "Edge_Stable"
       },
       {
         "event": "NavigationRequest::BeginNavigation",
         "phase": "browser",
-        "required": true
+        "required": true,
+        "etwSource": "Edge_Stable"
       },
       {
         "event": "WebView2_ContentLoading",
@@ -567,17 +659,20 @@
           "etw_event": "WebView2_Event",
           "handlerInterface": "ICoreWebView2ContentLoadingEventHandler"
         },
-        "notes": " [In ETL: look for WebView2_Event with handler param]"
+        "notes": " [In ETL: look for WebView2_Event with handler param]",
+        "etwSource": "Edge_WebView"
       },
       {
         "event": "NavigationRequest::CommitNavigation",
         "phase": "browser",
-        "required": true
+        "required": true,
+        "etwSource": "Edge_Stable"
       },
       {
         "event": "NavigationRequest::DidCommitNavigation",
         "phase": "browser",
-        "required": true
+        "required": true,
+        "etwSource": "Edge_Stable"
       },
       {
         "event": "WebView2_DOMContentLoaded",
@@ -587,7 +682,8 @@
           "etw_event": "WebView2_Event",
           "handlerInterface": "ICoreWebView2DOMContentLoadedEventHandler"
         },
-        "notes": " [In ETL: look for WebView2_Event with handler param]"
+        "notes": " [In ETL: look for WebView2_Event with handler param]",
+        "etwSource": "Edge_WebView"
       },
       {
         "event": "WebView2_NavigationCompleted",
@@ -597,7 +693,8 @@
           "etw_event": "WebView2_Event",
           "handlerInterface": "ICoreWebView2NavigationCompletedEventHandler"
         },
-        "notes": " [In ETL: look for WebView2_Event with handler param]"
+        "notes": " [In ETL: look for WebView2_Event with handler param]",
+        "etwSource": "Edge_WebView"
       },
       {
         "event": "WebView2_Event",
@@ -609,7 +706,8 @@
           "handlerInterface": "ICoreWebView2NavigationCompletedEventHandler"
         },
         "notes": "Handler dispatch for NavigationCompleted — same WebView2_Event trace with specific handler param [In ETL: same WebView2_Event trace as the callback above]",
-        "field": "event=ICoreWebView2NavigationCompletedEventHandler"
+        "field": "event=ICoreWebView2NavigationCompletedEventHandler",
+        "etwSource": "Edge_WebView"
       }
     ],
     "timingEvents": [
@@ -629,7 +727,8 @@
         "event": "WebView2_APICalled",
         "field": "API=22",
         "phase": "trigger",
-        "required": true
+        "required": true,
+        "etwSource": "Edge_WebView"
       },
       {
         "event": "WebView2_NavigationStarting",
@@ -639,17 +738,20 @@
           "etw_event": "WebView2_Event",
           "handlerInterface": "ICoreWebView2NavigationStartingEventHandler"
         },
-        "notes": " [In ETL: look for WebView2_Event with handler param]"
+        "notes": " [In ETL: look for WebView2_Event with handler param]",
+        "etwSource": "Edge_WebView"
       },
       {
         "event": "NavigationRequest::Create",
         "phase": "browser",
-        "required": false
+        "required": false,
+        "etwSource": "Edge_Stable"
       },
       {
         "event": "NavigationRequest::BeginNavigation",
         "phase": "browser",
-        "required": true
+        "required": true,
+        "etwSource": "Edge_Stable"
       },
       {
         "event": "WebView2_ContentLoading",
@@ -659,17 +761,20 @@
           "etw_event": "WebView2_Event",
           "handlerInterface": "ICoreWebView2ContentLoadingEventHandler"
         },
-        "notes": " [In ETL: look for WebView2_Event with handler param]"
+        "notes": " [In ETL: look for WebView2_Event with handler param]",
+        "etwSource": "Edge_WebView"
       },
       {
         "event": "NavigationRequest::CommitNavigation",
         "phase": "browser",
-        "required": true
+        "required": true,
+        "etwSource": "Edge_Stable"
       },
       {
         "event": "NavigationRequest::DidCommitNavigation",
         "phase": "browser",
-        "required": true
+        "required": true,
+        "etwSource": "Edge_Stable"
       },
       {
         "event": "WebView2_DOMContentLoaded",
@@ -679,7 +784,8 @@
           "etw_event": "WebView2_Event",
           "handlerInterface": "ICoreWebView2DOMContentLoadedEventHandler"
         },
-        "notes": " [In ETL: look for WebView2_Event with handler param]"
+        "notes": " [In ETL: look for WebView2_Event with handler param]",
+        "etwSource": "Edge_WebView"
       },
       {
         "event": "WebView2_NavigationCompleted",
@@ -689,7 +795,8 @@
           "etw_event": "WebView2_Event",
           "handlerInterface": "ICoreWebView2NavigationCompletedEventHandler"
         },
-        "notes": " [In ETL: look for WebView2_Event with handler param]"
+        "notes": " [In ETL: look for WebView2_Event with handler param]",
+        "etwSource": "Edge_WebView"
       },
       {
         "event": "WebView2_Event",
@@ -701,7 +808,8 @@
           "handlerInterface": "ICoreWebView2NavigationCompletedEventHandler"
         },
         "notes": "Handler dispatch for NavigationCompleted — same WebView2_Event trace with specific handler param [In ETL: same WebView2_Event trace as the callback above]",
-        "field": "event=ICoreWebView2NavigationCompletedEventHandler"
+        "field": "event=ICoreWebView2NavigationCompletedEventHandler",
+        "etwSource": "Edge_WebView"
       }
     ],
     "timingEvents": [
@@ -721,7 +829,8 @@
         "event": "WebView2_APICalled",
         "field": "API=23",
         "phase": "trigger",
-        "required": true
+        "required": true,
+        "etwSource": "Edge_WebView"
       }
     ],
     "expectedTimingKey": null,
@@ -738,19 +847,22 @@
         "event": "WebView2_APICalled",
         "field": "API=5",
         "phase": "trigger",
-        "required": true
+        "required": true,
+        "etwSource": "Edge_WebView"
       },
       {
         "event": "WebView2_ObjectCalled",
         "phase": "host_ipc",
         "required": false,
-        "notes": "COM object call to renderer"
+        "notes": "COM object call to renderer",
+        "etwSource": "Edge_WebView"
       },
       {
         "event": "WebView2_InvokeFinished",
         "phase": "host_dispatch",
         "required": true,
-        "terminal": true
+        "terminal": true,
+        "etwSource": "Edge_WebView"
       }
     ],
     "expectedTimingKey": "execute_script",
@@ -771,18 +883,21 @@
         "event": "WebView2_APICalled",
         "field": "API=173",
         "phase": "trigger",
-        "required": true
+        "required": true,
+        "etwSource": "Edge_WebView"
       },
       {
         "event": "WebView2_ObjectCalled",
         "phase": "host_ipc",
-        "required": false
+        "required": false,
+        "etwSource": "Edge_WebView"
       },
       {
         "event": "WebView2_InvokeFinished",
         "phase": "host_dispatch",
         "required": true,
-        "terminal": true
+        "terminal": true,
+        "etwSource": "Edge_WebView"
       }
     ],
     "expectedTimingKey": "execute_script",
@@ -802,7 +917,8 @@
         "event": "WebView2_APICalled",
         "field": "API=8",
         "phase": "trigger",
-        "required": true
+        "required": true,
+        "etwSource": "Edge_WebView"
       }
     ],
     "expectedTimingKey": null,
@@ -822,13 +938,15 @@
         "event": "WebView2_APICalled",
         "field": "API=10",
         "phase": "trigger",
-        "required": true
+        "required": true,
+        "etwSource": "Edge_WebView"
       },
       {
         "event": "WebView2_InvokeFinished",
         "phase": "host_dispatch",
         "required": true,
-        "terminal": true
+        "terminal": true,
+        "etwSource": "Edge_WebView"
       }
     ],
     "expectedTimingKey": "capture_preview",
@@ -846,7 +964,8 @@
         "event": "WebView2_APICalled",
         "field": "API=11",
         "phase": "trigger",
-        "required": true
+        "required": true,
+        "etwSource": "Edge_WebView"
       }
     ],
     "expectedTimingKey": "event_handler_registration",
@@ -861,7 +980,8 @@
         "event": "WebView2_APICalled",
         "field": "API=33",
         "phase": "trigger",
-        "required": true
+        "required": true,
+        "etwSource": "Edge_WebView"
       }
     ],
     "expectedTimingKey": "event_handler_registration",
@@ -880,7 +1000,8 @@
         "event": "WebView2_APICalled",
         "field": "API=37",
         "phase": "trigger",
-        "required": true
+        "required": true,
+        "etwSource": "Edge_WebView"
       }
     ],
     "expectedTimingKey": "event_handler_registration",
@@ -900,7 +1021,8 @@
         "event": "WebView2_APICalled",
         "field": "API=77",
         "phase": "trigger",
-        "required": true
+        "required": true,
+        "etwSource": "Edge_WebView"
       }
     ],
     "expectedTimingKey": "event_handler_registration",
@@ -915,7 +1037,8 @@
         "event": "WebView2_APICalled",
         "field": "API=93",
         "phase": "trigger",
-        "required": true
+        "required": true,
+        "etwSource": "Edge_WebView"
       }
     ],
     "expectedTimingKey": "event_handler_registration",
@@ -930,7 +1053,8 @@
         "event": "WebView2_APICalled",
         "field": "API=47",
         "phase": "trigger",
-        "required": true
+        "required": true,
+        "etwSource": "Edge_WebView"
       }
     ],
     "expectedTimingKey": "event_handler_registration",
@@ -947,7 +1071,8 @@
         "event": "WebView2_APICalled",
         "field": "API=55",
         "phase": "trigger",
-        "required": true
+        "required": true,
+        "etwSource": "Edge_WebView"
       }
     ],
     "expectedTimingKey": "event_handler_registration",
@@ -962,7 +1087,8 @@
         "event": "WebView2_APICalled",
         "field": "API=128",
         "phase": "trigger",
-        "required": true
+        "required": true,
+        "etwSource": "Edge_WebView"
       }
     ],
     "expectedTimingKey": "event_handler_registration",
@@ -981,19 +1107,22 @@
         "event": "WebView2_APICalled",
         "field": "API=177",
         "phase": "trigger",
-        "required": true
+        "required": true,
+        "etwSource": "Edge_WebView"
       },
       {
         "event": "WebView2_ObjectCalled",
         "phase": "host_ipc",
         "required": false,
-        "notes": "Print IPC to renderer"
+        "notes": "Print IPC to renderer",
+        "etwSource": "Edge_WebView"
       },
       {
         "event": "WebView2_InvokeFinished",
         "phase": "host_dispatch",
         "required": true,
-        "terminal": true
+        "terminal": true,
+        "etwSource": "Edge_WebView"
       }
     ],
     "expectedTimingKey": "print_operation",
@@ -1016,7 +1145,8 @@
         "event": "WebView2_APICalled",
         "field": "API=175",
         "phase": "trigger",
-        "required": true
+        "required": true,
+        "etwSource": "Edge_WebView"
       }
     ],
     "expectedTimingKey": null,
@@ -1035,7 +1165,8 @@
         "event": "WebView2_APICalled",
         "field": "API=176",
         "phase": "trigger",
-        "required": true
+        "required": true,
+        "etwSource": "Edge_WebView"
       }
     ],
     "expectedTimingKey": null,
@@ -1054,18 +1185,21 @@
         "event": "WebView2_APICalled",
         "field": "API=154",
         "phase": "trigger",
-        "required": true
+        "required": true,
+        "etwSource": "Edge_WebView"
       },
       {
         "event": "WebView2_ObjectCalled",
         "phase": "host_ipc",
-        "required": false
+        "required": false,
+        "etwSource": "Edge_WebView"
       },
       {
         "event": "WebView2_InvokeFinished",
         "phase": "host_dispatch",
         "required": true,
-        "terminal": true
+        "terminal": true,
+        "etwSource": "Edge_WebView"
       }
     ],
     "expectedTimingKey": "print_operation",
@@ -1085,18 +1219,21 @@
         "event": "WebView2_APICalled",
         "field": "API=178",
         "phase": "trigger",
-        "required": true
+        "required": true,
+        "etwSource": "Edge_WebView"
       },
       {
         "event": "WebView2_ObjectCalled",
         "phase": "host_ipc",
-        "required": false
+        "required": false,
+        "etwSource": "Edge_WebView"
       },
       {
         "event": "WebView2_InvokeFinished",
         "phase": "host_dispatch",
         "required": true,
-        "terminal": true
+        "terminal": true,
+        "etwSource": "Edge_WebView"
       }
     ],
     "expectedTimingKey": "print_operation",
@@ -1115,19 +1252,22 @@
         "event": "WebView2_APICalled",
         "field": "API=207",
         "phase": "trigger",
-        "required": true
+        "required": true,
+        "etwSource": "Edge_WebView"
       },
       {
         "event": "WebView2_Event",
         "phase": "host_dispatch",
         "required": false,
-        "notes": "SaveAsUIShowing event if handler registered"
+        "notes": "SaveAsUIShowing event if handler registered",
+        "etwSource": "Edge_WebView"
       },
       {
         "event": "WebView2_InvokeFinished",
         "phase": "host_dispatch",
         "required": true,
-        "terminal": true
+        "terminal": true,
+        "etwSource": "Edge_WebView"
       }
     ],
     "expectedTimingKey": null,
@@ -1144,28 +1284,33 @@
         "event": "WebView2_APICalled",
         "field": "API=109",
         "phase": "trigger",
-        "required": true
+        "required": true,
+        "etwSource": "Edge_WebView"
       },
       {
         "event": "WebView2_CloseInternal",
         "phase": "client",
-        "required": true
+        "required": true,
+        "etwSource": "Edge_WebView"
       },
       {
         "event": "WebView2_OnNcDestroy",
         "phase": "client",
-        "required": false
+        "required": false,
+        "etwSource": "Edge_WebView"
       },
       {
         "event": "WebView2_ShuttingDown",
         "phase": "process",
-        "required": false
+        "required": false,
+        "etwSource": "Edge_WebView"
       },
       {
         "event": "WebView2_ProcessExited",
         "phase": "process",
         "required": false,
-        "notes": "Only if last controller"
+        "notes": "Only if last controller",
+        "etwSource": "Edge_WebView"
       }
     ],
     "expectedTimingKey": null,
@@ -1186,23 +1331,27 @@
         "event": "WebView2_APICalled",
         "field": "API=105",
         "phase": "trigger",
-        "required": true
+        "required": true,
+        "etwSource": "Edge_WebView"
       },
       {
         "event": "WebView2_CollectSuspendMemoryRequested",
         "phase": "client",
-        "required": false
+        "required": false,
+        "etwSource": "Edge_WebView"
       },
       {
         "event": "WebView2_CollectingSuspendMemory",
         "phase": "client",
-        "required": false
+        "required": false,
+        "etwSource": "Edge_WebView"
       },
       {
         "event": "WebView2_SuspendMemory",
         "phase": "client",
         "required": true,
-        "terminal": true
+        "terminal": true,
+        "etwSource": "Edge_WebView"
       }
     ],
     "expectedTimingKey": null,
@@ -1220,7 +1369,8 @@
         "event": "WebView2_APICalled",
         "field": "API=106",
         "phase": "trigger",
-        "required": true
+        "required": true,
+        "etwSource": "Edge_WebView"
       }
     ],
     "expectedTimingKey": null,
@@ -1235,7 +1385,8 @@
         "event": "WebView2_APICalled",
         "field": "API=6",
         "phase": "trigger",
-        "required": true
+        "required": true,
+        "etwSource": "Edge_WebView"
       }
     ],
     "expectedTimingKey": null,
@@ -1255,12 +1406,14 @@
         "event": "WebView2_APICalled",
         "field": "API=28",
         "phase": "trigger",
-        "required": true
+        "required": true,
+        "etwSource": "Edge_WebView"
       },
       {
         "event": "WebView2_SetWindowPos",
         "phase": "controller",
-        "required": false
+        "required": false,
+        "etwSource": "Edge_WebView"
       }
     ],
     "expectedTimingKey": null,
@@ -1280,13 +1433,15 @@
         "event": "WebView2_APICalled",
         "field": "API=67",
         "phase": "trigger",
-        "required": true
+        "required": true,
+        "etwSource": "Edge_WebView"
       },
       {
         "event": "WebView2_CallRemoteObject",
         "phase": "host_ipc",
         "required": false,
-        "notes": "Fires when JS accesses the object"
+        "notes": "Fires when JS accesses the object",
+        "etwSource": "Edge_WebView"
       }
     ],
     "expectedTimingKey": null,
@@ -1305,23 +1460,27 @@
         "event": "WebView2_APICalled",
         "field": "API=66",
         "phase": "trigger",
-        "required": true
+        "required": true,
+        "etwSource": "Edge_WebView"
       },
       {
         "event": "WebView2_ObjectCalled",
         "phase": "host_ipc",
-        "required": false
+        "required": false,
+        "etwSource": "Edge_WebView"
       },
       {
         "event": "WebView2_ObjectCallResponse",
         "phase": "host_ipc",
-        "required": false
+        "required": false,
+        "etwSource": "Edge_WebView"
       },
       {
         "event": "WebView2_InvokeFinished",
         "phase": "host_dispatch",
         "required": true,
-        "terminal": true
+        "terminal": true,
+        "etwSource": "Edge_WebView"
       }
     ],
     "expectedTimingKey": "cdp_method_call",
@@ -1338,7 +1497,8 @@
         "event": "WebView2_APICalled",
         "field": "API=57",
         "phase": "trigger",
-        "required": true
+        "required": true,
+        "etwSource": "Edge_WebView"
       }
     ],
     "expectedTimingKey": "event_handler_registration",
@@ -1355,7 +1515,8 @@
         "event": "WebView2_APICalled",
         "field": "API=155",
         "phase": "trigger",
-        "required": true
+        "required": true,
+        "etwSource": "Edge_WebView"
       }
     ],
     "expectedTimingKey": "event_handler_registration",
@@ -1372,12 +1533,14 @@
         "event": "WebView2_APICalled",
         "field": "API=141",
         "phase": "trigger",
-        "required": true
+        "required": true,
+        "etwSource": "Edge_WebView"
       },
       {
         "event": "WebView2_AudioStatus",
         "phase": "client",
-        "required": false
+        "required": false,
+        "etwSource": "Edge_WebView"
       }
     ],
     "expectedTimingKey": null,
@@ -1392,17 +1555,20 @@
         "event": "WebView2_APICalled",
         "field": "API=137",
         "phase": "trigger",
-        "required": true
+        "required": true,
+        "etwSource": "Edge_WebView"
       },
       {
         "event": "WebView2_SetRendererMemoryUsageTarget",
         "phase": "client",
-        "required": false
+        "required": false,
+        "etwSource": "Edge_WebView"
       },
       {
         "event": "WebView2_SetMemoryPressure",
         "phase": "client",
-        "required": false
+        "required": false,
+        "etwSource": "Edge_WebView"
       }
     ],
     "expectedTimingKey": null,
@@ -1419,7 +1585,8 @@
         "event": "WebView2_APICalled",
         "field": "API=210",
         "phase": "trigger",
-        "required": true
+        "required": true,
+        "etwSource": "Edge_WebView"
       }
     ],
     "expectedTimingKey": "event_handler_registration",
@@ -1434,7 +1601,8 @@
         "event": "WebView2_APICalled",
         "field": "API=61",
         "phase": "trigger",
-        "required": true
+        "required": true,
+        "etwSource": "Edge_WebView"
       }
     ],
     "expectedTimingKey": "event_handler_registration",
@@ -1458,6 +1626,12 @@
         "browser,content,navigation": "WebContents-level events"
       },
       "noTraceEventsFor": "Print, Download, SaveAs operations have NO dedicated WebView2_ trace events in the client layer. They are tracked only via WebView2_APICalled + generic WebView2_ObjectCalled/InvokeFinished."
+    },
+    "wprpCaptureNotes": {
+      "cpuSamplingRequirement": "CPU profiling data (SampledProfile) is only available when using WebView2_CPU.wprp, not WebView2.wprp.",
+      "allEventsInHappyPaths": "All events in the happy path sequences are from either Edge_WebView or Edge_Stable ETW providers, both included in the WPRP diagnostic profiles.",
+      "notCapturedByWprp": "Print, Download, SaveAs operations have no dedicated trace events. They appear only as WebView2_APICalled + WebView2_ObjectCalled/InvokeFinished.",
+      "genericEventDispatch": "Events like WebView2_NavigationStarting appear in ETW traces as the generic WebView2_Event with a handler interface parameter. Use the traceMapping field to know what to search for."
     }
   }
 }

@@ -173,15 +173,16 @@ function formatApiSequence(apiName: string, seq: ApiSequenceEntry): FlowResult {
   // Happy path
   out.push("### Happy Path (expected order)");
   out.push("");
-  out.push("| # | Event | Phase | Required |");
-  out.push("|---|-------|-------|----------|");
+  out.push("| # | Event | Phase | Required | ETW Source |");
+  out.push("|---|-------|-------|----------|------------|");
 
-  seq.happyPath.forEach((step, i) => {
+  seq.happyPath.forEach((step: any, i: number) => {
     const label = step.field ? `${step.event} (${step.field})` : step.event;
     const req = step.required ? "✅ Yes" : "⚪ No";
     const terminal = step.terminal ? " 🏁" : "";
+    const etwSrc = step.etwSource || "—";
     allEvents.push(step.event);
-    out.push(`| ${i + 1} | \`${label}\`${terminal} | ${step.phase} | ${req} |`);
+    out.push(`| ${i + 1} | \`${label}\`${terminal} | ${step.phase} | ${req} | ${etwSrc} |`);
   });
   out.push("");
 
@@ -245,6 +246,15 @@ function checkTraceForEvents(filteredFile: string, expectedEvents: string[]): st
   const content = readFileSync(filteredFile, "utf-8");
   const out: string[] = [];
 
+  // Load WPRP capture scope for awareness
+  let wprpScope: any = null;
+  try {
+    wprpScope = loadJson<any>("wprp_capture_scope.json");
+  } catch { /* proceed without WPRP awareness */ }
+
+  // Build set of event resolution rules
+  const resolutionRules = wprpScope?.eventResolutionRules?.rules || [];
+
   out.push("## 🔎 Trace Verification");
   out.push("");
   out.push(`Checked \`${filteredFile}\` against ${expectedEvents.length} expected events:`);
@@ -252,6 +262,7 @@ function checkTraceForEvents(filteredFile: string, expectedEvents: string[]): st
 
   const found: string[] = [];
   const missing: string[] = [];
+  const missingNotes: Map<string, string> = new Map();
 
   for (const evt of expectedEvents) {
     // Normalize: "WebView2_APICalled(API=3)" → check for both patterns
@@ -261,11 +272,23 @@ function checkTraceForEvents(filteredFile: string, expectedEvents: string[]): st
       searchPatterns.push(apiMatch[1]); // base name
     }
 
+    // Check WPRP event resolution rules — some events appear under a different ETW name
+    for (const rule of resolutionRules) {
+      if (evt.includes(rule.pattern) && rule.actualEtwEvent !== evt) {
+        searchPatterns.push(rule.actualEtwEvent);
+      }
+    }
+
     const isPresent = searchPatterns.some(p => content.includes(p));
     if (isPresent) {
       found.push(evt);
     } else {
       missing.push(evt);
+      // Add context note for missing events dispatched via generic WebView2_Event
+      const rule = resolutionRules.find((r: any) => evt.includes(r.pattern));
+      if (rule && rule.actualEtwEvent === "WebView2_Event") {
+        missingNotes.set(evt, `ℹ️ This event fires as generic \`WebView2_Event\` — look for handler: \`${rule.matchField}\``);
+      }
     }
   }
 
@@ -279,9 +302,20 @@ function checkTraceForEvents(filteredFile: string, expectedEvents: string[]): st
     out.push("### ❌ Missing Events");
     out.push("");
     for (const m of missing) {
-      out.push(`- \`${m}\``);
+      const note = missingNotes.get(m);
+      if (note) {
+        out.push(`- \`${m}\` — ${note}`);
+      } else {
+        out.push(`- \`${m}\``);
+      }
     }
     out.push("");
+
+    // WPRP awareness note
+    if (wprpScope) {
+      out.push("> **Note**: All events in this sequence are from ETW providers included in the [WebView2 WPRP diagnostic profile](https://github.com/MicrosoftEdge/WebView2Feedback/blob/main/diagnostics/etw.md). Missing events indicate they genuinely did not fire, not a capture gap.");
+      out.push("");
+    }
   }
 
   if (found.length > 0) {
