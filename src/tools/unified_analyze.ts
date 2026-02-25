@@ -87,6 +87,52 @@ function runFullAnalysis(params: UnifiedParams): string {
   const sections: string[] = [];
   const outputDir = params.outputDir || "C:\\temp\\etl_analysis";
 
+  // ── Check for unresolved TraceLogging events (GUID-based names) ──
+  // WebView2 uses TraceLogging (self-describing events). If the extraction tool
+  // didn't decode TraceLogging metadata, event names appear as GUID/EventID(N)
+  // instead of human-readable names like WebView2_APICalled.
+  let hasUnresolvedEvents = false;
+  try {
+    const content = readFileSync(filteredFile, "utf-8");
+    const sampleLines = content.split("\n").slice(0, 5000);
+    const guidPattern = /[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}\/EventID\(\d+\)/i;
+    const unresolvedCount = sampleLines.filter(l => guidPattern.test(l)).length;
+    const webview2Count = sampleLines.filter(l => l.includes("WebView2_")).length;
+    if (unresolvedCount > 10 && webview2Count === 0) {
+      hasUnresolvedEvents = true;
+    }
+  } catch { /* ignore */ }
+
+  if (hasUnresolvedEvents) {
+    return [
+      "# ⚠️ Unresolved WebView2 ETW Events",
+      "",
+      "The filtered trace contains **GUID-based event names** (e.g., `e34441d9/EventID(5)`) instead of",
+      "human-readable names like `WebView2_APICalled`. This means the extraction tool could not decode",
+      "the TraceLogging metadata embedded in the ETL.",
+      "",
+      "**Root cause**: The trace was likely extracted using `xperf -a dumper` on a machine without",
+      "the WebView2/Edge ETW provider registered. xperf cannot decode TraceLogging metadata without",
+      "provider registration.",
+      "",
+      "## Fix: Use the TraceEvent-based extractor",
+      "",
+      "The built-in TraceEvent extractor (`EtlExtract.exe`) properly decodes TraceLogging metadata",
+      "from the ETL file itself — no provider registration needed.",
+      "",
+      "```powershell",
+      "# Build the extractor (one-time)",
+      "cd <mcp-server-path>/tools/etl-extract/EtlExtract",
+      "dotnet publish -c Release -r win-x64 --self-contained true -o ../bin",
+      "",
+      "# Re-extract the trace",
+      `& <mcp-server-path>/tools/etl-extract/bin/EtlExtract.exe "${etlPath}" "${hostApp}" "${outputDir}\\filtered.txt"`,
+      "```",
+      "",
+      "Then re-run the analysis with the new filtered file.",
+    ].join("\n");
+  }
+
   // ── Run all analyzers first, then assemble report in user-friendly order ──
 
   // Extract trace structure

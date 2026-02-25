@@ -80,6 +80,19 @@ class Program
         var sw = Stopwatch.StartNew();
         var hostAppLower = hostApp.ToLowerInvariant();
 
+        // Known WebView2-related ETW provider GUIDs — used to match events even when
+        // provider manifests aren't registered on the analysis machine (event names
+        // come as "UnknownEvent" or "EventID(N)" without manifests)
+        var webview2ProviderGuids = new HashSet<Guid>
+        {
+            Guid.Parse("E16EC3D2-BB0F-4E8F-BDB8-DE0BEA82DC3D"), // Edge_WebView
+            Guid.Parse("3A5F2396-5C8F-4F1F-9B67-6CCA6C990E61"), // Edge_Stable
+            Guid.Parse("C56B8664-45C5-4E65-B3C7-A8D6BD3F2E67"), // Edge_Canary
+            Guid.Parse("D30B5C9F-B58F-4DC9-AFAF-134405D72107"), // Edge_Dev
+            Guid.Parse("BD089BAA-4E52-4794-A887-9E96868570D2"), // Edge_Beta
+            Guid.Parse("57277741-3638-4A4B-BDBA-0AC6E45DA56C"), // V8js
+        };
+
         // Patterns to match (same as analyze.ts Step 2 + Step 3 combined into single pass)
         string[] eventPatterns = [
             hostAppLower, "webview2_", "msedgewebview2", "navigationrequest",
@@ -144,12 +157,22 @@ class Program
                 string processLower = processName.ToLowerInvariant();
 
                 bool matches = false;
-                for (int i = 0; i < eventPatterns.Length; i++)
+
+                // First: match by provider GUID (works even without registered manifests)
+                if (webview2ProviderGuids.Contains(data.ProviderGuid))
                 {
-                    if (eventLower.Contains(eventPatterns[i]) || processLower.Contains(eventPatterns[i]))
+                    matches = true;
+                }
+
+                if (!matches)
+                {
+                    for (int i = 0; i < eventPatterns.Length; i++)
                     {
-                        matches = true;
-                        break;
+                        if (eventLower.Contains(eventPatterns[i]) || processLower.Contains(eventPatterns[i]))
+                        {
+                            matches = true;
+                            break;
+                        }
                     }
                 }
 
@@ -478,13 +501,17 @@ static class CpuAnalyzer
             };
 
             // TraceProcessor needs WPT toolkit with symsrv.dll for symbol resolution.
-            // Priority: NuGet package toolkit (has symsrv.dll) > installed WPT (may not).
+            // Priority: bundled alongside exe > NuGet cache > installed WPT.
+            var exeDir = AppContext.BaseDirectory; // Where EtlExtract.exe and its DLLs live
             var wptPaths = new[]
             {
-                // NuGet package includes symsrv.dll, dbghelp proxy, etc.
+                // 1. Bundled: symsrv.dll co-located with EtlExtract.exe (self-contained package)
+                exeDir,
+                // 2. NuGet cache (dev machine)
                 System.IO.Path.Combine(
                     Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
                     @".nuget\packages\microsoft.windows.eventtracing.processing.toolkit\1.11.0\build\x64\wpt"),
+                // 3. Installed WPT
                 @"C:\Program Files (x86)\Windows Kits\10\Windows Performance Toolkit",
                 @"C:\Program Files\Windows Kits\10\Windows Performance Toolkit"
             };

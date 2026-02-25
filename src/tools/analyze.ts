@@ -135,13 +135,29 @@ export function analyzeEtl(etlPath: string, hostApp: string, outDir?: string, pi
   }
 
   // Legacy fallback: xperf-based extraction (slow, two passes)
-  // WARNING: xperf dumper fails on "Sequential Relogged Compressed" ETL files
-  // (common with WPR captures, SearchHost, Windows system traces)
+  // WARNING: xperf cannot decode TraceLogging event names without registered manifests.
+  // WebView2 uses TraceLogging — names like "WebView2_APICalled" are embedded in the ETL
+  // but xperf may not resolve them on machines without Edge installed.
   return [
     `## ETL Analysis Setup for ${hostApp} (xperf — legacy mode)`,
     "",
-    "⚠️ **Important**: xperf may fail on compressed/relogged ETL files (e.g., WPR captures, SearchHost traces).",
-    "If Step 2 produces 0 lines, see the **Fallback** section below.",
+    "### ⚠️ IMPORTANT: xperf Limitations",
+    "",
+    "**xperf may not resolve WebView2 event names** on machines without Edge/WebView2 Runtime installed.",
+    "WebView2 uses TraceLogging (self-describing events), but xperf requires the provider to be",
+    "registered on the analysis machine. If you see GUID-based event names (e.g., `e34441d9/EventID(5)`)",
+    "instead of `WebView2_APICalled`, **build the TraceEvent extractor** for reliable analysis:",
+    "",
+    "```powershell",
+    "cd tools/etl-extract/EtlExtract && dotnet publish -c Release -r win-x64 --self-contained true -o ../bin",
+    "```",
+    "",
+    "The TraceEvent-based extractor uses Microsoft.Diagnostics.Tracing.TraceEvent which properly",
+    "decodes TraceLogging metadata embedded in the ETL — no manifest registration needed.",
+    "",
+    "---",
+    "",
+    "If Step 2 produces 0 lines or only GUID-based names, see the **Fallback** section below.",
     "",
     "### Step 1: Set Variables",
     "```powershell",

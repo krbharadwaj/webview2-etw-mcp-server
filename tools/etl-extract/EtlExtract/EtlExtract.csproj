@@ -13,4 +13,12 @@
     <PackageReference Include="Microsoft.Windows.EventTracing.Processing.All" Version="1.12.10" />
   </ItemGroup>
 
+  <!-- Bundle WPT native DLLs from the TraceProcessor NuGet toolkit for self-contained
+       CPU analysis. Without these, TraceProcessor cannot process traces or load symbols.
+       Total ~12MB — required for zero-dependency operation on any Windows machine. -->
+  <ItemGroup>
+    <None Include="$(NuGetPackageRoot)microsoft.windows.eventtracing.processing.toolkit\1.11.0\build\x64\wpt\*.dll"
+          CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" LinkBase="" />
+  </ItemGroup>
+
 </Project>
