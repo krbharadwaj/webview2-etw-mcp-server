@@ -472,10 +472,34 @@ static class CpuAnalyzer
 
         try
         {
-            using var trace = TraceProcessor.Create(etlPath, new TraceProcessorSettings
+            var settings = new TraceProcessorSettings
             {
                 AllowLostEvents = true
-            });
+            };
+
+            // TraceProcessor needs WPT toolkit with symsrv.dll for symbol resolution.
+            // Priority: NuGet package toolkit (has symsrv.dll) > installed WPT (may not).
+            var wptPaths = new[]
+            {
+                // NuGet package includes symsrv.dll, dbghelp proxy, etc.
+                System.IO.Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
+                    @".nuget\packages\microsoft.windows.eventtracing.processing.toolkit\1.11.0\build\x64\wpt"),
+                @"C:\Program Files (x86)\Windows Kits\10\Windows Performance Toolkit",
+                @"C:\Program Files\Windows Kits\10\Windows Performance Toolkit"
+            };
+            foreach (var wpt in wptPaths)
+            {
+                if (System.IO.Directory.Exists(wpt) &&
+                    System.IO.File.Exists(System.IO.Path.Combine(wpt, "symsrv.dll")))
+                {
+                    settings.ToolkitPath = wpt;
+                    Console.Error.WriteLine($"  WPT Toolkit: {wpt}");
+                    break;
+                }
+            }
+
+            using var trace = TraceProcessor.Create(etlPath, settings);
 
             var cpuSamplingData = trace.UseCpuSamplingData();
             var processData = trace.UseProcesses();
@@ -487,8 +511,18 @@ static class CpuAnalyzer
             // Load symbols from configured symbol servers
             Console.Error.WriteLine("Loading symbols (resolving from symbol servers)...");
             var symPaths = effectiveSymPath.Split(';', StringSplitOptions.RemoveEmptyEntries);
+
+            // SymCachePath.Automatic fails in single-file apps (Assembly.Location is empty).
+            // Use an explicit symcache path instead.
+            var symCacheDir = System.IO.Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                "Temp", "SymCache");
+            System.IO.Directory.CreateDirectory(symCacheDir);
+            var symCachePath = new SymCachePath(symCacheDir);
+            Console.Error.WriteLine($"  SymCache:   {symCacheDir}");
+
             symbolData.Result.LoadSymbolsAsync(
-                SymCachePath.Automatic,
+                symCachePath,
                 new SymbolPath(symPaths)
             ).GetAwaiter().GetResult();
 

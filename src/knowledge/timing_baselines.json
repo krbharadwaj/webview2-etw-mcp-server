@@ -8,11 +8,11 @@
     "sampleCount": 1
   },
   "creation_client_cold_start": {
-    "p50_ms": 1665.1910116959061,
-    "p95_ms": 1687.6933562753038,
-    "p99_ms": 1687.6933562753038,
+    "p50_ms": 1693.9331105263154,
+    "p95_ms": 1714.1852206477733,
+    "p99_ms": 1714.1852206477733,
     "notes": "Cold start (WebViewProcessLaunchType=0) — first WebView2 in session",
-    "sampleCount": 18
+    "sampleCount": 19
   },
   "creation_client_warm_start": {
     "p50_ms": 200,
