@@ -436,6 +436,17 @@ static class CpuAnalyzer
         string[] keywords = ["msedge.dll", "msedgewebview2.dll"];
         string? outputPath = null;
         string? symPath = null;
+        // Modules to skip symbol resolution for (well-known OS DLLs that are noise)
+        HashSet<string> excludeModules = new(StringComparer.OrdinalIgnoreCase)
+        {
+            "ntdll.dll", "ntoskrnl.exe", "kernel32.dll", "kernelbase.dll",
+            "user32.dll", "gdi32.dll", "gdi32full.dll", "win32u.dll",
+            "dxgi.dll", "d3d11.dll", "d3d10warp.dll",
+            "msvcp_win.dll", "ucrtbase.dll", "vcruntime140.dll",
+            "rpcrt4.dll", "sechost.dll", "bcryptprimitives.dll",
+            "advapi32.dll", "msvcrt.dll", "ole32.dll", "oleaut32.dll",
+            "combase.dll", "shcore.dll", "shlwapi.dll",
+        };
 
         // Parse args
         for (int i = 0; i < args.Length - 1; i++)
@@ -459,6 +470,15 @@ static class CpuAnalyzer
                     break;
                 case "--sympath":
                     symPath = args[i + 1];
+                    break;
+                case "--exclude-modules":
+                    // Add custom modules to exclusion set
+                    foreach (var mod in args[i + 1].Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+                        excludeModules.Add(mod);
+                    break;
+                case "--no-exclude":
+                    // Disable default module exclusion
+                    excludeModules.Clear();
                     break;
             }
         }
@@ -491,6 +511,8 @@ static class CpuAnalyzer
         Console.Error.WriteLine($"  Keywords:   {string.Join(", ", keywords)}");
         Console.Error.WriteLine($"  Symbols:    {effectiveSymPath}");
         Console.Error.WriteLine($"  Output:     {outputPath}");
+        if (excludeModules.Count > 0)
+            Console.Error.WriteLine($"  Exclude:    {excludeModules.Count} OS modules (skip symbol resolution for noise)");
         Console.Error.WriteLine();
 
         try
@@ -614,21 +636,31 @@ static class CpuAnalyzer
                         if (!frame.HasValue) continue;
 
                         string frameName;
-                        var symbol = frame.Symbol;
-                        if (symbol != null)
+                        string moduleName = frame.Symbol?.Image?.FileName ?? frame.Image?.FileName ?? "unknown";
+
+                        // For excluded OS modules: use module-only name (skip function-level noise)
+                        if (excludeModules.Contains(moduleName))
                         {
-                            string modName = symbol.Image?.FileName ?? "???";
-                            string funcName = symbol.FunctionName ?? $"+0x{frame.RelativeVirtualAddress.Value:x}";
-                            frameName = $"{modName}!{funcName}";
-                        }
-                        else if (frame.Image != null)
-                        {
-                            string modName = frame.Image.FileName ?? "???";
-                            frameName = $"{modName}!+0x{frame.RelativeVirtualAddress.Value:x}";
+                            frameName = $"{moduleName}!<os>";
                         }
                         else
                         {
-                            frameName = $"0x{frame.Address.Value:x}";
+                            var symbol = frame.Symbol;
+                            if (symbol != null)
+                            {
+                                string modName = symbol.Image?.FileName ?? "???";
+                                string funcName = symbol.FunctionName ?? $"+0x{frame.RelativeVirtualAddress.Value:x}";
+                                frameName = $"{modName}!{funcName}";
+                            }
+                            else if (frame.Image != null)
+                            {
+                                string modName = frame.Image.FileName ?? "???";
+                                frameName = $"{modName}!+0x{frame.RelativeVirtualAddress.Value:x}";
+                            }
+                            else
+                            {
+                                frameName = $"0x{frame.Address.Value:x}";
+                            }
                         }
 
                         stackFrames.Add(frameName);
@@ -636,8 +668,7 @@ static class CpuAnalyzer
                         // Aggregate function counts
                         functionCounts[frameName] = functionCounts.GetValueOrDefault(frameName) + 1;
 
-                        // Aggregate module counts
-                        string moduleName = frame.Symbol?.Image?.FileName ?? frame.Image?.FileName ?? "unknown";
+                        // Aggregate module counts (moduleName already computed above)
                         moduleCounts[moduleName] = moduleCounts.GetValueOrDefault(moduleName) + 1;
 
                         // Keyword matching against frame
@@ -688,6 +719,9 @@ static class CpuAnalyzer
                 rangeUs = new[] { rangeStartUs ?? 0, rangeEndUs ?? 0 },
                 elapsedSec = Math.Round(sw.Elapsed.TotalSeconds, 1),
                 symbolPath = effectiveSymPath,
+                symbolCache = symCacheDir,
+                symbolDownloadDir = "C:\\Symbols",
+                excludedModules = excludeModules.ToArray(),
                 rawSamplesFile = rawSamplesPath,
                 topFunctions,
                 topModules,

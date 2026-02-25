@@ -38,6 +38,9 @@ interface CpuJsonSummary {
   rangeUs: [number, number];
   elapsedSec: number;
   symbolPath: string;
+  symbolCache?: string;
+  symbolDownloadDir?: string;
+  excludedModules?: string[];
   rawSamplesFile: string;
   topFunctions: { name: string; samples: number }[];
   topModules: { name: string; samples: number; pct: number }[];
@@ -183,6 +186,9 @@ function formatJsonSummary(jsonPath: string, keywords: string[], pid: string): s
   result.push(`**Source**: \`${jsonPath}\``);
   result.push(`**Total CPU samples**: ${summary.totalSamples.toLocaleString()} (~${summary.totalSamples}ms CPU time at 1ms sampling)`);
   result.push(`**Extraction time**: ${summary.elapsedSec}s`);
+  if (summary.symbolCache) result.push(`**Symbol cache (local)**: \`${summary.symbolCache}\``);
+  if (summary.symbolDownloadDir) result.push(`**PDB download dir (local)**: \`${summary.symbolDownloadDir}\``);
+  if (summary.excludedModules && summary.excludedModules.length > 0) result.push(`**Excluded modules**: ${summary.excludedModules.length} OS DLLs (collapsed to module-only in stacks)`);
   if (summary.skippedByPid > 0) result.push(`**Skipped (other PIDs)**: ${summary.skippedByPid.toLocaleString()}`);
   if (summary.skippedByRange > 0) result.push(`**Skipped (outside range)**: ${summary.skippedByRange.toLocaleString()}`);
   result.push("");

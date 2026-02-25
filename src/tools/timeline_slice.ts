@@ -289,7 +289,9 @@ function parseMicroseconds(ts: string, firstEventTs?: number | null): number | n
   if (secMatch) return Math.round(parseFloat(s) * 1_000_000);
 
   // Raw integer — assume microseconds (any digit count, not just 8+)
-  if (/^\d+$/.test(s)) return parseInt(s, 10);
+  // Also strip commas for copy-pasted numbers like "151,500,000"
+  const stripped = s.replace(/,/g, "");
+  if (/^\d+$/.test(stripped)) return parseInt(stripped, 10);
 
   return null;
 }
