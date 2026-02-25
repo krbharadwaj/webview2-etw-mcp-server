@@ -20,10 +20,15 @@ class Program
     {
         if (args.Length < 2)
         {
-            Console.Error.WriteLine("Usage: EtlExtract <etl-path> <host-app> [output-path] [--feature-flags <ff-output>]");
+            Console.Error.WriteLine("Usage: EtlExtract <etl-path> <host-app> [output-path] [--feature-flags <ff-output>] [--pid <host-pid>]");
             Console.Error.WriteLine();
             Console.Error.WriteLine("  Extracts WebView2-relevant events from ETL using TraceEvent.");
             Console.Error.WriteLine("  Output is xperf-dumper compatible text for MCP server analysis.");
+            Console.Error.WriteLine();
+            Console.Error.WriteLine("Options:");
+            Console.Error.WriteLine("  --pid <pid>           Filter to this host PID and its child processes only.");
+            Console.Error.WriteLine("                        Without --pid, all processes matching the host app name are included.");
+            Console.Error.WriteLine("  --feature-flags <path> Write feature flag lines to a separate file.");
             return 1;
         }
 
@@ -31,11 +36,14 @@ class Program
         string hostApp = args[1];
         string outputPath = args.Length > 2 && !args[2].StartsWith("--") ? args[2] : Path.Combine("C:\\temp\\etl_analysis", "filtered.txt");
         string? featureFlagsPath = null;
+        int? rootPid = null;
 
         for (int i = 0; i < args.Length - 1; i++)
         {
             if (args[i] == "--feature-flags")
                 featureFlagsPath = args[i + 1];
+            if (args[i] == "--pid" && int.TryParse(args[i + 1], out int parsedPid))
+                rootPid = parsedPid;
         }
 
         if (!File.Exists(etlPath))
@@ -63,7 +71,19 @@ class Program
         int matchCount = 0;
         int totalEvents = 0;
         int featureFlagCount = 0;
+        int pidFilteredCount = 0;
         var featureFlagLines = featureFlagsPath != null ? new List<string>() : null;
+
+        // Process tree tracking for --pid filtering
+        // allowedPids: set of PIDs in the host app's process tree
+        // When --pid is given, only events from these PIDs pass through
+        var allowedPids = new HashSet<int>();
+        bool usePidFilter = rootPid.HasValue;
+        if (rootPid.HasValue)
+            allowedPids.Add(rootPid.Value);
+
+        // When no --pid given, discover host PIDs by name and track their children
+        var discoveredHostPids = new HashSet<int>();
 
         // Feature flag specific patterns
         string[] ffPatterns = [
@@ -133,6 +153,13 @@ class Program
 
                 if (!matches) return;
 
+                // PID-based process tree filter: skip events from PIDs outside the host's tree
+                if (usePidFilter && !allowedPids.Contains(pid))
+                {
+                    pidFilteredCount++;
+                    return;
+                }
+
                 WriteEventLine(writer, eventName, tsUs, processName, pid, tid, opcode, data, ref matchCount, featureFlagLines, ffPatterns, ref featureFlagCount);
 
                 // Progress every 10k matches
@@ -148,6 +175,28 @@ class Program
                 if (!string.IsNullOrEmpty(processName) && !processName.Contains('.'))
                     processName += ".exe";
                 string processLower = processName.ToLowerInvariant();
+                int childPid = data.ProcessID;
+                int parentPid = data.ParentID;
+
+                // Build process tree: if parent is in allowedPids, add child
+                if (usePidFilter)
+                {
+                    if (allowedPids.Contains(parentPid))
+                        allowedPids.Add(childPid);
+                }
+                else
+                {
+                    // Auto-discover host PIDs by name and track their children
+                    if (processLower.Contains(hostAppLower))
+                    {
+                        discoveredHostPids.Add(childPid);
+                        allowedPids.Add(childPid);
+                    }
+                    else if (allowedPids.Contains(parentPid))
+                    {
+                        allowedPids.Add(childPid);
+                    }
+                }
 
                 // Only include processes matching our patterns
                 bool matches = false;
@@ -173,6 +222,13 @@ class Program
                     }
                 }
                 if (!matches) return;
+
+                // PID filter: skip Process/Start events for processes outside the tree
+                if (usePidFilter && !allowedPids.Contains(childPid))
+                {
+                    pidFilteredCount++;
+                    return;
+                }
 
                 long tsUs = (long)(data.TimeStampRelativeMSec * 1000);
                 var sb = new StringBuilder(256);
@@ -208,6 +264,8 @@ class Program
 
             Console.Error.WriteLine($"Processing: {Path.GetFileName(etlPath)}");
             Console.Error.WriteLine($"Host app:   {hostApp}");
+            if (rootPid.HasValue)
+                Console.Error.WriteLine($"PID filter: {rootPid.Value} (host + children only)");
             Console.Error.WriteLine($"Output:     {outputPath}");
             Console.Error.WriteLine();
 
@@ -233,6 +291,12 @@ class Program
         Console.Error.WriteLine($"Done in {sw.Elapsed.TotalSeconds:F1}s");
         Console.Error.WriteLine($"  Total events:   {totalEvents:N0}");
         Console.Error.WriteLine($"  Matched events: {matchCount:N0}");
+        if (usePidFilter)
+            Console.Error.WriteLine($"  PID-filtered:   {pidFilteredCount:N0} events skipped (outside process tree)");
+        if (allowedPids.Count > 0)
+            Console.Error.WriteLine($"  Process tree:   {allowedPids.Count} PIDs tracked ({string.Join(", ", allowedPids.OrderBy(p => p).Take(10))}{(allowedPids.Count > 10 ? "..." : "")})");
+        if (discoveredHostPids.Count > 0)
+            Console.Error.WriteLine($"  Host PIDs:      {string.Join(", ", discoveredHostPids.OrderBy(p => p))}");
         Console.Error.WriteLine($"  Output:         {outputPath}");
 
         // Machine-readable summary on stdout (for MCP server to parse)

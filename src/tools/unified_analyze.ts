@@ -39,7 +39,7 @@ export interface UnifiedParams {
 export function unifiedAnalyze(params: UnifiedParams): string {
   // ── Phase 1: No filtered file → extraction commands ──
   if (!params.filteredFile) {
-    const extractionCmds = analyzeEtl(params.etlPath, params.hostApp, params.outputDir);
+    const extractionCmds = analyzeEtl(params.etlPath, params.hostApp, params.outputDir, params.pid);
 
     // Replace the "Next Steps" section with simplified guidance
     const nextSteps = [

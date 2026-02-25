@@ -51,7 +51,7 @@ interface TimelineEvent {
   details: string;
 }
 
-export function analyzeEtl(etlPath: string, hostApp: string, outDir?: string): string {
+export function analyzeEtl(etlPath: string, hostApp: string, outDir?: string, pid?: string): string {
   if (!existsSync(etlPath)) {
     return `❌ ETL file not found: ${etlPath}`;
   }
@@ -90,7 +90,7 @@ export function analyzeEtl(etlPath: string, hostApp: string, outDir?: string): s
       ``,
       `# Fast extraction using TraceEvent — replaces xperf dumper + Select-String`,
       `# Single pass extracts both filtered events and feature flags`,
-      `& "${etlExtractPath}" "${etlPath}" "${hostApp}" "$outDir\\filtered.txt" --feature-flags "$outDir\\feature_flags.txt"`,
+      `& "${etlExtractPath}" "${etlPath}" "${hostApp}" "$outDir\\filtered.txt" --feature-flags "$outDir\\feature_flags.txt"${pid ? ` --pid ${pid}` : ""}`,
       ``,
       `$filtered = "$outDir\\filtered.txt"`,
       `$featureFlags = "$outDir\\feature_flags.txt"`,
