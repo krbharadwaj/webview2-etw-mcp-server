@@ -15,19 +15,29 @@ export function timelineSlice(
     return `❌ Filtered file not found: ${filteredFile}. Run analyze_etl extraction first.`;
   }
 
-  const startUs = parseMicroseconds(startTimestamp);
-  const endUs = parseMicroseconds(endTimestamp);
+  // Find first event timestamp for relative offset support
+  const firstEventTs = findFirstTimestamp(filteredFile);
+
+  const startUs = parseMicroseconds(startTimestamp, firstEventTs);
+  const endUs = parseMicroseconds(endTimestamp, firstEventTs);
 
   if (startUs === null || endUs === null) {
     return [
       `❌ Could not parse timestamps.`,
       "",
       "**Accepted formats:**",
-      "- Microseconds (raw from xperf): `32456789012`",
+      "- Microseconds: `17677000` (any length)",
+      "- Milliseconds with suffix: `84ms`, `17677ms`",
       "- Seconds with decimal: `32456.789`",
-      "- Relative offset: `+500ms` (from first event in file)",
+      "- Seconds with suffix: `17.6s`",
+      "- Relative offset from trace start: `+84ms`, `+17.6s`",
+      "- Raw from xperf: `32456789012`",
       "",
-      "Tip: Copy timestamps directly from xperf/filtered output.",
+      firstEventTs !== null
+        ? `ℹ️ First event in trace: ${firstEventTs}µs (${(firstEventTs / 1_000_000).toFixed(3)}s)`
+        : "⚠️ Could not determine first event timestamp for relative offsets.",
+      "",
+      "Tip: Copy timestamps directly from xperf/filtered output, or use relative offsets like `+84ms`.",
     ].join("\n");
   }
 
@@ -249,22 +259,59 @@ function extractTimestamp(line: string): number | null {
   return null;
 }
 
-function parseMicroseconds(ts: string): number | null {
-  // Raw microseconds
-  if (/^\d{8,}$/.test(ts.trim())) return parseInt(ts.trim(), 10);
+function parseMicroseconds(ts: string, firstEventTs?: number | null): number | null {
+  const s = ts.trim();
 
-  // Seconds with decimal (e.g., "32456.789")
-  const secMatch = ts.trim().match(/^(\d+)\.(\d+)$/);
-  if (secMatch) return Math.round(parseFloat(ts.trim()) * 1_000_000);
+  // Relative offset from trace start: "+84ms", "+17.6s", "+500ms"
+  const relMsMatch = s.match(/^\+(\d+(?:\.\d+)?)\s*ms$/i);
+  if (relMsMatch) {
+    const offsetMs = parseFloat(relMsMatch[1]);
+    const base = firstEventTs ?? 0;
+    return base + Math.round(offsetMs * 1_000);
+  }
+  const relSecMatch = s.match(/^\+(\d+(?:\.\d+)?)\s*s$/i);
+  if (relSecMatch) {
+    const offsetSec = parseFloat(relSecMatch[1]);
+    const base = firstEventTs ?? 0;
+    return base + Math.round(offsetSec * 1_000_000);
+  }
 
-  // Relative ms offset (e.g., "+500ms") — not supported without base, return null
+  // Milliseconds with suffix: "84ms", "17677ms"
+  const msMatch = s.match(/^(\d+(?:\.\d+)?)\s*ms$/i);
+  if (msMatch) return Math.round(parseFloat(msMatch[1]) * 1_000);
+
+  // Seconds with suffix: "17.6s", "150s"
+  const secSuffix = s.match(/^(\d+(?:\.\d+)?)\s*s$/i);
+  if (secSuffix) return Math.round(parseFloat(secSuffix[1]) * 1_000_000);
+
+  // Seconds with decimal but no suffix (e.g., "32456.789")
+  const secMatch = s.match(/^(\d+)\.(\d+)$/);
+  if (secMatch) return Math.round(parseFloat(s) * 1_000_000);
+
+  // Raw integer — assume microseconds (any digit count, not just 8+)
+  if (/^\d+$/.test(s)) return parseInt(s, 10);
+
+  return null;
+}
+
+/** Scan filtered file to find the first real event timestamp (skip -1 / header lines). */
+function findFirstTimestamp(filteredFile: string): number | null {
+  const lines = readFileSync(filteredFile, "utf-8").split("\n");
+  for (const line of lines) {
+    const ts = extractTimestamp(line);
+    if (ts !== null && ts > 0) return ts;
+  }
   return null;
 }
 
 function formatTimestamp(us: number): string {
-  if (us > 1_000_000_000) {
+  if (us >= 1_000_000) {
     const sec = (us / 1_000_000).toFixed(3);
-    return `${sec}s (${us})`;
+    return `${sec}s (${us.toLocaleString()}µs)`;
+  }
+  if (us >= 1_000) {
+    const ms = (us / 1_000).toFixed(1);
+    return `${ms}ms (${us.toLocaleString()}µs)`;
   }
   return `${us}µs`;
 }
