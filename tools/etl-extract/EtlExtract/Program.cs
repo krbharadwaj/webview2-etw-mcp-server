@@ -74,15 +74,14 @@ class Program
         int pidFilteredCount = 0;
         var featureFlagLines = featureFlagsPath != null ? new List<string>() : null;
 
-        // Process tree tracking for --pid filtering
-        // allowedPids: set of PIDs in the host app's process tree
-        // When --pid is given, only events from these PIDs pass through
+        // Process tree tracking — ALWAYS active
+        // allowedPids: PIDs in the host app's process tree (host + its WebView2 children)
+        // Events from PIDs outside this tree are filtered out
         var allowedPids = new HashSet<int>();
-        bool usePidFilter = rootPid.HasValue;
         if (rootPid.HasValue)
             allowedPids.Add(rootPid.Value);
 
-        // When no --pid given, discover host PIDs by name and track their children
+        // Track which host PIDs were auto-discovered by name
         var discoveredHostPids = new HashSet<int>();
 
         // Feature flag specific patterns
@@ -153,9 +152,23 @@ class Program
 
                 if (!matches) return;
 
-                // PID-based process tree filter: skip events from PIDs outside the host's tree
-                if (usePidFilter && !allowedPids.Contains(pid))
+                // Process tree filter (always active):
+                //   - Host app by name → always include (add PID to tree)
+                //   - PID in discovered tree → include
+                //   - Tree not yet built (no host discovered) → include as fallback
+                //   - Otherwise → skip (belongs to a different host's tree)
+                if (processLower.Contains(hostAppLower))
                 {
+                    // Host app process — always include, ensure it's in the tree
+                    if (!allowedPids.Contains(pid))
+                    {
+                        allowedPids.Add(pid);
+                        discoveredHostPids.Add(pid);
+                    }
+                }
+                else if (allowedPids.Count > 0 && !allowedPids.Contains(pid))
+                {
+                    // Tree is built but this PID isn't in it — skip
                     pidFilteredCount++;
                     return;
                 }
@@ -178,24 +191,17 @@ class Program
                 int childPid = data.ProcessID;
                 int parentPid = data.ParentID;
 
-                // Build process tree: if parent is in allowedPids, add child
-                if (usePidFilter)
+                // Build process tree (always active):
+                // - Host app by name → add to tree + discoveredHostPids
+                // - Child of a known tree PID → add to tree
+                if (processLower.Contains(hostAppLower))
                 {
-                    if (allowedPids.Contains(parentPid))
-                        allowedPids.Add(childPid);
+                    discoveredHostPids.Add(childPid);
+                    allowedPids.Add(childPid);
                 }
-                else
+                else if (allowedPids.Contains(parentPid))
                 {
-                    // Auto-discover host PIDs by name and track their children
-                    if (processLower.Contains(hostAppLower))
-                    {
-                        discoveredHostPids.Add(childPid);
-                        allowedPids.Add(childPid);
-                    }
-                    else if (allowedPids.Contains(parentPid))
-                    {
-                        allowedPids.Add(childPid);
-                    }
+                    allowedPids.Add(childPid);
                 }
 
                 // Only include processes matching our patterns
@@ -223,8 +229,8 @@ class Program
                 }
                 if (!matches) return;
 
-                // PID filter: skip Process/Start events for processes outside the tree
-                if (usePidFilter && !allowedPids.Contains(childPid))
+                // Process tree filter: skip Process/Start for processes outside the tree
+                if (allowedPids.Count > 0 && !allowedPids.Contains(childPid))
                 {
                     pidFilteredCount++;
                     return;
@@ -265,7 +271,9 @@ class Program
             Console.Error.WriteLine($"Processing: {Path.GetFileName(etlPath)}");
             Console.Error.WriteLine($"Host app:   {hostApp}");
             if (rootPid.HasValue)
-                Console.Error.WriteLine($"PID filter: {rootPid.Value} (host + children only)");
+                Console.Error.WriteLine($"PID filter: {rootPid.Value} (explicit root + children)");
+            else
+                Console.Error.WriteLine($"PID filter: auto (discovering {hostApp} PIDs and their children)");
             Console.Error.WriteLine($"Output:     {outputPath}");
             Console.Error.WriteLine();
 
@@ -291,13 +299,12 @@ class Program
         Console.Error.WriteLine($"Done in {sw.Elapsed.TotalSeconds:F1}s");
         Console.Error.WriteLine($"  Total events:   {totalEvents:N0}");
         Console.Error.WriteLine($"  Matched events: {matchCount:N0}");
-        if (usePidFilter)
+        if (pidFilteredCount > 0)
             Console.Error.WriteLine($"  PID-filtered:   {pidFilteredCount:N0} events skipped (outside process tree)");
         if (allowedPids.Count > 0)
             Console.Error.WriteLine($"  Process tree:   {allowedPids.Count} PIDs tracked ({string.Join(", ", allowedPids.OrderBy(p => p).Take(10))}{(allowedPids.Count > 10 ? "..." : "")})");
         if (discoveredHostPids.Count > 0)
-            Console.Error.WriteLine($"  Host PIDs:      {string.Join(", ", discoveredHostPids.OrderBy(p => p))}");
-        Console.Error.WriteLine($"  Output:         {outputPath}");
+            Console.Error.WriteLine($"  Host PIDs:      {string.Join(", ", discoveredHostPids.OrderBy(p => p))}");Console.Error.WriteLine($"  Output:         {outputPath}");
 
         // Machine-readable summary on stdout (for MCP server to parse)
         Console.WriteLine($"EXTRACT_OK|{matchCount}|{totalEvents}|{sw.Elapsed.TotalSeconds:F1}|{outputPath}");
