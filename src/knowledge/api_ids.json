@@ -341,7 +341,7 @@
       "WebView2_APICalled"
     ],
     "capturedByWprp": true,
-    "hasDetailedSequence": false
+    "hasDetailedSequence": true
   },
   "40": {
     "name": "RemoveFrameNavigationStarting",
@@ -467,7 +467,7 @@
       "WebView2_APICalled"
     ],
     "capturedByWprp": true,
-    "hasDetailedSequence": false
+    "hasDetailedSequence": true
   },
   "54": {
     "name": "RemovePermissionRequested",
@@ -704,7 +704,7 @@
       "WebView2_APICalled"
     ],
     "capturedByWprp": true,
-    "hasDetailedSequence": false
+    "hasDetailedSequence": true
   },
   "80": {
     "name": "RemoveSourceChanged",
@@ -723,7 +723,7 @@
       "WebView2_APICalled"
     ],
     "capturedByWprp": true,
-    "hasDetailedSequence": false
+    "hasDetailedSequence": true
   },
   "82": {
     "name": "RemoveHistoryChanged",
@@ -786,7 +786,7 @@
       "WebView2_APICalled"
     ],
     "capturedByWprp": true,
-    "hasDetailedSequence": false
+    "hasDetailedSequence": true
   },
   "89": {
     "name": "RemoveFrameNavigationCompleted",
@@ -1171,7 +1171,7 @@
       "WebView2_APICalled"
     ],
     "capturedByWprp": true,
-    "hasDetailedSequence": false
+    "hasDetailedSequence": true
   },
   "131": {
     "name": "RemoveClientCertificateRequested",
@@ -1758,10 +1758,12 @@
     "category": "Lifecycle",
     "critical": true,
     "etwEvents": [
-      "WebView2_APICalled"
+      "WebView2_APICalled",
+      "WebView2_ObjectCalled",
+      "WebView2_InvokeFinished"
     ],
     "capturedByWprp": true,
-    "hasDetailedSequence": false
+    "hasDetailedSequence": true
   },
   "196": {
     "name": "GetFrameId",
@@ -1858,10 +1860,12 @@
     "category": "Lifecycle",
     "critical": true,
     "etwEvents": [
-      "WebView2_APICalled"
+      "WebView2_APICalled",
+      "WebView2_ObjectCalled",
+      "WebView2_InvokeFinished"
     ],
     "capturedByWprp": true,
-    "hasDetailedSequence": false
+    "hasDetailedSequence": true
   },
   "207": {
     "name": "ShowSaveAsUI",

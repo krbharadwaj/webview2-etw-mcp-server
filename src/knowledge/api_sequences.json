@@ -303,6 +303,178 @@
     ],
     "knownIssues": []
   },
+  "AddFrameNavigationStarting": {
+    "apiId": 39,
+    "description": "Registers handler for FrameNavigationStarting event on child frames",
+    "happyPath": [
+      {
+        "event": "WebView2_APICalled",
+        "field": "API=39",
+        "phase": "trigger",
+        "required": true,
+        "etwSource": "Edge_WebView"
+      }
+    ],
+    "expectedTimingKey": "event_handler_registration",
+    "failureIndicators": [],
+    "knownIssues": []
+  },
+  "AddFrameNavigationCompleted": {
+    "apiId": 88,
+    "description": "Registers handler for FrameNavigationCompleted event on child frames",
+    "happyPath": [
+      {
+        "event": "WebView2_APICalled",
+        "field": "API=88",
+        "phase": "trigger",
+        "required": true,
+        "etwSource": "Edge_WebView"
+      }
+    ],
+    "expectedTimingKey": "event_handler_registration",
+    "failureIndicators": [],
+    "knownIssues": []
+  },
+  "AddSourceChanged": {
+    "apiId": 79,
+    "description": "Registers handler for SourceChanged event — fires when the document source URI changes during navigation",
+    "happyPath": [
+      {
+        "event": "WebView2_APICalled",
+        "field": "API=79",
+        "phase": "trigger",
+        "required": true,
+        "etwSource": "Edge_WebView"
+      }
+    ],
+    "expectedTimingKey": "event_handler_registration",
+    "failureIndicators": [],
+    "knownIssues": []
+  },
+  "AddHistoryChanged": {
+    "apiId": 81,
+    "description": "Registers handler for HistoryChanged event — fires when the browser history is updated",
+    "happyPath": [
+      {
+        "event": "WebView2_APICalled",
+        "field": "API=81",
+        "phase": "trigger",
+        "required": true,
+        "etwSource": "Edge_WebView"
+      }
+    ],
+    "expectedTimingKey": "event_handler_registration",
+    "failureIndicators": [],
+    "knownIssues": []
+  },
+  "GetProcessInfosWithDetails": {
+    "apiId": 195,
+    "description": "Gets detailed process information for all WebView2-associated processes",
+    "happyPath": [
+      {
+        "event": "WebView2_APICalled",
+        "field": "API=195",
+        "phase": "trigger",
+        "required": true,
+        "etwSource": "Edge_WebView"
+      },
+      {
+        "event": "WebView2_ObjectCalled",
+        "phase": "host_ipc",
+        "required": false,
+        "etwSource": "Edge_WebView"
+      },
+      {
+        "event": "WebView2_ObjectCallResponse",
+        "phase": "host_ipc",
+        "required": false,
+        "etwSource": "Edge_WebView"
+      },
+      {
+        "event": "WebView2_InvokeFinished",
+        "phase": "host_dispatch",
+        "required": true,
+        "terminal": true,
+        "etwSource": "Edge_WebView"
+      }
+    ],
+    "expectedTimingKey": null,
+    "failureIndicators": [
+      "WebView2_ProcessExited during call"
+    ],
+    "knownIssues": []
+  },
+  "GetProcessExtendedInfos": {
+    "apiId": 206,
+    "description": "Gets extended process information including associated frame info",
+    "happyPath": [
+      {
+        "event": "WebView2_APICalled",
+        "field": "API=206",
+        "phase": "trigger",
+        "required": true,
+        "etwSource": "Edge_WebView"
+      },
+      {
+        "event": "WebView2_ObjectCalled",
+        "phase": "host_ipc",
+        "required": false,
+        "etwSource": "Edge_WebView"
+      },
+      {
+        "event": "WebView2_ObjectCallResponse",
+        "phase": "host_ipc",
+        "required": false,
+        "etwSource": "Edge_WebView"
+      },
+      {
+        "event": "WebView2_InvokeFinished",
+        "phase": "host_dispatch",
+        "required": true,
+        "terminal": true,
+        "etwSource": "Edge_WebView"
+      }
+    ],
+    "expectedTimingKey": null,
+    "failureIndicators": [
+      "WebView2_ProcessExited during call"
+    ],
+    "knownIssues": []
+  },
+  "AddPermissionRequested": {
+    "apiId": 53,
+    "description": "Registers handler for PermissionRequested event — fires when web content requests a permission",
+    "happyPath": [
+      {
+        "event": "WebView2_APICalled",
+        "field": "API=53",
+        "phase": "trigger",
+        "required": true,
+        "etwSource": "Edge_WebView"
+      }
+    ],
+    "expectedTimingKey": "event_handler_registration",
+    "failureIndicators": [],
+    "knownIssues": []
+  },
+  "AddClientCertificateRequested": {
+    "apiId": 130,
+    "description": "Registers handler for ClientCertificateRequested event — fires when a server requires client certificate authentication",
+    "happyPath": [
+      {
+        "event": "WebView2_APICalled",
+        "field": "API=130",
+        "phase": "trigger",
+        "required": true,
+        "etwSource": "Edge_WebView"
+      }
+    ],
+    "expectedTimingKey": "event_handler_registration",
+    "failureIndicators": [],
+    "knownIssues": [
+      "auth_proxy_block"
+    ]
+  },
   "NavigateWithWebResourceRequest": {
     "apiId": 95,
     "description": "Navigates using a custom WebResourceRequest with headers/method",
@@ -1614,7 +1786,7 @@
     "description": "Maps WebView2 APIs to their expected event sequences verified against the Edge codebase (edge_embedded_browser/client/). Event names match actual TRACE_EVENT macros and events.json entries. Note: WebView2_Event is the generic event dispatch — the specific event type (NavigationCompleted, etc.) is dispatched via COM InvokeAll without a dedicated trace event per type.",
     "verifiedAgainst": "edge_embedded_browser/client/win/current/ and edge_embedded_browser/public/constants/telemetry_constants.h",
     "autoMinedSequences": 0,
-    "manualSequences": 36,
+    "manualSequences": 44,
     "lastUpdated": "2025-07-21",
     "codebaseNotes": {
       "eventDispatchMechanism": "Navigation lifecycle events (NavigationStarting, NavigationCompleted, ContentLoading, etc.) are dispatched to the host via COM EventSource::InvokeAll(). There is NO dedicated WebView2_ trace event per navigation lifecycle event. The generic WebView2_Event trace fires for all dispatched events.",

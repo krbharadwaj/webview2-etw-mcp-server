@@ -414,7 +414,6 @@
       "NavigationRequest::DidCommitNavigation"
     ],
     "diagnosticEvents": [
-      "WebView2_DocStateChanged",
       "WebView2_Creation_Client",
       "ThrottlingURLLoader_OnReceiveResponse"
     ],
@@ -439,8 +438,7 @@
       "NavigationRequest::DidCommitNavigation"
     ],
     "diagnosticEvents": [
-      "WebView2_NavigationStarting",
-      "WebView2_DocStateChanged"
+      "WebView2_NavigationStarting"
     ],
     "keyChecks": [
       "Is SW activation handler doing synchronous cache iteration + deletion?",
@@ -556,8 +554,7 @@
       "WebView2_APICalled"
     ],
     "diagnosticEvents": [
-      "WebView2_CreationTime",
-      "WebView2_DocStateChanged"
+      "WebView2_CreationTime"
     ],
     "keyChecks": [
       "Was CreateCoreWebView2ControllerAsync called and completed? Check timing.",
@@ -743,7 +740,9 @@
       "Watson crash signatures may show renderer crash on first navigation."
     ],
     "taxonomyRef": "renderer_app_container",
-    "relatedIssues": ["Bug 48452932"],
+    "relatedIssues": [
+      "Bug 48452932"
+    ],
     "rootCause": "RendererAppContainer enabled by default caused missing capability SID for renderer processes in Low-IL apps. Fix: disable RendererAppContainer for non-AppContainer Low-IL scenarios.",
     "concluded": true
   },
@@ -854,7 +853,9 @@
       "Mitigation: WebView2 bypass of force-update logic while upstream fix pending."
     ],
     "taxonomyRef": "service_worker_force_update",
-    "relatedIssues": ["Chromium CL 6619069"],
+    "relatedIssues": [
+      "Chromium CL 6619069"
+    ],
     "rootCause": "Upstream Chromium change forces service worker reload on DevTools detach for security. Since WRR uses CDP, this forces SW updates even when SW script is not intercepted, causing navigation stalls.",
     "concluded": true
   },

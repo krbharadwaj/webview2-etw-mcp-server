@@ -70,8 +70,7 @@
         "name": "DocumentCommit",
         "events": [
           "NavigationRequest::CommitNavigation",
-          "NavigationRequest::DidCommitNavigation",
-          "WebView2_DocStateChanged"
+          "NavigationRequest::DidCommitNavigation"
         ],
         "phase": "browser",
         "required": true,
@@ -312,7 +311,7 @@
           "yes": "check_nav_completed_event",
           "no": "diagnosis_doc_state_suppressed",
           "diagnosis_no": "Navigation committed but client-side doc state may not have updated — possible nav ID mismatch (WebView2_DifferentNavigationId) or about:blank suppression.",
-          "traceNote": "WebView2_DocStateChanged will be available after nav diagnostic PR merges. For now, use DidCommitNavigation as proxy — if commit succeeded, doc state should have changed.",
+          "traceNote": "[UNMERGED EVENT REMOVED] will be available after nav diagnostic PR merges. For now, use DidCommitNavigation as proxy — if commit succeeded, doc state should have changed.",
           "status": "degraded_until_nav_diagnostic_pr"
         },
         {
@@ -385,7 +384,7 @@
       "note": "Events prefixed WebView2_ may be real ETW TRACE_EVENT names or logical API callback names.",
       "real_etw_events": "Events like WebView2_APICalled, WebView2_Creation_Client, WebView2_NewNavigationContext are standalone ETW trace events.",
       "api_callbacks": "Events like WebView2_NavigationStarting, WebView2_NavigationCompleted appear in ETL traces as WebView2_Event with the handler interface name as a parameter.",
-      "pr_only_events": "Events like WebView2_DocStateChanged, WebView2_DocStateSuppressed, WebView2_IFrameNotFound are only available after the navigation diagnostic PR merges to main."
+      "pr_only_events": "Events like WebView2_DocStateSuppressed, WebView2_IFrameNotFound are only available after the navigation diagnostic PR merges to main."
     }
   }
 }

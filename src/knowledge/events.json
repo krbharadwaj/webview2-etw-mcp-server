@@ -2115,6 +2115,78 @@
       "WebView2_Event"
     ]
   },
+  "WebView2_SetPreferredColorScheme": {
+    "description": "Color scheme preference was set on the WebView2",
+    "category": "View",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "source": "embedded_browser_webview_impl.cc"
+  },
+  "WebView2_MissingCallIdForCancel": {
+    "description": "Attempted to cancel an object call but the call ID was not found",
+    "category": "IPC",
+    "severity": "Warning",
+    "params": [],
+    "relatedEvents": [
+      "WebView2_ObjectCalled"
+    ],
+    "source": "embedded_browser_host.cc"
+  },
+  "WebView2_GetHostChildWorkerNotFound": {
+    "description": "Host child worker lookup failed — the worker was not found",
+    "category": "Worker",
+    "severity": "Warning",
+    "params": [],
+    "relatedEvents": [
+      "WebView2_GetHostWorkerNotFound"
+    ],
+    "source": "webview_dedicated_worker_core.cc"
+  },
+  "WebView2_RegisterHostEndpointFailed": {
+    "description": "Failed to register the host endpoint — may cause WebView2 communication failures",
+    "category": "Factory & Creation",
+    "severity": "Critical",
+    "params": [],
+    "relatedEvents": [
+      "WebView2_Creation_Client"
+    ],
+    "source": "embedded_browser_webview_host_endpoint.cc"
+  },
+  "WebView2_OnCreateAutomationConnection_Failed": {
+    "description": "Failed to create UI automation connection — accessibility features may not work",
+    "category": "Accessibility",
+    "severity": "Warning",
+    "params": [],
+    "relatedEvents": [],
+    "source": "embedded_browser_webview_host_endpoint.cc"
+  },
+  "WebView2_RegisterUIAEndpointHost_Failed": {
+    "description": "Failed to register UIA endpoint host — accessibility provider registration failed",
+    "category": "Accessibility",
+    "severity": "Warning",
+    "params": [],
+    "relatedEvents": [
+      "WebView2_OnCreateAutomationConnection_Failed"
+    ],
+    "source": "embedded_browser_webview_host_endpoint.cc"
+  },
+  "WebView2_TextureStreamError": {
+    "description": "Error in texture stream — GPU content sharing between WebView2 and host failed",
+    "category": "Rendering",
+    "severity": "Critical",
+    "params": [],
+    "relatedEvents": [],
+    "source": "embedded_browser_webview_texture_stream_impl.cc"
+  },
+  "WebView2_MojoMessageOverLimit": {
+    "description": "Mojo IPC message exceeded size limit — data being sent between processes is too large",
+    "category": "IPC",
+    "severity": "Critical",
+    "params": [],
+    "relatedEvents": [],
+    "source": "core/utils.cc"
+  },
   "ReadyThread": {
     "description": "Auto-discovered: ready thread",
     "category": "Uncategorized",

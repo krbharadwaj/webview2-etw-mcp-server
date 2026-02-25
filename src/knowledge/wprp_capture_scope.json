@@ -2,7 +2,10 @@
   "_metadata": {
     "description": "Documents what the WebView2 WPRP diagnostic profiles capture. Used to avoid false-positive 'missing event' flags when events were deliberately not captured.",
     "source": "https://github.com/MicrosoftEdge/WebView2Feedback/blob/main/diagnostics/etw.md",
-    "profiles": ["WebView2_CPU.wprp", "WebView2.wprp"],
+    "profiles": [
+      "WebView2_CPU.wprp",
+      "WebView2.wprp"
+    ],
     "lastUpdated": "2026-02-25"
   },
   "providers": {
@@ -11,7 +14,9 @@
       "keywords": "0x3F0000054404",
       "level": 5,
       "description": "WebView2-specific ETW events (WebView2_* prefix). All WebView2 client-layer events are emitted through this provider.",
-      "capturedEventPrefixes": ["WebView2_"],
+      "capturedEventPrefixes": [
+        "WebView2_"
+      ],
       "notes": "Event dispatch mechanism: Navigation lifecycle events (NavigationStarting, NavigationCompleted, etc.) are dispatched via generic WebView2_Event, not as dedicated trace events."
     },
     "Edge_Stable": {
@@ -19,7 +24,11 @@
       "keywords": "0x10000000202F",
       "level": 5,
       "description": "Edge browser ETW provider. Includes Chrome TRACE_EVENT macros piped to ETW when appropriate keyword bits are enabled.",
-      "capturedEventPrefixes": ["NavigationRequest::", "NavigationThrottle::", "RenderFrame"],
+      "capturedEventPrefixes": [
+        "NavigationRequest::",
+        "NavigationThrottle::",
+        "RenderFrame"
+      ],
       "notes": "Chrome tracing categories enabled depend on the keyword bitmask. Navigation-related TRACE_EVENT events are captured."
     },
     "Edge_Canary": {
@@ -66,10 +75,32 @@
     }
   },
   "systemProvider": {
-    "keywords": ["ProcessThread", "Loader", "Power", "CSwitch", "ReadyThread", "SampledProfile", "DPC", "Interrupt", "IdleStates", "DiskIO", "FileIO", "HardFaults", "MemoryInfo", "MemoryInfoWS"],
+    "keywords": [
+      "ProcessThread",
+      "Loader",
+      "Power",
+      "CSwitch",
+      "ReadyThread",
+      "SampledProfile",
+      "DPC",
+      "Interrupt",
+      "IdleStates",
+      "DiskIO",
+      "FileIO",
+      "HardFaults",
+      "MemoryInfo",
+      "MemoryInfoWS"
+    ],
     "stacks": {
-      "WebView2_CPU.wprp": ["CSwitch", "ReadyThread", "SampledProfile"],
-      "WebView2.wprp": ["CSwitch", "ReadyThread"]
+      "WebView2_CPU.wprp": [
+        "CSwitch",
+        "ReadyThread",
+        "SampledProfile"
+      ],
+      "WebView2.wprp": [
+        "CSwitch",
+        "ReadyThread"
+      ]
     },
     "notes": "SampledProfile (CPU sampling) is only in WebView2_CPU.wprp. WebView2.wprp excludes it for smaller trace files."
   },
@@ -77,28 +108,64 @@
     "webview2_client": {
       "description": "All WebView2_* events from the client layer",
       "provider": "Edge_WebView",
-      "examples": ["WebView2_APICalled", "WebView2_Event", "WebView2_Creation_Client", "WebView2_CreationTime", "WebView2_CreationFailure", "WebView2_DroppedEvent", "WebView2_NoEventDispatcher", "WebView2_NavIdNotFound", "WebView2_DifferentNavigationId", "WebView2_DocStateSuppressed", "WebView2_ObjectCalled", "WebView2_ObjectCallResponse", "WebView2_InvokeFinished", "WebView2_FactoryCreate", "WebView2_FactoryAcquired", "WebView2_ProcessFailure", "WebView2_SetPendingNavigation", "WebView2_NewNavigationContext"]
+      "examples": [
+        "WebView2_APICalled",
+        "WebView2_Event",
+        "WebView2_Creation_Client",
+        "WebView2_CreationTime",
+        "WebView2_CreationFailure",
+        "WebView2_DroppedEvent",
+        "WebView2_NoEventDispatcher",
+        "WebView2_NavIdNotFound",
+        "WebView2_DifferentNavigationId",
+        "WebView2_DocStateSuppressed",
+        "WebView2_ObjectCalled",
+        "WebView2_ObjectCallResponse",
+        "WebView2_InvokeFinished",
+        "WebView2_FactoryCreate",
+        "WebView2_FactoryAcquired",
+        "WebView2_ProcessFailure",
+        "WebView2_SetPendingNavigation",
+        "WebView2_NewNavigationContext"
+      ]
     },
     "navigation_chromium": {
       "description": "Chromium NavigationRequest lifecycle events piped through Edge ETW provider",
       "provider": "Edge_Stable",
-      "examples": ["NavigationRequest::Create", "NavigationRequest::BeginNavigation", "NavigationRequest::StartNavigation", "NavigationRequest::CommitNavigation", "NavigationRequest::DidCommitNavigation", "NavigationRequest::OnRequestFailedInternal"]
+      "examples": [
+        "NavigationRequest::Create",
+        "NavigationRequest::BeginNavigation",
+        "NavigationRequest::StartNavigation",
+        "NavigationRequest::CommitNavigation",
+        "NavigationRequest::DidCommitNavigation",
+        "NavigationRequest::OnRequestFailedInternal"
+      ]
     },
     "process_lifecycle": {
       "description": "Process start/stop, DLL loads, thread operations",
       "provider": "KernelProcess + SystemProvider",
-      "examples": ["ProcessStart", "ProcessStop", "ImageLoad", "ThreadStart"]
+      "examples": [
+        "ProcessStart",
+        "ProcessStop",
+        "ImageLoad",
+        "ThreadStart"
+      ]
     },
     "crash_reporting": {
       "description": "Crash and error reporting events",
       "provider": "Crashpad + WER + FaultReporting",
-      "examples": ["CrashpadHandlerStart", "WerReportCreate"]
+      "examples": [
+        "CrashpadHandlerStart",
+        "WerReportCreate"
+      ]
     },
     "cpu_sampling": {
       "description": "CPU profiling data (only with WebView2_CPU.wprp)",
       "provider": "SystemProvider",
       "wprpProfile": "WebView2_CPU.wprp only",
-      "examples": ["SampledProfile"]
+      "examples": [
+        "SampledProfile"
+      ]
     }
   },
   "notCapturedCategories": {
