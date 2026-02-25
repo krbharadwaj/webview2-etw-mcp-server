@@ -13484,5 +13484,2145 @@
     "autoDiscovered": true,
     "firstSeenDate": "2026-02-22",
     "seenCount": 1
+  },
+  "IndexerQueryExecutionClient_Aggregate": {
+    "description": "Auto-discovered: indexer query execution client  aggregate",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 2
+  },
+  "DeliveredPerfChange": {
+    "description": "Auto-discovered: delivered perf change",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 1097
+  },
+  "HeteroWpsActiveWorkloadClass": {
+    "description": "Auto-discovered: hetero wps active workload class",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 184
+  },
+  "WpsContainmentUnparkCount": {
+    "description": "Auto-discovered: wps containment unpark count",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 184
+  },
+  "HeteroParkingSelectionCount": {
+    "description": "Auto-discovered: hetero parking selection count",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 184
+  },
+  "ParkingCountSelection": {
+    "description": "Auto-discovered: parking count selection",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 184
+  },
+  "HeteroFavoredCoreRotationChanged": {
+    "description": "Auto-discovered: hetero favored core rotation changed",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 464
+  },
+  "VSyncInterrupt": {
+    "description": "Auto-discovered: v sync interrupt",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 292
+  },
+  "VSyncDPC": {
+    "description": "Auto-discovered: v sync d p c",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 293
+  },
+  "VSyncDPCMultiPlane": {
+    "description": "Auto-discovered: v sync d p c multi plane",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 293
+  },
+  "DWMVsyncSignal": {
+    "description": "Auto-discovered: d w m vsync signal",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 293
+  },
+  "VSyncWaiterChange": {
+    "description": "Auto-discovered: v sync waiter change",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 11989
+  },
+  "TlsHandshakeInfoClientAggregated": {
+    "description": "Auto-discovered: tls handshake info client aggregated",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 1
+  },
+  "Microsoft.WebBrowser.Protobuf.UMA.SystemProfile": {
+    "description": "Auto-discovered: microsoft. web browser. protobuf. u m a. system profile",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 4
+  },
+  "Microsoft.WebBrowser.Protobuf.UMA.Histograms.Group2": {
+    "description": "Auto-discovered: microsoft. web browser. protobuf. u m a. histograms. group2",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 4
+  },
+  "DmaPacket": {
+    "description": "Auto-discovered: dma packet",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 1127
+  },
+  "UnwaitQueuePacket": {
+    "description": "Auto-discovered: unwait queue packet",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 2239
+  },
+  "UnwaitCpuWaiter": {
+    "description": "Auto-discovered: unwait cpu waiter",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 429
+  },
+  "BehaviorMonitoring": {
+    "description": "Auto-discovered: behavior monitoring",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 48
+  },
+  "VidSchiSignalSynchronizationObjectFromCpu": {
+    "description": "Auto-discovered: vid schi signal synchronization object from cpu",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 504
+  },
+  "VSyncHwFlipQueueLogUpdate": {
+    "description": "Auto-discovered: v sync hw flip queue log update",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 89
+  },
+  "SetInterruptTargetPresentId": {
+    "description": "Auto-discovered: set interrupt target present id",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 92
+  },
+  "GenerationToBrowserMain": {
+    "description": "Auto-discovered: generation to browser main",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 608
+  },
+  "BrowserMainToRendererCompositor": {
+    "description": "Auto-discovered: browser main to renderer compositor",
+    "category": "Browser Startup",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 608
+  },
+  "RendererMainProcessing": {
+    "description": "Auto-discovered: renderer main processing",
+    "category": "Process Management",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 306
+  },
+  "RendererMainFinishedToTermination": {
+    "description": "Auto-discovered: renderer main finished to termination",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 302
+  },
+  "BehaviorMonitorTask": {
+    "description": "Auto-discovered: behavior monitor task",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 132
+  },
+  "VSyncSmoothenedPeriod": {
+    "description": "Auto-discovered: v sync smoothened period",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 490
+  },
+  "DdiSetVidPnMultiPlaneOverlay3": {
+    "description": "Auto-discovered: ddi set vid pn multi plane overlay3",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 490
+  },
+  "MMIOFlipMultiPlaneOverlay3": {
+    "description": "Auto-discovered: m m i o flip multi plane overlay3",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 245
+  },
+  "MMIOFlipMultiPlaneOverlay": {
+    "description": "Auto-discovered: m m i o flip multi plane overlay",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 245
+  },
+  "MMIOFlipMultiPlaneOverlayDirtyRect": {
+    "description": "Auto-discovered: m m i o flip multi plane overlay dirty rect",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 245
+  },
+  "startentity_command_01f7d663_9216_4af1_accb_de10ddbc9b6c": {
+    "description": "Auto-discovered: startentity command 01f7d663 9216 4af1 accb de10ddbc9b6c",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 1
+  },
+  "BeforeOnEventReceivedentity_command_01f7d663_9216_4af1_accb_de10ddbc9b6c": {
+    "description": "Auto-discovered: before on event receivedentity command 01f7d663 9216 4af1 accb de10ddbc9b6c",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 1
+  },
+  "[write]AppsShellSelectedAppStateQuery": {
+    "description": "Auto-discovered: [write] apps shell selected app state query",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 6
+  },
+  "Blink.UserTiming.Measure": {
+    "description": "Auto-discovered: blink. user timing. measure",
+    "category": "Blink Rendering",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 63
+  },
+  "AfterOnEventReceivedentity_command_01f7d663_9216_4af1_accb_de10ddbc9b6c": {
+    "description": "Auto-discovered: after on event receivedentity command 01f7d663 9216 4af1 accb de10ddbc9b6c",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 1
+  },
+  "stopentity_command_01f7d663_9216_4af1_accb_de10ddbc9b6c": {
+    "description": "Auto-discovered: stopentity command 01f7d663 9216 4af1 accb de10ddbc9b6c",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 1
+  },
+  "entity_command_(EventHandled)": {
+    "description": "Auto-discovered: entity command ( event handled)",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 14
+  },
+  "PagingQueuePacket": {
+    "description": "Auto-discovered: paging queue packet",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 772
+  },
+  "SetAllocationPriority": {
+    "description": "Auto-discovered: set allocation priority",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 154
+  },
+  "MakeResident": {
+    "description": "Auto-discovered: make resident",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 308
+  },
+  "VidMmMakeResident": {
+    "description": "Auto-discovered: vid mm make resident",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 155
+  },
+  "BlockThread": {
+    "description": "Auto-discovered: block thread",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 260
+  },
+  "VidSchiCompleteSignalCommmand": {
+    "description": "Auto-discovered: vid schi complete signal commmand",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 181
+  },
+  "WaitForSynchronizationObjectFromCpu": {
+    "description": "Auto-discovered: wait for synchronization object from cpu",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 327
+  },
+  "startentity_command_58d4ebe2_22e7_480c_a4f8_dda443331617": {
+    "description": "Auto-discovered: startentity command 58d4ebe2 22e7 480c a4f8 dda443331617",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 1
+  },
+  "BeforeOnEventReceivedentity_command_58d4ebe2_22e7_480c_a4f8_dda443331617": {
+    "description": "Auto-discovered: before on event receivedentity command 58d4ebe2 22e7 480c a4f8 dda443331617",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 1
+  },
+  "AfterOnEventReceivedentity_command_58d4ebe2_22e7_480c_a4f8_dda443331617": {
+    "description": "Auto-discovered: after on event receivedentity command 58d4ebe2 22e7 480c a4f8 dda443331617",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 1
+  },
+  "stopentity_command_58d4ebe2_22e7_480c_a4f8_dda443331617": {
+    "description": "Auto-discovered: stopentity command 58d4ebe2 22e7 480c a4f8 dda443331617",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 1
+  },
+  "startentity_command_48aac3af_5b65_41ce_99c0_c5dab346927e": {
+    "description": "Auto-discovered: startentity command 48aac3af 5b65 41ce 99c0 c5dab346927e",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 1
+  },
+  "BeforeOnEventReceivedentity_command_48aac3af_5b65_41ce_99c0_c5dab346927e": {
+    "description": "Auto-discovered: before on event receivedentity command 48aac3af 5b65 41ce 99c0 c5dab346927e",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 1
+  },
+  "AfterOnEventReceivedentity_command_48aac3af_5b65_41ce_99c0_c5dab346927e": {
+    "description": "Auto-discovered: after on event receivedentity command 48aac3af 5b65 41ce 99c0 c5dab346927e",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 1
+  },
+  "stopentity_command_48aac3af_5b65_41ce_99c0_c5dab346927e": {
+    "description": "Auto-discovered: stopentity command 48aac3af 5b65 41ce 99c0 c5dab346927e",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 1
+  },
+  "ReferenceWrittenPrimaries": {
+    "description": "Auto-discovered: reference written primaries",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 126
+  },
+  "Microsoft.WebBrowser.Protobuf.UMA.Histograms.Group1": {
+    "description": "Auto-discovered: microsoft. web browser. protobuf. u m a. histograms. group1",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 3
+  },
+  "ParkCore": {
+    "description": "Auto-discovered: park core",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 21
+  },
+  "WpsDynamicUpdate": {
+    "description": "Auto-discovered: wps dynamic update",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 3
+  },
+  "ExpectedUtility": {
+    "description": "Auto-discovered: expected utility",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 5
+  },
+  "CCoreServicesOnResume": {
+    "description": "Auto-discovered: c core services on resume",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 1
+  },
+  "ReclaimResources": {
+    "description": "Auto-discovered: reclaim resources",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 2
+  },
+  "UndockedShellExperienceProxy_CancelBundleUpdateTimer": {
+    "description": "Auto-discovered: undocked shell experience proxy  cancel bundle update timer",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 1
+  },
+  "WebView2LargestContentfulPaintTimerStarted": {
+    "description": "Auto-discovered: web view2 largest contentful paint timer started",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 2
+  },
+  "MemoryPurgeManager_PurgeCancelled": {
+    "description": "Auto-discovered: memory purge manager  purge cancelled",
+    "category": "Memory",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 1
+  },
+  "SearchEntranceAnimationStarted": {
+    "description": "Auto-discovered: search entrance animation started",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 3
+  },
+  "TestResult34903294": {
+    "description": "Auto-discovered: test result34903294",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 1
+  },
+  "\"source\":": {
+    "description": "Auto-discovered: \"source\":",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 1
+  },
+  "\"view_navigated_to_visible\":": {
+    "description": "Auto-discovered: \"view navigated to visible\":",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 1
+  },
+  "\"positioned\":": {
+    "description": "Auto-discovered: \"positioned\":",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 1
+  },
+  "\"view_already_created\":": {
+    "description": "Auto-discovered: \"view already created\":",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 1
+  },
+  "\"launch_source\":": {
+    "description": "Auto-discovered: \"launch source\":",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 1
+  },
+  "\"using_reactivation_udk\":": {
+    "description": "Auto-discovered: \"using reactivation udk\":",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 1
+  },
+  "\"uncloaked\":": {
+    "description": "Auto-discovered: \"uncloaked\":",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 1
+  },
+  "UndockedSearchExperienceManager_ShowResult": {
+    "description": "Auto-discovered: undocked search experience manager  show result",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 2
+  },
+  "CheckForStaleDxgiDevice": {
+    "description": "Auto-discovered: check for stale dxgi device",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 1
+  },
+  "SearchEntranceAnimationCompleted": {
+    "description": "Auto-discovered: search entrance animation completed",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 3
+  },
+  "UndockedShellExperienceProxy_OnHideViewRequested": {
+    "description": "Auto-discovered: undocked shell experience proxy  on hide view requested",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 2
+  },
+  "SearchBoxControl_ClearText": {
+    "description": "Auto-discovered: search box control  clear text",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 8
+  },
+  "SearchDismissAnimationStarted": {
+    "description": "Auto-discovered: search dismiss animation started",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 2
+  },
+  "SearchDismissAnimationCompleted": {
+    "description": "Auto-discovered: search dismiss animation completed",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 2
+  },
+  "UndockedShellExperienceProxy_CloakViewWithoutSuspension": {
+    "description": "Auto-discovered: undocked shell experience proxy  cloak view without suspension",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 2
+  },
+  "\"complete_called_by_client\":": {
+    "description": "Auto-discovered: \"complete called by client\":",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 3
+  },
+  "UpdateWebView2BrowserVersionIfApplicable": {
+    "description": "Auto-discovered: update web view2 browser version if applicable",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 4
+  },
+  "ComponentTaskbarSearch_SessionComplete": {
+    "description": "Auto-discovered: component taskbar search  session complete",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 4
+  },
+  "TestResult56646452": {
+    "description": "Auto-discovered: test result56646452",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 3
+  },
+  "WebView2LargestContentfulPaintTimerStopped": {
+    "description": "Auto-discovered: web view2 largest contentful paint timer stopped",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 2
+  },
+  "SearchBoxViewModel_StateCleared": {
+    "description": "Auto-discovered: search box view model  state cleared",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 2
+  },
+  "CCoreServicesOnSuspend": {
+    "description": "Auto-discovered: c core services on suspend",
+    "category": "Memory",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 2
+  },
+  "OfferResources": {
+    "description": "Auto-discovered: offer resources",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 4
+  },
+  "\"launchCountChanged\":": {
+    "description": "Auto-discovered: \"launch count changed\":",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 1
+  },
+  "startuser_preferences_manager_get_by_category_2eaa6dea_00f0_47b1_9a1d_5f2943822e1f": {
+    "description": "Auto-discovered: startuser preferences manager get by category 2eaa6dea 00f0 47b1 9a1d 5f2943822e1f",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 1
+  },
+  "stopuser_preferences_manager_get_by_category_2eaa6dea_00f0_47b1_9a1d_5f2943822e1f": {
+    "description": "Auto-discovered: stopuser preferences manager get by category 2eaa6dea 00f0 47b1 9a1d 5f2943822e1f",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 1
+  },
+  "user_preferences_manager_get_by_category": {
+    "description": "Auto-discovered: user preferences manager get by category",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 8
+  },
+  "subscriptionuseUnifiedRailSubscription(event)": {
+    "description": "Auto-discovered: subscriptionuse unified rail subscription(event)",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 8
+  },
+  "[write]useUnifiedRailSubscription": {
+    "description": "Auto-discovered: [write]use unified rail subscription",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 8
+  },
+  "startsync_engine_oninterval_2bf0579a_a177_470b_b576_823423cf8a63": {
+    "description": "Auto-discovered: startsync engine oninterval 2bf0579a a177 470b b576 823423cf8a63",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 1
+  },
+  "stopsync_engine_oninterval_2bf0579a_a177_470b_b576_823423cf8a63": {
+    "description": "Auto-discovered: stopsync engine oninterval 2bf0579a a177 470b b576 823423cf8a63",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 1
+  },
+  "sync_engine_oninterval": {
+    "description": "Auto-discovered: sync engine oninterval",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 14
+  },
+  "startsync_engine_oninterval_e4144bc5_64c6_4758_83bd_654b27ab8eed": {
+    "description": "Auto-discovered: startsync engine oninterval e4144bc5 64c6 4758 83bd 654b27ab8eed",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 1
+  },
+  "stopsync_engine_oninterval_e4144bc5_64c6_4758_83bd_654b27ab8eed": {
+    "description": "Auto-discovered: stopsync engine oninterval e4144bc5 64c6 4758 83bd 654b27ab8eed",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 1
+  },
+  "startsync_engine_oninterval_946b4074_6f36_4446_9fbc_984a95db1ab1": {
+    "description": "Auto-discovered: startsync engine oninterval 946b4074 6f36 4446 9fbc 984a95db1ab1",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 1
+  },
+  "stopsync_engine_oninterval_946b4074_6f36_4446_9fbc_984a95db1ab1": {
+    "description": "Auto-discovered: stopsync engine oninterval 946b4074 6f36 4446 9fbc 984a95db1ab1",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 1
+  },
+  "startsync_engine_oninterval_b5c8e9b0_0057_4393_ab35_7fd1281a13b9": {
+    "description": "Auto-discovered: startsync engine oninterval b5c8e9b0 0057 4393 ab35 7fd1281a13b9",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 1
+  },
+  "stopsync_engine_oninterval_b5c8e9b0_0057_4393_ab35_7fd1281a13b9": {
+    "description": "Auto-discovered: stopsync engine oninterval b5c8e9b0 0057 4393 ab35 7fd1281a13b9",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 1
+  },
+  "DeepSleepSetConstraint": {
+    "description": "Auto-discovered: deep sleep set constraint",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 1
+  },
+  "ServiceWorkerVersion::StopWorker": {
+    "description": "Auto-discovered: service worker version  stop worker",
+    "category": "Service Worker",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 2
+  },
+  "EmbeddedWorkerInstanceClientImpl::StopWorker": {
+    "description": "Auto-discovered: embedded worker instance client impl  stop worker",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 2
+  },
+  "EmbeddedWorkerInstanceClientImpl::WorkerContextDestroyed": {
+    "description": "Auto-discovered: embedded worker instance client impl  worker context destroyed",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 2
+  },
+  "WindowsTaskManagerHandler::DoTasksUpdated": {
+    "description": "Auto-discovered: windows task manager handler  do tasks updated",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 6
+  },
+  "WindowsTaskManagerHandler::UpdateTasks": {
+    "description": "Auto-discovered: windows task manager handler  update tasks",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 6
+  },
+  "CreateElementWithoutAggregator": {
+    "description": "Auto-discovered: create element without aggregator",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 25
+  },
+  "Aggregator": {
+    "description": "Auto-discovered: aggregator",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 8
+  },
+  "RowsetEventListener_RowsetEvent": {
+    "description": "Auto-discovered: rowset event listener  rowset event",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 2
+  },
+  "UndockedShellExperienceProxy_BundleUpdateTimerExpired": {
+    "description": "Auto-discovered: undocked shell experience proxy  bundle update timer expired",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 1
+  },
+  "startuser_preferences_manager_get_by_category_c7cf219f_cac0_48ab_a93f_214fbf4d2063": {
+    "description": "Auto-discovered: startuser preferences manager get by category c7cf219f cac0 48ab a93f 214fbf4d2063",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 1
+  },
+  "stopuser_preferences_manager_get_by_category_c7cf219f_cac0_48ab_a93f_214fbf4d2063": {
+    "description": "Auto-discovered: stopuser preferences manager get by category c7cf219f cac0 48ab a93f 214fbf4d2063",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 1
+  },
+  "[write]ComponentsPresenceSubscription": {
+    "description": "Auto-discovered: [write] components presence subscription",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 4
+  },
+  "subscriptionComponentsPresenceSubscription(event)": {
+    "description": "Auto-discovered: subscription components presence subscription(event)",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 4
+  },
+  "PrerenderHostRegistry::CancelHostsForTrigger": {
+    "description": "Auto-discovered: prerender host registry  cancel hosts for trigger",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 4
+  },
+  "PrerenderHostRegistry::CancelHosts": {
+    "description": "Auto-discovered: prerender host registry  cancel hosts",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 4
+  },
+  "RetireSyncPoint": {
+    "description": "Auto-discovered: retire sync point",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 2
+  },
+  "VidMmEvict": {
+    "description": "Auto-discovered: vid mm evict",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 7
+  },
+  "startsync_engine_oninterval_a1c33721_ed14_48d0_9363_20625797e3f8": {
+    "description": "Auto-discovered: startsync engine oninterval a1c33721 ed14 48d0 9363 20625797e3f8",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 1
+  },
+  "stopsync_engine_oninterval_a1c33721_ed14_48d0_9363_20625797e3f8": {
+    "description": "Auto-discovered: stopsync engine oninterval a1c33721 ed14 48d0 9363 20625797e3f8",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 1
+  },
+  "ExpensiveOperationTask": {
+    "description": "Auto-discovered: expensive operation task",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 22
+  },
+  "CacheTask": {
+    "description": "Auto-discovered: cache task",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 34
+  },
+  "SenseRemediationTask": {
+    "description": "Auto-discovered: sense remediation task",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 8
+  },
+  "RendererMainFinishedToCommit": {
+    "description": "Auto-discovered: renderer main finished to commit",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 4
+  },
+  "subscriptionComponentsTitleBarWindowFocusStateSubscription(event15)": {
+    "description": "Auto-discovered: subscription components title bar window focus state subscription(event15)",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 2
+  },
+  "[write]ComponentsTitleBarWindowFocusStateSubscription": {
+    "description": "Auto-discovered: [write] components title bar window focus state subscription",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 4
+  },
+  "[write]ComponentsTitleBarWindowFocusStateQuery": {
+    "description": "Auto-discovered: [write] components title bar window focus state query",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 4
+  },
+  "startentity_command_15a054b1_5974_461b_b004_a890649a0059": {
+    "description": "Auto-discovered: startentity command 15a054b1 5974 461b b004 a890649a0059",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 1
+  },
+  "BeforeOnBeforeCommandHandledentity_command_15a054b1_5974_461b_b004_a890649a0059": {
+    "description": "Auto-discovered: before on before command handledentity command 15a054b1 5974 461b b004 a890649a0059",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 1
+  },
+  "[write]AppsShellGetBannerNotificationQueueQuery": {
+    "description": "Auto-discovered: [write] apps shell get banner notification queue query",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 8
+  },
+  "startentity_command_f355da2f_0acc_4d3d_82b3_ec965c7b118a": {
+    "description": "Auto-discovered: startentity command f355da2f 0acc 4d3d 82b3 ec965c7b118a",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 1
+  },
+  "BeforeOnBeforeCommandHandledentity_command_f355da2f_0acc_4d3d_82b3_ec965c7b118a": {
+    "description": "Auto-discovered: before on before command handledentity command f355da2f 0acc 4d3d 82b3 ec965c7b118a",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 1
+  },
+  "startentity_command_00a5fa0f_31ec_4fca_bc35_8bee578ddd9e": {
+    "description": "Auto-discovered: startentity command 00a5fa0f 31ec 4fca bc35 8bee578ddd9e",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 1
+  },
+  "BeforeOnBeforeCommandHandledentity_command_00a5fa0f_31ec_4fca_bc35_8bee578ddd9e": {
+    "description": "Auto-discovered: before on before command handledentity command 00a5fa0f 31ec 4fca bc35 8bee578ddd9e",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 1
+  },
+  "startentity_command_347c27cb_da36_4b13_b5f9_b7bc52f0edaf": {
+    "description": "Auto-discovered: startentity command 347c27cb da36 4b13 b5f9 b7bc52f0edaf",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 1
+  },
+  "BeforeOnBeforeCommandHandledentity_command_347c27cb_da36_4b13_b5f9_b7bc52f0edaf": {
+    "description": "Auto-discovered: before on before command handledentity command 347c27cb da36 4b13 b5f9 b7bc52f0edaf",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 1
+  },
+  "stopentity_command_15a054b1_5974_461b_b004_a890649a0059": {
+    "description": "Auto-discovered: stopentity command 15a054b1 5974 461b b004 a890649a0059",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 1
+  },
+  "entity_command_(CommandHandledPriorToResolution)": {
+    "description": "Auto-discovered: entity command ( command handled prior to resolution)",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 8
+  },
+  "stopentity_command_f355da2f_0acc_4d3d_82b3_ec965c7b118a": {
+    "description": "Auto-discovered: stopentity command f355da2f 0acc 4d3d 82b3 ec965c7b118a",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 1
+  },
+  "stopentity_command_00a5fa0f_31ec_4fca_bc35_8bee578ddd9e": {
+    "description": "Auto-discovered: stopentity command 00a5fa0f 31ec 4fca bc35 8bee578ddd9e",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 1
+  },
+  "stopentity_command_347c27cb_da36_4b13_b5f9_b7bc52f0edaf": {
+    "description": "Auto-discovered: stopentity command 347c27cb da36 4b13 b5f9 b7bc52f0edaf",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 1
+  },
+  "starthost_comms_load_module_08a312b8_f869_40a7_b775_065f8e43c64a": {
+    "description": "Auto-discovered: starthost comms load module 08a312b8 f869 40a7 b775 065f8e43c64a",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 1
+  },
+  "starthost_comms_load_module_3a2ad4f4_ef78_4bcf_8b93_f08e3505360f": {
+    "description": "Auto-discovered: starthost comms load module 3a2ad4f4 ef78 4bcf 8b93 f08e3505360f",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 1
+  },
+  "stophost_comms_load_module_08a312b8_f869_40a7_b775_065f8e43c64a": {
+    "description": "Auto-discovered: stophost comms load module 08a312b8 f869 40a7 b775 065f8e43c64a",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 1
+  },
+  "host_comms_load_module_(osutils)": {
+    "description": "Auto-discovered: host comms load module (osutils)",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 6
+  },
+  "stophost_comms_load_module_3a2ad4f4_ef78_4bcf_8b93_f08e3505360f": {
+    "description": "Auto-discovered: stophost comms load module 3a2ad4f4 ef78 4bcf 8b93 f08e3505360f",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 1
+  },
+  "starthost_comms_load_module_2451df31_3edb_4b93_830c_a087bfb0e4e1": {
+    "description": "Auto-discovered: starthost comms load module 2451df31 3edb 4b93 830c a087bfb0e4e1",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 1
+  },
+  "stophost_comms_load_module_2451df31_3edb_4b93_830c_a087bfb0e4e1": {
+    "description": "Auto-discovered: stophost comms load module 2451df31 3edb 4b93 830c a087bfb0e4e1",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 1
+  },
+  "queryComponentsLocalizationSettingsForUserQuery": {
+    "description": "Auto-discovered: query components localization settings for user query",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 2
+  },
+  "[write]ComponentsLocalizationSettingsForUserQuery": {
+    "description": "Auto-discovered: [write] components localization settings for user query",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 2
+  },
+  "queryComponentsLocalizationSettingsFormattingQuery": {
+    "description": "Auto-discovered: query components localization settings formatting query",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 2
+  },
+  "[write]ComponentsLocalizationSettingsFormattingQuery": {
+    "description": "Auto-discovered: [write] components localization settings formatting query",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 2
+  },
+  "queryComponentsComposeMessageStreamCameraRecorderInUseStatusQuery": {
+    "description": "Auto-discovered: query components compose message stream camera recorder in use status query",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 6
+  },
+  "startquery_message_draft_dae94afe_a988_43fa_b22a_7ffc34894df9": {
+    "description": "Auto-discovered: startquery message draft dae94afe a988 43fa b22a 7ffc34894df9",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 1
+  },
+  "queryComponentsComposeMessageDraftQuery": {
+    "description": "Auto-discovered: query components compose message draft query",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 2
+  },
+  "stopquery_message_draft_dae94afe_a988_43fa_b22a_7ffc34894df9": {
+    "description": "Auto-discovered: stopquery message draft dae94afe a988 43fa b22a 7ffc34894df9",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 1
+  },
+  "query_message_draft": {
+    "description": "Auto-discovered: query message draft",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 2
+  },
+  "mutationComponentsComposeMessageSwitchSpellCheckLanguageMutation": {
+    "description": "Auto-discovered: mutation components compose message switch spell check language mutation",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 2
+  },
+  "[write]ComponentsComposeMessageSwitchSpellCheckLanguageMutation": {
+    "description": "Auto-discovered: [write] components compose message switch spell check language mutation",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 2
+  },
+  "[write]modifyROOT_MUTATION": {
+    "description": "Auto-discovered: [write]modify r o o t  m u t a t i o n",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 2
+  },
+  "FireIdleCallback": {
+    "description": "Auto-discovered: fire idle callback",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 1
+  },
+  "startmessage_action_menu_time_to_interact_bbdfb3ca_76bb_41da_866b_3cd54a2dd140": {
+    "description": "Auto-discovered: startmessage action menu time to interact bbdfb3ca 76bb 41da 866b 3cd54a2dd140",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 1
+  },
+  "stopmessage_action_menu_time_to_interact_bbdfb3ca_76bb_41da_866b_3cd54a2dd140": {
+    "description": "Auto-discovered: stopmessage action menu time to interact bbdfb3ca 76bb 41da 866b 3cd54a2dd140",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 1
+  },
+  "message_action_menu_time_to_interact": {
+    "description": "Auto-discovered: message action menu time to interact",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 2
+  },
+  "subscriptionComponentsTitleBarWindowFocusStateSubscription(event16)": {
+    "description": "Auto-discovered: subscription components title bar window focus state subscription(event16)",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 2
+  },
+  "startentity_command_ac8f598c_d401_49f0_9046_1ca8ddcda631": {
+    "description": "Auto-discovered: startentity command ac8f598c d401 49f0 9046 1ca8ddcda631",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 1
+  },
+  "BeforeOnEventReceivedentity_command_ac8f598c_d401_49f0_9046_1ca8ddcda631": {
+    "description": "Auto-discovered: before on event receivedentity command ac8f598c d401 49f0 9046 1ca8ddcda631",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 1
+  },
+  "AfterOnEventReceivedentity_command_ac8f598c_d401_49f0_9046_1ca8ddcda631": {
+    "description": "Auto-discovered: after on event receivedentity command ac8f598c d401 49f0 9046 1ca8ddcda631",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 1
+  },
+  "stopentity_command_ac8f598c_d401_49f0_9046_1ca8ddcda631": {
+    "description": "Auto-discovered: stopentity command ac8f598c d401 49f0 9046 1ca8ddcda631",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 1
+  },
+  "startentity_command_3d066dd4_a0c0_4bc2_a317_564662d6a979": {
+    "description": "Auto-discovered: startentity command 3d066dd4 a0c0 4bc2 a317 564662d6a979",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 1
+  },
+  "BeforeOnEventReceivedentity_command_3d066dd4_a0c0_4bc2_a317_564662d6a979": {
+    "description": "Auto-discovered: before on event receivedentity command 3d066dd4 a0c0 4bc2 a317 564662d6a979",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 1
+  },
+  "AfterOnEventReceivedentity_command_3d066dd4_a0c0_4bc2_a317_564662d6a979": {
+    "description": "Auto-discovered: after on event receivedentity command 3d066dd4 a0c0 4bc2 a317 564662d6a979",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 1
+  },
+  "stopentity_command_3d066dd4_a0c0_4bc2_a317_564662d6a979": {
+    "description": "Auto-discovered: stopentity command 3d066dd4 a0c0 4bc2 a317 564662d6a979",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 1
+  },
+  "startentity_command_05030128_1c73_4ade_a328_6a757544b50b": {
+    "description": "Auto-discovered: startentity command 05030128 1c73 4ade a328 6a757544b50b",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 1
+  },
+  "BeforeOnEventReceivedentity_command_05030128_1c73_4ade_a328_6a757544b50b": {
+    "description": "Auto-discovered: before on event receivedentity command 05030128 1c73 4ade a328 6a757544b50b",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 1
+  },
+  "AfterOnEventReceivedentity_command_05030128_1c73_4ade_a328_6a757544b50b": {
+    "description": "Auto-discovered: after on event receivedentity command 05030128 1c73 4ade a328 6a757544b50b",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 1
+  },
+  "stopentity_command_05030128_1c73_4ade_a328_6a757544b50b": {
+    "description": "Auto-discovered: stopentity command 05030128 1c73 4ade a328 6a757544b50b",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 1
+  },
+  "startentity_command_c7a1b196_c789_4034_bdab_9cbf9acaea15": {
+    "description": "Auto-discovered: startentity command c7a1b196 c789 4034 bdab 9cbf9acaea15",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 1
+  },
+  "BeforeOnEventReceivedentity_command_c7a1b196_c789_4034_bdab_9cbf9acaea15": {
+    "description": "Auto-discovered: before on event receivedentity command c7a1b196 c789 4034 bdab 9cbf9acaea15",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 1
+  },
+  "AfterOnEventReceivedentity_command_c7a1b196_c789_4034_bdab_9cbf9acaea15": {
+    "description": "Auto-discovered: after on event receivedentity command c7a1b196 c789 4034 bdab 9cbf9acaea15",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 1
+  },
+  "stopentity_command_c7a1b196_c789_4034_bdab_9cbf9acaea15": {
+    "description": "Auto-discovered: stopentity command c7a1b196 c789 4034 bdab 9cbf9acaea15",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 1
+  },
+  "LocalFrame::DetachImpl": {
+    "description": "Auto-discovered: local frame  detach impl",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 2
+  },
+  "HwQueue": {
+    "description": "Auto-discovered: hw queue",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 28
+  },
+  "AllocatedContent": {
+    "description": "Auto-discovered: allocated content",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 1
+  },
+  "ClientRunningTime": {
+    "description": "Auto-discovered: client running time",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 1
+  },
+  "ProcessFenceTelemetry": {
+    "description": "Auto-discovered: process fence telemetry",
+    "category": "Process Management",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 1
+  },
+  "StreamScanRequestTask": {
+    "description": "Auto-discovered: stream scan request task",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 40
+  },
+  "GenericMessageTask": {
+    "description": "Auto-discovered: generic message task",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 12
+  },
+  "ChangeHwContextPriority": {
+    "description": "Auto-discovered: change hw context priority",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 14
+  },
+  "ImageCacheDecode": {
+    "description": "Auto-discovered: image cache decode",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 2
+  },
+  "DecodeToSurface": {
+    "description": "Auto-discovered: decode to surface",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 2
+  },
+  "ReleaseDManipSharedTransform": {
+    "description": "Auto-discovered: release d manip shared transform",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 1
+  },
+  "DmViewportStatus": {
+    "description": "Auto-discovered: dm viewport status",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 13
+  },
+  "ModernAppResume_UIResponsive": {
+    "description": "Auto-discovered: modern app resume  u i responsive",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 1
+  },
+  "DmViewportStatusUpdate": {
+    "description": "Auto-discovered: dm viewport status update",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 10
+  },
+  "CompTreeSetRedirectionTarget": {
+    "description": "Auto-discovered: comp tree set redirection target",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 8
+  },
+  "IsDeviceITManaged": {
+    "description": "Auto-discovered: is device i t managed",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 1
+  },
+  "SkippedFileTask": {
+    "description": "Auto-discovered: skipped file task",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 8
+  },
+  "startuser_preferences_manager_get_by_category_21af98af_6705_48e3_98f2_0baaa6078719": {
+    "description": "Auto-discovered: startuser preferences manager get by category 21af98af 6705 48e3 98f2 0baaa6078719",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 1
+  },
+  "stopuser_preferences_manager_get_by_category_21af98af_6705_48e3_98f2_0baaa6078719": {
+    "description": "Auto-discovered: stopuser preferences manager get by category 21af98af 6705 48e3 98f2 0baaa6078719",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 1
+  },
+  "ContextClusteringHistoryServiceObserver::CleanUpClusters": {
+    "description": "Auto-discovered: context clustering history service observer  clean up clusters",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 2
+  },
+  "startsync_engine_oninterval_ff7034a2_1346_4fb7_a14d_10389817267b": {
+    "description": "Auto-discovered: startsync engine oninterval ff7034a2 1346 4fb7 a14d 10389817267b",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 1
+  },
+  "stopsync_engine_oninterval_ff7034a2_1346_4fb7_a14d_10389817267b": {
+    "description": "Auto-discovered: stopsync engine oninterval ff7034a2 1346 4fb7 a14d 10389817267b",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 1
+  },
+  "startsync_engine_oninterval_972601ff_eebc_4093_8fd1_4c427e069b9a": {
+    "description": "Auto-discovered: startsync engine oninterval 972601ff eebc 4093 8fd1 4c427e069b9a",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 1
+  },
+  "stopsync_engine_oninterval_972601ff_eebc_4093_8fd1_4c427e069b9a": {
+    "description": "Auto-discovered: stopsync engine oninterval 972601ff eebc 4093 8fd1 4c427e069b9a",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 1
+  },
+  "\"largestContentfulPaintTimeout\":": {
+    "description": "Auto-discovered: \"largest contentful paint timeout\":",
+    "category": "Uncategorized",
+    "severity": "Critical",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 2
+  },
+  "startuser_preferences_manager_get_by_category_4b60bbda_8c53_4022_82af_dac23a2cf011": {
+    "description": "Auto-discovered: startuser preferences manager get by category 4b60bbda 8c53 4022 82af dac23a2cf011",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 1
+  },
+  "stopuser_preferences_manager_get_by_category_4b60bbda_8c53_4022_82af_dac23a2cf011": {
+    "description": "Auto-discovered: stopuser preferences manager get by category 4b60bbda 8c53 4022 82af dac23a2cf011",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 1
+  },
+  "TestResult50568343": {
+    "description": "Auto-discovered: test result50568343",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 1
+  },
+  "FindDomainActions_Lookaside": {
+    "description": "Auto-discovered: find domain actions  lookaside",
+    "category": "Uncategorized",
+    "severity": "Info",
+    "params": [],
+    "relatedEvents": [],
+    "autoDiscovered": true,
+    "firstSeenDate": "2026-02-22",
+    "seenCount": 1
   }
 }

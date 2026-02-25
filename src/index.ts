@@ -6,6 +6,7 @@ import { z } from "zod";
 
 import { decodeApiId, decodeApiIdBatch, listApisByCategory } from "./tools/decode.js";
 import { unifiedAnalyze } from "./tools/unified_analyze.js";
+import { deepDive } from "./tools/deep_dive.js";
 import { getExpectedTraceEvents } from "./tools/expected_events.js";
 import { lookupFlag, listFlagsByCategory, listAllCategories, findFlagsForScenario } from "./tools/feature_flags.js";
 import { initSync, pullLatest, getSyncStatus, previewLearnings, confirmAndPush } from "./knowledge/sync.js";
@@ -62,7 +63,38 @@ Optional: add start_time/end_time for timeline slice, include_cpu=true for CPU p
   }
 );
 
-// ─── Tool 2: decode_api_id ───
+// ─── Tool 2: deep_dive ───
+// Automatically identifies suspicious windows and drills into them.
+server.tool(
+  "deep_dive",
+  `Automatically identify and analyze suspicious windows in a filtered ETL trace.
+
+No manual start_time/end_time needed — it finds stuck navigations, large gaps, timeout clusters,
+and renderer failures, then runs focused timeline analysis on each. Optionally triggers CPU profiling.
+
+Requires a filtered file from a prior analyze_etl run.`,
+  {
+    filtered_file: z.string().describe("Path to the filtered ETL text file from a prior analyze_etl extraction"),
+    etl_path: z.string().describe("Full path to the original .etl file (needed for CPU profiling)"),
+    host_app: z.string().describe("Host application name (e.g., 'Teams', 'SearchHost', 'Outlook')"),
+    symptom: z.string().optional().describe("Symptom description"),
+    auto_cpu: z.boolean().optional().describe("Auto-trigger CPU profiling commands for windows with contention signals (default: true)"),
+    output_dir: z.string().optional().describe("Output directory for the deep dive report (default: C:\\temp\\etl_analysis)"),
+  },
+  async ({ filtered_file, etl_path, host_app, symptom, auto_cpu, output_dir }) => {
+    const result = deepDive({
+      filteredFile: filtered_file,
+      etlPath: etl_path,
+      hostApp: host_app,
+      symptom: symptom || undefined,
+      autoCpu: auto_cpu !== undefined ? auto_cpu : true,
+      outputDir: output_dir || undefined,
+    });
+    return { content: [{ type: "text", text: result }] };
+  }
+);
+
+// ─── Tool 3: decode_api_id ───
 server.tool(
   "decode_api_id",
   "Decode a WebView2 API ID number to its name and category. Use when you see WebView2_APICalled events with numeric Field1 values.",
@@ -84,7 +116,7 @@ server.tool(
   }
 );
 
-// ─── Tool 3: get_expected_trace_events ───
+// ─── Tool 4: get_expected_trace_events ───
 server.tool(
   "get_expected_trace_events",
   `Get the expected set of ETW trace events for a specific WebView2 flow/scenario.
@@ -103,7 +135,7 @@ Supported flows: navigation, initialization, Navigate, NavigateToString, Initial
   }
 );
 
-// ─── Tool 4: lookup_feature_flags ───
+// ─── Tool 5: lookup_feature_flags ───
 server.tool(
   "lookup_feature_flags",
   `Look up WebView2 feature flags (browser arguments) — their purpose, risk level, and when to use them.
@@ -133,7 +165,7 @@ Modes:
   }
 );
 
-// ─── Tool 5: share_learnings ───
+// ─── Tool 6: share_learnings ───
 server.tool(
   "share_learnings",
   "Share locally-learned knowledge with all users via GitHub. Use 'preview' to see what would be shared, then 'confirm' to push. Two-step: preview → review → confirm.",
@@ -182,7 +214,7 @@ async function main() {
 
   const transport = new StdioServerTransport();
   await server.connect(transport);
-  console.error("WebView2 ETW Analysis MCP Server running on stdio (5 tools)");
+  console.error("WebView2 ETW Analysis MCP Server running on stdio (6 tools)");
 }
 
 main().catch((error) => {
